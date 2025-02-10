@@ -1,0 +1,11 @@
+# Ignore all object files
+*.o
+
+# Ignore directory which contains temporary compilation files
+build/
+
+# Ignore the compiled executable
+game
+
+# Ignore todo list
+todo
