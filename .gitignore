@@ -1,6 +1,9 @@
 # Ignore all object files
 *.o
 
+# Ingore precomiled headers
+include/stdafx.hpp.gch
+
 # Ignore directory which contains temporary compilation files
 build/
 

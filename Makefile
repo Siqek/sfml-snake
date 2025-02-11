@@ -6,12 +6,22 @@ SRC = $(wildcard src/*.cpp)
 OBJ = $(patsubst src/%.cpp, build/%.o, $(SRC))
 EXEC = game
 
+PCH = include/stdafx.hpp
+PCH_GCH = $(PCH).gch
+PCH_OBJ = build/stdafx.o
+
 $(EXEC): $(OBJ)
-	$(CC) $(CPPFLAGS) -o $(EXEC) $(OBJ) $(LDFLAGS)
+	$(CC) $(CPPFLAGS) -o $(EXEC) $(PCH_OBJ) $(OBJ) $(LDFLAGS)
 
 objects: $(OBJ)
 
-build/%.o: src/%.cpp | build
+$(PCH_OBJ): src/stdafx.cpp | build $(PCH_GCH)
+	$(CC) $(CPPFLAGS) -c $< -o $@
+
+$(PCH_GCH): $(PCH)
+	$(CC) $(CPPFLAGS) -c $(PCH) -o $(PCH_GCH)
+
+build/%.o: src/%.cpp | build $(PCH_GCH)
 	$(CC) $(CPPFLAGS) -c $< -o $@
 
 build:
@@ -23,4 +33,4 @@ run:
 	./$(EXEC)
 
 clean:
-	rm -rf build $(EXEC)
+	rm -rf build $(EXEC) $(PCH_GCH)
