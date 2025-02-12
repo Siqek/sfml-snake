@@ -4,7 +4,13 @@
 // core
 #include <iostream>
 #include <string>
+#include <stack>
+#include <vector>
+#include <unordered_map>
+#include <map>
 #include <cmath>
+#include <cassert>
+#include <stdexcept>
 
 // SFML headers
 #include <SFML/Graphics.hpp>
