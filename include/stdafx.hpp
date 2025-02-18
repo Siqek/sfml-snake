@@ -8,6 +8,7 @@
 #include <vector>
 #include <unordered_map>
 #include <map>
+#include <cctype>
 #include <cmath>
 #include <filesystem>
 #include <iostream>

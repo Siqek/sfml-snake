@@ -22,3 +22,25 @@ std::string ltrim(const std::string &str, const std::string& trim_set)
 
     return str.substr(start);
 }
+
+std::string toUpperCase(const std::string &str)
+{
+    std::string result = "";
+    result.reserve(str.size());
+
+    for (auto c : str) {
+        result += toupper(c);
+    }
+    return result;
+}
+
+std::string toLowerCase(const std::string &str)
+{
+    std::string result = "";
+    result.reserve(str.size());
+
+    for (auto c : str) {
+        result += tolower(c);
+    }
+    return result;
+}
