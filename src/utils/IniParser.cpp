@@ -2,6 +2,11 @@
 #include "utils/IniParser.hpp"
 #include "utils/string_utils.hpp"
 
+IniParser::IniParser()
+{
+    this->data = {};
+}
+
 void IniParser::loadFromFile(const std::string &filename)
 {
     std::filesystem::path p(filename);
@@ -48,4 +53,61 @@ void IniParser::loadFromFile(const std::string &filename)
     }
 
     file.close();
+}
+
+std::string IniParser::getString(const std::string& section, const std::string& key, const std::string& defaultValue) const
+{
+    auto it_section = this->data.find(section);
+    if (it_section != this->data.end()) {
+        auto it_value = it_section->second.find(key);
+        if (it_value != it_section->second.end()) {
+            return it_value->second;
+        }
+    }
+    return defaultValue;
+}
+
+int IniParser::getInt(const std::string& section, const std::string& key, int defaultValue) const
+{
+    auto it_section = this->data.find(section);
+    if (it_section != this->data.end()) {
+        auto it_value = it_section->second.find(key);
+        if (it_value != it_section->second.end()) {
+            std::string str_value = toLowerCase(it_value->second);
+
+            try {
+                size_t pos;
+                int value = std::stoi(str_value, &pos);
+                if (pos != str_value.size()) {
+                    throw std::invalid_argument("Invalid argument");
+                }
+                return value;
+            } catch (const std::exception& e) {
+                std::cerr << "Error::IniParser::getInt::" << e.what() << '\n';
+                return defaultValue;
+            }
+
+            return defaultValue;
+        }
+    }
+    return defaultValue;
+}
+
+bool IniParser::getBool(const std::string& section, const std::string& key, bool defaultValue) const
+{
+    auto it_section = this->data.find(section);
+    if (it_section != this->data.end()) {
+        auto it_value = it_section->second.find(key);
+        if (it_value != it_section->second.end()) {
+            std::string str_value = toLowerCase(it_value->second);
+
+            if (str_value == "true" || str_value == "1")
+                return true;
+            if (str_value == "false" || str_value == "0")
+                return false;
+
+            return defaultValue;
+        }
+    }
+    return defaultValue;
 }
