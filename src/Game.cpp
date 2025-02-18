@@ -1,5 +1,6 @@
 #include "stdafx.hpp"
 #include "Game.hpp"
+#include "utils/IniParser.hpp"
 
 void Game::initVariables()
 {
@@ -8,7 +9,29 @@ void Game::initVariables()
 
 void Game::initWindow()
 {
-    this->window = new sf::RenderWindow(sf::VideoMode({ 400, 400 }), "SFML project");
+    sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
+
+    IniParser* iniParser = new IniParser();
+    iniParser->loadFromFile("config/video.ini");
+
+    sf::ContextSettings gfxSetting = sf::ContextSettings();
+    gfxSetting.antialiasingLevel = iniParser->getInt("Graphics", "iAntiAliasing", 4);
+
+    unsigned int width = iniParser->getInt("Graphics", "iResolutionWidth");
+    unsigned int height = iniParser->getInt("Graphics", "iResolutionHeight");
+    this->window = new sf::RenderWindow(
+        sf::VideoMode({
+            width == 0 ? desktopMode.width : width,
+            height == 0 ? desktopMode.height : height
+        }),
+        "SFML project",
+        (iniParser->getBool("Graphics", "bFullscreen", true) ? sf::Style::Fullscreen : sf::Style::Default),
+        gfxSetting
+    );
+    this->window->setFramerateLimit(iniParser->getInt("Graphics", "iFramerateLimit", 60));
+    this->window->setVerticalSyncEnabled(iniParser->getBool("Graphics", "bVSync", true));
+
+    delete iniParser;
 }
 
 void Game::initStates()
