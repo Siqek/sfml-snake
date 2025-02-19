@@ -19,11 +19,12 @@ void Game::initWindow()
 
     unsigned int width = iniParser->getInt("Graphics", "iResolutionWidth");
     unsigned int height = iniParser->getInt("Graphics", "iResolutionHeight");
+
+    if (width == 0) width = desktopMode.width;
+    if (height == 0) height = desktopMode.height;
+
     this->window = new sf::RenderWindow(
-        sf::VideoMode({
-            width == 0 ? desktopMode.width : width,
-            height == 0 ? desktopMode.height : height
-        }),
+        sf::VideoMode({ width, height }),
         "SFML project",
         (iniParser->getBool("Graphics", "bFullscreen", true) ? sf::Style::Fullscreen : sf::Style::Default),
         gfxSetting
