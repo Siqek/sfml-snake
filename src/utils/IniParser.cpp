@@ -73,7 +73,7 @@ int IniParser::getInt(const std::string& section, const std::string& key, int de
     if (it_section != this->data.end()) {
         auto it_value = it_section->second.find(key);
         if (it_value != it_section->second.end()) {
-            std::string str_value = toLowerCase(it_value->second);
+            std::string str_value = it_value->second;
 
             try {
                 size_t pos;
