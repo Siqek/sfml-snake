@@ -7,6 +7,12 @@ IniParser::IniParser()
     this->data = {};
 }
 
+IniParser::IniParser(const std::string &filename)
+{
+    this->data = {};
+    this->loadFromFile(filename);
+}
+
 void IniParser::loadFromFile(const std::string &filename)
 {
     std::filesystem::path p(filename);
@@ -110,4 +116,13 @@ bool IniParser::getBool(const std::string& section, const std::string& key, bool
         }
     }
     return defaultValue;
+}
+
+const std::unordered_map<std::string, std::string>& IniParser::getSection(const std::string &section) const
+{
+    static const std::unordered_map<std::string, std::string> empty_map;
+    auto it = this->data.find(section);
+    if (it != this->data.end())
+        return it->second;
+    return empty_map;
 }
