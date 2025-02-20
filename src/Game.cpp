@@ -35,6 +35,23 @@ void Game::initWindow()
     delete iniParser;
 }
 
+void Game::initSupportedKeys()
+{
+    std::unique_ptr<IniParser> iniParser = std::make_unique<IniParser>("config/supportedKeys.ini");
+    auto& keys = iniParser->getSection("Keys");
+
+    this->supportedKeys.rehash(keys.size());
+
+    for (const auto& [key, value] : keys) {
+        try {
+            int val = std::stoi(value);
+            this->supportedKeys[key] = val;
+        } catch (const std::exception& e) {
+            std::cerr << "Error::Game::initSupportedKeys::" << e.what() << '\n';
+        }
+    }
+}
+
 void Game::initStates()
 {
     this->states.push(new GameState(this->window));
@@ -44,6 +61,7 @@ Game::Game()
 {
     this->initVariables();
     this->initWindow();
+    this->initSupportedKeys();
     this->initStates();
 }
 

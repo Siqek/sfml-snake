@@ -15,6 +15,7 @@
 #include <fstream>
 #include <cassert>
 #include <stdexcept>
+#include <memory>
 
 // SFML headers
 #include <SFML/Graphics.hpp>

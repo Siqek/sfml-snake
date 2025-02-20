@@ -18,8 +18,11 @@ private:
 
     std::stack<State*> states;
 
+    std::unordered_map<std::string, int> supportedKeys;
+
     void initVariables();
     void initWindow();
+    void initSupportedKeys();
     void initStates();
 
 public:
