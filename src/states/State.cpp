@@ -6,7 +6,4 @@ State::State(sf::RenderWindow* window)
     this->window = window;
 }
 
-State::~State()
-{
-    delete window;
-}
+State::~State() {}
