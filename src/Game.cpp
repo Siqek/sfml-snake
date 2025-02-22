@@ -38,7 +38,7 @@ void Game::initWindow()
 void Game::initSupportedKeys()
 {
     std::unique_ptr<IniParser> iniParser = std::make_unique<IniParser>("config/supportedKeys.ini");
-    auto& keys = iniParser->getSection("Keys");
+    const auto& keys = iniParser->getSection("Keys");
 
     this->supportedKeys.rehash(keys.size());
 
