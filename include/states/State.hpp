@@ -3,13 +3,11 @@
 
 class State
 {
-private:
-
 protected:
     sf::RenderWindow* window;
-
+    const std::unordered_map<std::string, int>& supportedKeys;
 public:
-    State(sf::RenderWindow* window);
+    State(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys);
     virtual ~State();
 
     virtual void updateInput() = 0;

@@ -2,16 +2,24 @@
 #define GAMESTATE_HPP
 
 class State;
+class KeyStateTracker;
 
-#include "State.hpp"
+#include "states/State.hpp"
+#include "utils/KeyStateTracker.hpp"
 
 class GameState
     : public State
 {
 private:
+    std::unordered_map<std::string, int> keybinds;
+    KeyStateTracker* keyStateTracker;
+
     sf::CircleShape circle;
+
+    void initKeybinds();
+    void initKeyStateTracker();
 public:
-    GameState(sf::RenderWindow* window);
+    GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys);
     ~GameState();
 
     void updateInput() override;
