@@ -3,12 +3,12 @@
 
 void KeyStateTracker::initKeyStates()
 {
-    for (const auto& [ _, key ] : keys) {
+    for (const auto& [ _, key ] : this->keys) {
         this->keyStates[key];
     }
 }
 
-KeyStateTracker::KeyStateTracker(std::unordered_map<std::string, int> &keys)
+KeyStateTracker::KeyStateTracker(const std::unordered_map<std::string, int> &keys)
     : keys(keys)
 {
     this->initKeyStates();

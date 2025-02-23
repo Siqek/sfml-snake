@@ -9,12 +9,12 @@ struct KeyState {
 class KeyStateTracker
 {
 private:
-    std::unordered_map<std::string, int>& keys;
+    const std::unordered_map<std::string, int>& keys;
     std::unordered_map<int, KeyState> keyStates;
 
     void initKeyStates();
 public:
-    KeyStateTracker(std::unordered_map<std::string, int>& keys);
+    KeyStateTracker(const std::unordered_map<std::string, int>& keys);
 
     void updateKeyStates();
 
