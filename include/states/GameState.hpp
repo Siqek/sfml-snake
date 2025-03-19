@@ -15,11 +15,12 @@ private:
     KeyStateTracker* keyStateTracker;
 
     sf::CircleShape circle;
+    sf::Text text;
 
     void initKeybinds();
     void initKeyStateTracker();
 public:
-    GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys);
+    GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font);
     ~GameState();
 
     void updateInput() override;

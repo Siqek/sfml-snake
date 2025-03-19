@@ -20,11 +20,23 @@ void GameState::initKeyStateTracker()
     this->keyStateTracker = new KeyStateTracker(this->keybinds);
 }
 
-GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys)
-    : State(window, supportedKeys)
+GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font)
+    : State(window, supportedKeys, font)
 {
     this->circle.setRadius(200.f);
     this->circle.setFillColor(sf::Color::Green);
+
+    this->text.setFont(this->font);
+    this->text.setString("Hello World!");
+    this->text.setCharacterSize(24);
+    this->text.setPosition(sf::Vector2f(1920.f / 2.f, 500.f));
+    this->text.setFillColor(sf::Color(255, 255, 255));
+    this->text.setOutlineThickness(2.f);
+    this->text.setOutlineColor(sf::Color(0, 0, 0));
+
+    // centerize text
+    auto lb = this->text.getLocalBounds();
+    this->text.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
 
     this->initKeybinds();
     this->initKeyStateTracker();
@@ -63,4 +75,6 @@ void GameState::render(sf::RenderTarget* target)
         target = this->window;
 
     target->draw(this->circle);
+
+    target->draw(this->text);
 }

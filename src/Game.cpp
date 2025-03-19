@@ -52,9 +52,17 @@ void Game::initSupportedKeys()
     }
 }
 
+void Game::initFont()
+{
+    if (!this->font.loadFromFile("resources/fonts/Inter/static/Inter_28pt-Regular.ttf"))
+    {
+        std::cerr << "Error::Game::initFont::Failed to load font 'resources/fonts/Inter/static/Inter_28pt-Regular.ttf'\n";
+    }
+}
+
 void Game::initStates()
 {
-    this->states.push(new GameState(this->window, this->supportedKeys));
+    this->states.push(new GameState(this->window, this->supportedKeys, this->font));
 }
 
 Game::Game()
@@ -62,6 +70,7 @@ Game::Game()
     this->initVariables();
     this->initWindow();
     this->initSupportedKeys();
+    this->initFont();
     this->initStates();
 }
 

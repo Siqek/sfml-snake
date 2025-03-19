@@ -6,8 +6,9 @@ class State
 protected:
     sf::RenderWindow* window;
     const std::unordered_map<std::string, int>& supportedKeys;
+    const sf::Font& font;
 public:
-    State(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys);
+    State(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font);
     virtual ~State();
 
     virtual void updateInput() = 0;

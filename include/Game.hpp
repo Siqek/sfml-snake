@@ -14,6 +14,8 @@ private:
     sf::Clock dtClock;
     float dt;
 
+    sf::Font font;
+
     sf::Event sfEvent;
 
     std::stack<State*> states;
@@ -23,6 +25,7 @@ private:
     void initVariables();
     void initWindow();
     void initSupportedKeys();
+    void initFont();
     void initStates();
 
 public:
