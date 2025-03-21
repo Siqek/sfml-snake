@@ -49,12 +49,19 @@ GameState::~GameState()
 
 void GameState::updateInput()
 {
+    if (!this->window->hasFocus())
+        return;
+
     this->keyStateTracker->updateKeyStates();
 }
 
 void GameState::update(const float& dt)
 {
     this->updateInput();
+
+    /* TEMP: REMOVER LATER: This is a temporary workaround */
+    if (!this->window->hasFocus())
+        return;
 
     sf::Vector2f vel(0.f, 0.f);
     if (this->keyStateTracker->isKeyPressed("MoveUp"))
