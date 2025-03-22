@@ -11,14 +11,14 @@ void Game::initWindow()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
 
-    IniParser* iniParser = new IniParser();
-    iniParser->loadFromFile("config/video.ini");
+    IniParser iniParser;
+    iniParser.loadFromFile("config/video.ini");
 
     sf::ContextSettings gfxSetting = sf::ContextSettings();
-    gfxSetting.antialiasingLevel = iniParser->getInt("Graphics", "iAntiAliasing", 4);
+    gfxSetting.antialiasingLevel = iniParser.getInt("Graphics", "iAntiAliasing", 4);
 
-    unsigned int width = iniParser->getInt("Graphics", "iResolutionWidth");
-    unsigned int height = iniParser->getInt("Graphics", "iResolutionHeight");
+    unsigned int width = iniParser.getInt("Graphics", "iResolutionWidth");
+    unsigned int height = iniParser.getInt("Graphics", "iResolutionHeight");
 
     if (width == 0) width = desktopMode.width;
     if (height == 0) height = desktopMode.height;
@@ -26,19 +26,17 @@ void Game::initWindow()
     this->window = new sf::RenderWindow(
         sf::VideoMode({ width, height }),
         "SFML project",
-        (iniParser->getBool("Graphics", "bFullscreen", true) ? sf::Style::Fullscreen : sf::Style::Default),
+        (iniParser.getBool("Graphics", "bFullscreen", true) ? sf::Style::Fullscreen : sf::Style::Default),
         gfxSetting
     );
-    this->window->setFramerateLimit(iniParser->getInt("Graphics", "iFramerateLimit", 60));
-    this->window->setVerticalSyncEnabled(iniParser->getBool("Graphics", "bVSync", true));
-
-    delete iniParser;
+    this->window->setFramerateLimit(iniParser.getInt("Graphics", "iFramerateLimit", 60));
+    this->window->setVerticalSyncEnabled(iniParser.getBool("Graphics", "bVSync", true));
 }
 
 void Game::initSupportedKeys()
 {
-    std::unique_ptr<IniParser> iniParser = std::make_unique<IniParser>("config/supportedKeys.ini");
-    const auto& keys = iniParser->getSection("Keys");
+    IniParser iniParser("config/supportedKeys.ini");
+    const auto& keys = iniParser.getSection("Keys");
 
     this->supportedKeys.rehash(keys.size());
 

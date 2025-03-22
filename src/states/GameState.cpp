@@ -4,8 +4,8 @@
 
 void GameState::initKeybinds()
 {
-    std::unique_ptr<IniParser> iniParser = std::make_unique<IniParser>("config/gamestateKeybinds.ini");
-    const auto& keybinds = iniParser->getSection("Snake");
+    IniParser iniParser("config/gamestateKeybinds.ini");
+    const auto& keybinds = iniParser.getSection("Snake");
 
     for (const auto& [bind, key] : keybinds) {
         auto it = this->supportedKeys.find(key);
