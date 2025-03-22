@@ -38,7 +38,7 @@ void Game::initSupportedKeys()
     IniParser iniParser("config/supportedKeys.ini");
     const auto& keys = iniParser.getSection("Keys");
 
-    this->supportedKeys.rehash(keys.size());
+    this->supportedKeys.reserve(keys.size());
 
     for (const auto& [key, value] : keys) {
         try {

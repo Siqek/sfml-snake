@@ -3,7 +3,7 @@
 
 void KeyStateTracker::initKeyStates()
 {
-    this->keyStates.reserve(this->keys.size())
+    this->keyStates.reserve(this->keys.size());
     for (const auto& [ _, key ] : this->keys) {
         this->keyStates[key];
     }

@@ -7,6 +7,7 @@ void GameState::initKeybinds()
     IniParser iniParser("config/gamestateKeybinds.ini");
     const auto& keybinds = iniParser.getSection("Snake");
 
+    this->keybinds.reserve(keybinds.size());
     for (const auto& [bind, key] : keybinds) {
         auto it = this->supportedKeys.find(key);
         if (it != this->supportedKeys.end()) {
