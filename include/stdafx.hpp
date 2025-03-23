@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <map>
 #include <cctype>
+#include <cstdint>
 #include <cmath>
 #include <filesystem>
 #include <iostream>

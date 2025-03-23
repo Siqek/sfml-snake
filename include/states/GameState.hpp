@@ -14,6 +14,11 @@ private:
     std::unordered_map<std::string, int> keybinds;
     KeyStateTracker* keyStateTracker;
 
+    uint8_t gridSizeX;
+    uint8_t gridSizeY;
+    float tileSize;
+    sf::RectangleShape tile;
+
     sf::CircleShape circle;
     sf::Text text;
 

@@ -24,13 +24,22 @@ void GameState::initKeyStateTracker()
 GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font)
     : State(window, supportedKeys, font)
 {
+    this->gridSizeX = 12;
+    this->gridSizeY = 12;
+    this->tileSize = 60.f;
+
+    this->tile.setSize(sf::Vector2f(this->tileSize, this->tileSize));
+    this->tile.setFillColor(sf::Color(100, 0, 0));
+    this->tile.setOutlineThickness(2.f);
+    this->tile.setOutlineColor(sf::Color::Magenta);
+
     this->circle.setRadius(200.f);
     this->circle.setFillColor(sf::Color::Green);
 
     this->text.setFont(this->font);
     this->text.setString("Hello World!");
     this->text.setCharacterSize(24);
-    this->text.setPosition(sf::Vector2f(1920.f / 2.f, 500.f));
+    this->text.setPosition(sf::Vector2f(1920.f / 2.f, 100.f));
     this->text.setFillColor(sf::Color(255, 255, 255));
     this->text.setOutlineThickness(2.f);
     this->text.setOutlineColor(sf::Color(0, 0, 0));
@@ -81,6 +90,21 @@ void GameState::render(sf::RenderTarget* target)
 {
     if (!target)
         target = this->window;
+
+    float offsetX = static_cast<float>(this->window->getSize().x) / 2.f - static_cast<float>(this->gridSizeX) / 2.f * this->tileSize;
+    float offsetY = 200.f;
+
+    for (uint8_t x = 0; x < this->gridSizeX; ++x)
+    {
+        for (uint8_t y = 0; y < this->gridSizeY; ++y)
+        {
+            this->tile.setPosition(sf::Vector2f(
+                offsetX + static_cast<float>(x) * this->tileSize,
+                offsetY + static_cast<float>(y) * this->tileSize
+            ));
+            target->draw(this->tile);
+        }
+    }
 
     target->draw(this->circle);
 
