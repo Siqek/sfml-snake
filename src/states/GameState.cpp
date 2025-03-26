@@ -33,9 +33,6 @@ GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::str
     this->tile.setOutlineThickness(2.f);
     this->tile.setOutlineColor(sf::Color::Magenta);
 
-    this->circle.setRadius(200.f);
-    this->circle.setFillColor(sf::Color::Green);
-
     this->text.setFont(this->font);
     this->text.setString("Hello World!");
     this->text.setCharacterSize(24);
@@ -68,22 +65,6 @@ void GameState::updateInput()
 void GameState::update(const float& dt)
 {
     this->updateInput();
-
-    /* TEMP: REMOVER LATER: This is a temporary workaround */
-    if (!this->window->hasFocus())
-        return;
-
-    sf::Vector2f vel(0.f, 0.f);
-    if (this->keyStateTracker->isKeyPressed("MoveUp"))
-        vel.y -= 1.f;
-    if (this->keyStateTracker->isKeyPressed("MoveDown"))
-        vel.y += 1.f;
-    if (this->keyStateTracker->isKeyPressed("MoveLeft"))
-        vel.x -= 1.f;
-    if (this->keyStateTracker->isKeyPressed("MoveRight"))
-        vel.x += 1.f;
-
-    this->circle.move(vel * dt * 100.f);
 }
 
 void GameState::render(sf::RenderTarget* target)
@@ -105,8 +86,6 @@ void GameState::render(sf::RenderTarget* target)
             target->draw(this->tile);
         }
     }
-
-    target->draw(this->circle);
 
     target->draw(this->text);
 }

@@ -8,8 +8,10 @@
 #include <vector>
 #include <unordered_map>
 #include <map>
+#include <deque>
 #include <cctype>
 #include <cstdint>
+#include <utility>
 #include <cmath>
 #include <filesystem>
 #include <iostream>

@@ -19,7 +19,6 @@ private:
     float tileSize;
     sf::RectangleShape tile;
 
-    sf::CircleShape circle;
     sf::Text text;
 
     void initKeybinds();
