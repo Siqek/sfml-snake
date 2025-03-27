@@ -36,6 +36,7 @@ public:
 private:
     float speed;
     Direction direction;
+    Direction prevDirection;
 
     uint8_t gridSizeX;
     uint8_t gridSizeY;
@@ -46,6 +47,8 @@ private:
 
     sf::RectangleShape bodyFragment;
     std::deque<Position> body;
+
+    Direction getOppositeDirection(Direction direction) const;
 };
 
 #endif // SNAKE_HPP

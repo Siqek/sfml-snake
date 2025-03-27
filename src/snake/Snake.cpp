@@ -2,10 +2,13 @@
 #include "snake/Snake.hpp"
 
 Snake::Snake(float speed, unsigned int length)
-    : speed(speed), direction(Direction::RIGHT)
+    : speed(speed),
+    direction(Direction::RIGHT), prevDirection(Direction::RIGHT),
+    gridSizeX(0), gridSizeY(0), tileSize(0.f),
+    lengthToGrow(std::max(0u, length - 1)), /* prevent underflow */
+    distanceTraveled(0.f),
+    body{}
 {
-    this->lengthToGrow = length - 1;
-
     this->bodyFragment.setFillColor(sf::Color::Green);
 }
 
@@ -34,6 +37,9 @@ void Snake::setTileSize(float size)
 
 void Snake::setDirection(Direction direction)
 {
+    if (direction == this->getOppositeDirection(this->prevDirection))
+        return; // ignore move if it's the opposite of the last direction
+
     this->direction = direction;
 }
 
@@ -61,6 +67,8 @@ void Snake::move()
         head.second++;
         break;
     }
+
+    this->prevDirection = this->direction;
 
     this->body.push_front(head);
 
@@ -96,4 +104,16 @@ void Snake::render(sf::RenderTarget& target, float offsetX, float offsetY)
         ));
         target.draw(this->bodyFragment);
     }
+}
+
+Direction Snake::getOppositeDirection(Direction direction) const
+{
+    switch (direction)
+    {
+    case Direction::RIGHT: return Direction::LEFT;
+    case Direction::LEFT:  return Direction::RIGHT;
+    case Direction::DOWN:  return Direction::UP;
+    case Direction::UP:    return Direction::DOWN;
+    }
+    return direction;
 }
