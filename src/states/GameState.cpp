@@ -22,11 +22,16 @@ void GameState::initKeyStateTracker()
 }
 
 GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font)
-    : State(window, supportedKeys, font)
+    : State(window, supportedKeys, font),
+    gridSizeX(12), gridSizeY(12), tileSize(60.f),
+    snake(200.f, 3u)
 {
-    this->gridSizeX = 12;
-    this->gridSizeY = 12;
-    this->tileSize = 60.f;
+    this->snake.setGridSize(this->gridSizeX, this->gridSizeY);
+    this->snake.setTileSize(this->tileSize);
+    this->snake.initHeadPosition(Position(
+        static_cast<int>(this->gridSizeX / 2),
+        static_cast<int>(this->gridSizeY / 2)
+    ));
 
     this->tile.setSize(sf::Vector2f(this->tileSize, this->tileSize));
     this->tile.setFillColor(sf::Color(100, 0, 0));
@@ -60,11 +65,22 @@ void GameState::updateInput()
         return;
 
     this->keyStateTracker->updateKeyStates();
+
+    if (this->keyStateTracker->isKeyDown("MoveUp"))
+        this->snake.setDirection(Direction::UP);
+    else if (this->keyStateTracker->isKeyDown("MoveDown"))
+        this->snake.setDirection(Direction::DOWN);
+    else if (this->keyStateTracker->isKeyDown("MoveRight"))
+        this->snake.setDirection(Direction::RIGHT);
+    else if (this->keyStateTracker->isKeyDown("MoveLeft"))
+        this->snake.setDirection(Direction::LEFT);
 }
 
 void GameState::update(const float& dt)
 {
     this->updateInput();
+
+    this->snake.update(dt);
 }
 
 void GameState::render(sf::RenderTarget* target)
@@ -86,6 +102,8 @@ void GameState::render(sf::RenderTarget* target)
             target->draw(this->tile);
         }
     }
+
+    this->snake.render(*target, offsetX, offsetY);
 
     target->draw(this->text);
 }

@@ -5,6 +5,14 @@ Snake::Snake(float speed, unsigned int length)
     : speed(speed), direction(Direction::RIGHT)
 {
     this->lengthToGrow = length - 1;
+
+    this->bodyFragment.setFillColor(sf::Color::Green);
+}
+
+void Snake::initHeadPosition(Position position)
+{
+    if (this->body.empty())
+        this->body.push_front(position);
 }
 
 Position Snake::getHeadPosition() const
@@ -21,6 +29,7 @@ void Snake::setGridSize(uint8_t x, uint8_t y)
 void Snake::setTileSize(float size)
 {
     this->tileSize = size;
+    this->bodyFragment.setSize(sf::Vector2f(this->tileSize, this->tileSize));
 }
 
 void Snake::setDirection(Direction direction)
@@ -53,7 +62,7 @@ void Snake::move()
         break;
     }
 
-    this->body.push_back(head);
+    this->body.push_front(head);
 
     if (this->lengthToGrow > 0)
         this->lengthToGrow--;
@@ -77,7 +86,14 @@ void Snake::update(const float& dt)
     }
 }
 
-void Snake::render(sf::RenderTarget& target)
+void Snake::render(sf::RenderTarget& target, float offsetX, float offsetY)
 {
-
+    for (auto b : this->body)
+    {
+        this->bodyFragment.setPosition(sf::Vector2f(
+            offsetX + this->tileSize * b.first,
+            offsetY + this->tileSize * b.second
+        ));
+        target.draw(this->bodyFragment);
+    }
 }

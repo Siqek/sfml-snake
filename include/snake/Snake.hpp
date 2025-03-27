@@ -17,6 +17,8 @@ public:
     Snake(float speed, unsigned int length);
     ~Snake() = default;
 
+    void initHeadPosition(Position position);
+
     Position getHeadPosition() const;
 
     void setGridSize(uint8_t x, uint8_t y);
@@ -29,7 +31,7 @@ public:
     bool checkCollision(Position position);
 
     void update(const float& dt);
-    void render(sf::RenderTarget& target);
+    void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
 
 private:
     float speed;
@@ -42,6 +44,7 @@ private:
     unsigned int lengthToGrow;
     float distanceTraveled;
 
+    sf::RectangleShape bodyFragment;
     std::deque<Position> body;
 };
 

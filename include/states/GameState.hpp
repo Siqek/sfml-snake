@@ -3,9 +3,11 @@
 
 class State;
 class KeyStateTracker;
+class Snake;
 
 #include "states/State.hpp"
 #include "utils/KeyStateTracker.hpp"
+#include "snake/Snake.hpp"
 
 class GameState
     : public State
@@ -18,6 +20,8 @@ private:
     uint8_t gridSizeY;
     float tileSize;
     sf::RectangleShape tile;
+
+    Snake snake;
 
     sf::Text text;
 
