@@ -43,7 +43,7 @@ void Snake::setDirection(Direction direction)
     this->direction = direction;
 }
 
-void Snake::grow(unsigned int length)
+void Snake::grow(unsigned int lengthToGrow)
 {
     this->lengthToGrow += length;
 }
@@ -78,9 +78,19 @@ void Snake::move()
         this->body.pop_back();
 }
 
-bool Snake::checkCollision(Position position)
+bool Snake::checkCollision(Position position) const
 {
+    for (auto b : this->body) {
+        if (b == position)
+            return true;
+    }
+
     return false;
+}
+
+bool Snake::checkHeadCollision(Position position) const
+{
+    return this->getHeadPosition() == position;
 }
 
 void Snake::update(const float& dt)

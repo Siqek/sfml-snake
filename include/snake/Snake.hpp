@@ -25,10 +25,11 @@ public:
     void setTileSize(float size);
 
     void setDirection(Direction direction);
-    void grow(unsigned int length);
+    void grow(unsigned int lengthToGrow);
     void move();
 
-    bool checkCollision(Position position);
+    bool checkCollision(Position position) const;
+    bool checkHeadCollision(Position position) const;
 
     void update(const float& dt);
     void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
