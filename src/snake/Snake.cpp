@@ -45,7 +45,7 @@ void Snake::setDirection(Direction direction)
 
 void Snake::grow(unsigned int lengthToGrow)
 {
-    this->lengthToGrow += length;
+    this->lengthToGrow += lengthToGrow;
 }
 
 void Snake::move()
