@@ -23,9 +23,14 @@ void GameState::initKeyStateTracker()
 
 GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font)
     : State(window, supportedKeys, font),
-    gridSizeX(12), gridSizeY(12), tileSize(60.f),
+    gridSizeX(12), gridSizeY(12),
     snake(200.f, 3u)
 {
+    const auto windowSize = [](const auto& ws) -> sf::Vector2f {
+        return sf::Vector2f(static_cast<float>(ws.x), static_cast<float>(ws.y));
+    }(this->window->getSize());
+    this->tileSize = std::min(windowSize.x * 0.9f, windowSize.y * 0.75f) / static_cast<float>(std::max(this->gridSizeX, this->gridSizeY));
+
     this->snake.setGridSize(this->gridSizeX, this->gridSizeY);
     this->snake.setTileSize(this->tileSize);
     this->snake.initHeadPosition(Position(
@@ -38,17 +43,19 @@ GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::str
     this->tile.setOutlineThickness(2.f);
     this->tile.setOutlineColor(sf::Color::Magenta);
 
-    this->text.setFont(this->font);
-    this->text.setString("Hello World!");
-    this->text.setCharacterSize(24);
-    this->text.setPosition(sf::Vector2f(1920.f / 2.f, 100.f));
-    this->text.setFillColor(sf::Color(255, 255, 255));
-    this->text.setOutlineThickness(2.f);
-    this->text.setOutlineColor(sf::Color(0, 0, 0));
-
+    this->scoreText.setFont(this->font);
+    this->scoreText.setString("0");
+    this->scoreText.setCharacterSize(static_cast<int>(windowSize.y * (0.2f - 0.14f)));
+    this->scoreText.setPosition(sf::Vector2f(
+        static_cast<float>(windowSize.x) / 2.f,
+        static_cast<float>(windowSize.y) * 0.2f / 2.f
+    ));
+    this->scoreText.setFillColor(sf::Color::Black);
+    this->scoreText.setOutlineThickness(2.f);
+    this->scoreText.setOutlineColor(sf::Color::White);
     // centerize text
-    auto lb = this->text.getLocalBounds();
-    this->text.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
+    auto lb = this->scoreText.getLocalBounds();
+    this->scoreText.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
 
     this->initKeybinds();
     this->initKeyStateTracker();
@@ -88,8 +95,9 @@ void GameState::render(sf::RenderTarget* target)
     if (!target)
         target = this->window;
 
-    float offsetX = static_cast<float>(this->window->getSize().x) / 2.f - static_cast<float>(this->gridSizeX) / 2.f * this->tileSize;
-    float offsetY = 200.f;
+    const auto windowSize = this->window->getSize();
+    float offsetX = static_cast<float>(windowSize.x) / 2.f - static_cast<float>(this->gridSizeX) / 2.f * this->tileSize;
+    float offsetY = static_cast<float>(windowSize.y) * 0.2f;
 
     for (uint8_t x = 0; x < this->gridSizeX; ++x)
     {
@@ -105,5 +113,5 @@ void GameState::render(sf::RenderTarget* target)
 
     this->snake.render(*target, offsetX, offsetY);
 
-    target->draw(this->text);
+    target->draw(this->scoreText);
 }

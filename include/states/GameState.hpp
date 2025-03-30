@@ -23,7 +23,7 @@ private:
 
     Snake snake;
 
-    sf::Text text;
+    sf::Text scoreText;
 
     void initKeybinds();
     void initKeyStateTracker();
