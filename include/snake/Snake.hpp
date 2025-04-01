@@ -19,7 +19,8 @@ public:
 
     void initHeadPosition(Position position);
 
-    Position getHeadPosition() const;
+    Position getHeadPosition() const { return this->body.front(); };
+    float getSpeedPixelsPerSec() const { return this->speedTilesPerSec * this->tileSize; };
 
     void setGridSize(uint8_t x, uint8_t y);
     void setTileSize(float size);
@@ -35,7 +36,7 @@ public:
     void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
 
 private:
-    float speed;
+    float speedTilesPerSec;
     Direction direction;
     Direction prevDirection;
 

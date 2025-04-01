@@ -23,13 +23,16 @@ void GameState::initKeyStateTracker()
 
 GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font)
     : State(window, supportedKeys, font),
-    gridSizeX(12), gridSizeY(12),
-    snake(200.f, 3u)
+    gridSizeX(40), gridSizeY(10),
+    snake(4.f, 3u)
 {
     const auto windowSize = [](const auto& ws) -> sf::Vector2f {
         return sf::Vector2f(static_cast<float>(ws.x), static_cast<float>(ws.y));
     }(this->window->getSize());
-    this->tileSize = std::min(windowSize.x * 0.9f, windowSize.y * 0.75f) / static_cast<float>(std::max(this->gridSizeX, this->gridSizeY));
+    this->tileSize = std::min(
+        windowSize.x * 0.9f / static_cast<float>(this->gridSizeX),
+        windowSize.y * 0.75f / static_cast<float>(this->gridSizeY)
+    );
 
     this->snake.setGridSize(this->gridSizeX, this->gridSizeY);
     this->snake.setTileSize(this->tileSize);
@@ -97,7 +100,7 @@ void GameState::render(sf::RenderTarget* target)
 
     const auto windowSize = this->window->getSize();
     float offsetX = static_cast<float>(windowSize.x) / 2.f - static_cast<float>(this->gridSizeX) / 2.f * this->tileSize;
-    float offsetY = static_cast<float>(windowSize.y) * 0.2f;
+    float offsetY = static_cast<float>(windowSize.y) * (0.2f + 0.75f / 2.f ) - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
 
     for (uint8_t x = 0; x < this->gridSizeX; ++x)
     {

@@ -1,8 +1,8 @@
 #include "stdafx.hpp"
 #include "snake/Snake.hpp"
 
-Snake::Snake(float speed, unsigned int length)
-    : speed(speed),
+Snake::Snake(float speedTilesPerSec, unsigned int length)
+    : speedTilesPerSec(speedTilesPerSec),
     direction(Direction::RIGHT), prevDirection(Direction::RIGHT),
     gridSizeX(0), gridSizeY(0), tileSize(0.f),
     lengthToGrow(std::max(0u, length - 1)), /* prevent underflow */
@@ -16,11 +16,6 @@ void Snake::initHeadPosition(Position position)
 {
     if (this->body.empty())
         this->body.push_front(position);
-}
-
-Position Snake::getHeadPosition() const
-{
-    return this->body.front();
 }
 
 void Snake::setGridSize(uint8_t x, uint8_t y)
@@ -95,7 +90,7 @@ bool Snake::checkHeadCollision(Position position) const
 
 void Snake::update(const float& dt)
 {
-    this->distanceTraveled += this->speed * dt;
+    this->distanceTraveled += this->getSpeedPixelsPerSec() * dt;
 
     if (this->distanceTraveled > this->tileSize)
     {
