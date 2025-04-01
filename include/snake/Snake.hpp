@@ -39,6 +39,7 @@ private:
     float speedTilesPerSec;
     Direction direction;
     Direction prevDirection;
+    Direction nextDirection;
 
     uint8_t gridSizeX;
     uint8_t gridSizeY;

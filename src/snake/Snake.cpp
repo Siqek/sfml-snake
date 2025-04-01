@@ -3,7 +3,7 @@
 
 Snake::Snake(float speedTilesPerSec, unsigned int length)
     : speedTilesPerSec(speedTilesPerSec),
-    direction(Direction::RIGHT), prevDirection(Direction::RIGHT),
+    direction(Direction::RIGHT), prevDirection(Direction::RIGHT), nextDirection(Direction::RIGHT),
     gridSizeX(0), gridSizeY(0), tileSize(0.f),
     lengthToGrow(std::max(0u, length - 1)), /* prevent underflow */
     distanceTraveled(0.f),
@@ -32,10 +32,19 @@ void Snake::setTileSize(float size)
 
 void Snake::setDirection(Direction direction)
 {
-    if (direction == this->getOppositeDirection(this->prevDirection))
-        return; // ignore move if it's the opposite of the last direction
+    if (this->prevDirection == this->direction)
+    {
+        if (direction == this->getOppositeDirection(this->prevDirection))
+            return; // ignore move if it's the opposite of the last direction
 
-    this->direction = direction;
+        this->direction = direction;
+        this->nextDirection = direction;
+    } else {
+        if (direction == this->getOppositeDirection(this->direction))
+            return;
+
+        this->nextDirection = direction;
+    }
 }
 
 void Snake::grow(unsigned int lengthToGrow)
@@ -64,6 +73,7 @@ void Snake::move()
     }
 
     this->prevDirection = this->direction;
+    this->direction = this->nextDirection;
 
     this->body.push_front(head);
 
