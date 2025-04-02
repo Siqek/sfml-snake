@@ -72,6 +72,12 @@ void Snake::move()
         break;
     }
 
+    // Ensure the snake stays within grid boundaries
+    if (head.first >= this->gridSizeX || head.first < 0)
+        return;
+    if (head.second >= this->gridSizeY || head.second < 0)
+        return;
+
     this->prevDirection = this->direction;
     this->direction = this->nextDirection;
 
