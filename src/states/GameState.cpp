@@ -48,7 +48,13 @@ GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::str
 
     this->scoreText.setFont(this->font);
     this->scoreText.setString("0");
-    this->scoreText.setCharacterSize(static_cast<int>(windowSize.y * (0.2f - 0.14f)));
+    const auto convertToFontSize = [](float height) -> int {
+        // Converts pixel height to font size (75 px ~= 100 font size)
+        // Formula: fontSize = (4/3) * height
+        static constexpr float factor = 100.f / 75.f;
+        return static_cast<int>(height * factor);
+    };
+    this->scoreText.setCharacterSize(convertToFontSize(windowSize.y * (0.2f - 0.14f)));
     this->scoreText.setPosition(sf::Vector2f(
         static_cast<float>(windowSize.x) / 2.f,
         static_cast<float>(windowSize.y) * 0.2f / 2.f
