@@ -8,11 +8,6 @@ struct KeyState {
 
 class KeyStateTracker
 {
-private:
-    const std::unordered_map<std::string, int>& keys;
-    std::unordered_map<int, KeyState> keyStates;
-
-    void initKeyStates();
 public:
     KeyStateTracker(const std::unordered_map<std::string, int>& keys);
 
@@ -21,6 +16,12 @@ public:
     bool isKeyPressed(const std::string& key) const;
     bool isKeyDown(const std::string& key) const;
     bool isKeyUp(const std::string& key) const;
+
+private:
+    const std::unordered_map<std::string, int>& keys;
+    std::unordered_map<int, KeyState> keyStates;
+
+    void initKeyStates();
 };
 
 #endif

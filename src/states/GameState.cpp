@@ -30,8 +30,8 @@ GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::str
         return sf::Vector2f(static_cast<float>(ws.x), static_cast<float>(ws.y));
     }(this->window->getSize());
     this->tileSize = std::min(
-        windowSize.x * 0.9f / static_cast<float>(this->gridSizeX),
-        windowSize.y * 0.75f / static_cast<float>(this->gridSizeY)
+        windowSize.x * 0.95f / static_cast<float>(this->gridSizeX),
+        windowSize.y * UIConfig::GridHeightRatio / static_cast<float>(this->gridSizeY)
     );
 
     this->snake.setGridSize(this->gridSizeX, this->gridSizeY);
@@ -54,10 +54,10 @@ GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::str
         static constexpr float factor = 100.f / 75.f;
         return static_cast<int>(height * factor);
     };
-    this->scoreText.setCharacterSize(convertToFontSize(windowSize.y * (0.2f - 0.14f)));
+    this->scoreText.setCharacterSize(convertToFontSize(windowSize.y * UIConfig::ScoreHeightRatio * 0.25f));
     this->scoreText.setPosition(sf::Vector2f(
         static_cast<float>(windowSize.x) / 2.f,
-        static_cast<float>(windowSize.y) * 0.2f / 2.f
+        static_cast<float>(windowSize.y) * UIConfig::ScoreHeightRatio / 2.f
     ));
     this->scoreText.setFillColor(sf::Color::Black);
     this->scoreText.setOutlineThickness(2.f);
@@ -106,7 +106,11 @@ void GameState::render(sf::RenderTarget* target)
 
     const auto windowSize = this->window->getSize();
     float offsetX = static_cast<float>(windowSize.x) / 2.f - static_cast<float>(this->gridSizeX) / 2.f * this->tileSize;
-    float offsetY = static_cast<float>(windowSize.y) * (0.2f + 0.75f / 2.f ) - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
+    float offsetY =
+        static_cast<float>(windowSize.y)
+            * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f )
+        - static_cast<float>(this->gridSizeY) / 2.f
+            * this->tileSize;
 
     for (uint8_t x = 0; x < this->gridSizeX; ++x)
     {

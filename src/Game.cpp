@@ -2,11 +2,6 @@
 #include "Game.hpp"
 #include "utils/IniParser.hpp"
 
-void Game::initVariables()
-{
-    this->dt = 0.f;
-}
-
 void Game::initWindow()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
@@ -64,8 +59,8 @@ void Game::initStates()
 }
 
 Game::Game()
+    : dt(0.f)
 {
-    this->initVariables();
     this->initWindow();
     this->initSupportedKeys();
     this->initFont();

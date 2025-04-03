@@ -3,8 +3,6 @@
 
 class IniParser
 {
-private:
-    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> data;
 public:
     IniParser();
     IniParser(const std::string& filename);
@@ -15,6 +13,9 @@ public:
     bool getBool(const std::string& section, const std::string& key, bool defaultValue = false) const;
 
     const std::unordered_map<std::string, std::string>& getSection(const std::string& section) const;
+
+private:
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> data;
 };
 
 #endif

@@ -9,6 +9,17 @@ class GameState;
 
 class Game
 {
+public:
+    Game();
+    ~Game();
+
+    void run();
+    void updateDeltaTime();
+    void updateSFMLEvent();
+    void update();
+    void render();
+    void end();
+
 private:
     sf::RenderWindow* window;
     sf::Clock dtClock;
@@ -22,22 +33,10 @@ private:
 
     std::unordered_map<std::string, int> supportedKeys;
 
-    void initVariables();
     void initWindow();
     void initSupportedKeys();
     void initFont();
     void initStates();
-
-public:
-    Game();
-    ~Game();
-
-    void run();
-    void updateDeltaTime();
-    void updateSFMLEvent();
-    void update();
-    void render();
-    void end();
 };
 
 #endif

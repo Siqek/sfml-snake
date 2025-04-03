@@ -3,10 +3,6 @@
 
 class State
 {
-protected:
-    sf::RenderWindow* window;
-    const std::unordered_map<std::string, int>& supportedKeys;
-    const sf::Font& font;
 public:
     State(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font);
     virtual ~State();
@@ -15,6 +11,11 @@ public:
     virtual void update(const float& dt) = 0;
 
     virtual void render(sf::RenderTarget* target = nullptr) = 0;
+
+protected:
+    sf::RenderWindow* window;
+    const std::unordered_map<std::string, int>& supportedKeys;
+    const sf::Font& font;
 };
 
 #endif
