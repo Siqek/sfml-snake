@@ -1,7 +1,7 @@
 #include "stdafx.hpp"
 #include "utils/string_utils.hpp"
 
-std::string rtrim(const std::string &str, const std::string& trim_set)
+std::string utils::rtrim(const std::string& str, const std::string& trim_set)
 {
     size_t end = str.find_last_not_of(trim_set);
 
@@ -12,7 +12,7 @@ std::string rtrim(const std::string &str, const std::string& trim_set)
     return str.substr(0, end + 1);
 }
 
-std::string ltrim(const std::string &str, const std::string& trim_set)
+std::string utils::ltrim(const std::string& str, const std::string& trim_set)
 {
     size_t start = str.find_first_not_of(trim_set);
 
@@ -23,7 +23,12 @@ std::string ltrim(const std::string &str, const std::string& trim_set)
     return str.substr(start);
 }
 
-std::string toUpperCase(const std::string &str)
+std::string utils::trim(const std::string& str, const std::string& trim_set)
+{
+    return ltrim(rtrim(str, trim_set), trim_set);
+}
+
+std::string utils::toUpperCase(const std::string& str)
 {
     std::string result = "";
     result.reserve(str.size());
@@ -34,7 +39,7 @@ std::string toUpperCase(const std::string &str)
     return result;
 }
 
-std::string toLowerCase(const std::string &str)
+std::string utils::toLowerCase(const std::string& str)
 {
     std::string result = "";
     result.reserve(str.size());

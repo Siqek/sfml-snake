@@ -34,7 +34,7 @@ void IniParser::loadFromFile(const std::string &filename)
         }
 
         // trim whitespaces
-        line = rtrim(ltrim(line));
+        line = utils::trim(line);
 
         if (line.empty()) continue;
 
@@ -50,8 +50,8 @@ void IniParser::loadFromFile(const std::string &filename)
         std::string value = "";
 
         if (std::getline(ss, key, '=') && std::getline(ss, value)) {
-            key = rtrim(key);
-            value = ltrim(value);
+            key = utils::rtrim(key);
+            value = utils::ltrim(value);
             this->data[current_section][key] = value;
         } else {
             std::cerr << "IniParser::Invalid format in INI file. Expected: \'key=value\'. Invalid line: " << line << std::endl;
@@ -105,7 +105,7 @@ bool IniParser::getBool(const std::string& section, const std::string& key, bool
     if (it_section != this->data.end()) {
         auto it_value = it_section->second.find(key);
         if (it_value != it_section->second.end()) {
-            std::string str_value = toLowerCase(it_value->second);
+            std::string str_value = utils::toLowerCase(it_value->second);
 
             if (str_value == "true" || str_value == "1")
                 return true;
