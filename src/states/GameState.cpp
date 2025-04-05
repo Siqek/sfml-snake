@@ -69,8 +69,9 @@ int GameState::convertToFontSize(float height)
 
 GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font)
     : State(window, supportedKeys, font),
-    gridSizeX(40), gridSizeY(10),
-    snake(4.f, 3u)
+    gridSizeX(20), gridSizeY(20),
+    snake(4.f, 3u),
+    score(0u)
 {
     this->updateUIScaling();
 
@@ -128,6 +129,14 @@ void GameState::update(const float& dt)
     this->updateInput();
 
     this->snake.update(dt);
+
+    if (this->snake.checkHeadCollision(this->apple.getPosition()))
+    {
+        this->apple.spawn(this->snake.getUnoccupiedTiles());
+        this->snake.grow(1u);
+        this->score++;
+        this->scoreText.setString(std::to_string(this->score));
+    }
 }
 
 void GameState::render(sf::RenderTarget* target)

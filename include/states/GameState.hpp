@@ -43,6 +43,7 @@ private:
 
     Apple apple;
 
+    unsigned int score;
     sf::Text scoreText;
 
     void initKeybinds();
