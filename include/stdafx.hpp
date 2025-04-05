@@ -19,6 +19,7 @@
 #include <cassert>
 #include <stdexcept>
 #include <memory>
+#include <random>
 
 // SFML headers
 #include <SFML/Graphics.hpp>

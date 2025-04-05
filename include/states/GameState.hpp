@@ -9,10 +9,12 @@ namespace UIConfig {
 class State;
 class KeyStateTracker;
 class Snake;
+class Apple;
 
 #include "states/State.hpp"
 #include "utils/KeyStateTracker.hpp"
 #include "snake/Snake.hpp"
+#include "snake/Apple.hpp"
 
 class GameState
     : public State
@@ -38,6 +40,8 @@ private:
     sf::RectangleShape tile;
 
     Snake snake;
+
+    Apple apple;
 
     sf::Text scoreText;
 

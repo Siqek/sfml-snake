@@ -20,6 +20,8 @@ public:
     sf::Vector2i getHeadPosition() const { return this->body.front(); };
     float getSpeedPixelsPerSec() const { return this->speedTilesPerSec * this->tileSize; };
 
+    std::vector<sf::Vector2i> getUnoccupiedTiles() const;
+
     void setGridSize(uint8_t x, uint8_t y);
     void setTileSize(float size);
 

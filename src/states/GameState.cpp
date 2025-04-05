@@ -38,6 +38,7 @@ void GameState::updateUIScaling()
         windowSize.y * UIConfig::GridHeightRatio / static_cast<float>(this->gridSizeY)
     );
     this->snake.setTileSize(this->tileSize);
+    this->apple.setTileSize(this->tileSize);
     this->tile.setSize(sf::Vector2f(this->tileSize, this->tileSize));
 
     // score text
@@ -79,7 +80,9 @@ GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::str
         static_cast<int>(this->gridSizeY / 2)
     ));
 
-    this->tile.setFillColor(sf::Color(100, 0, 0));
+    this->apple.spawn(this->snake.getUnoccupiedTiles());
+
+    this->tile.setFillColor(sf::Color(0, 0, 100));
     this->tile.setOutlineThickness(2.f);
     this->tile.setOutlineColor(sf::Color::Magenta);
 
@@ -145,6 +148,8 @@ void GameState::render(sf::RenderTarget* target)
     }
 
     this->snake.render(*target, this->gridOffsetX, this->gridOffsetY);
+
+    this->apple.render(*target, this->gridOffsetX, this->gridOffsetY);
 
     target->draw(this->scoreText);
 }

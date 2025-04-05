@@ -18,6 +18,29 @@ void Snake::initHeadPosition(sf::Vector2i position)
         this->body.push_front(position);
 }
 
+std::vector<sf::Vector2i> Snake::getUnoccupiedTiles() const
+{
+    std::vector<sf::Vector2i> unoccupiedTiles{};
+    unoccupiedTiles.reserve(this->gridSizeX * this->gridSizeY - this->body.size());
+
+    std::vector<std::vector<bool>> occupiedTiles(this->gridSizeX, std::vector<bool>(this->gridSizeY, false));
+
+    for (const auto& b : this->body) {
+        assert(b.x >= 0 && b.x < this->gridSizeX);
+        assert(b.y >= 0 && b.y < this->gridSizeY);
+        occupiedTiles[b.x][b.y] = true;
+    }
+
+    for (size_t x = 0; x < this->gridSizeX; ++x) {
+        for (size_t y = 0; y < this->gridSizeY; ++y) {
+            if (!occupiedTiles[x][y])
+                unoccupiedTiles.emplace_back(sf::Vector2i(static_cast<int>(x), static_cast<int>(y)));
+        }
+    }
+
+    return unoccupiedTiles;
+}
+
 void Snake::setGridSize(uint8_t x, uint8_t y)
 {
     this->gridSizeX = x;
