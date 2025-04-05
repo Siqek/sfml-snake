@@ -9,17 +9,15 @@ enum class Direction
     DOWN
 };
 
-using Position = std::pair<int, int>;
-
 class Snake
 {
 public:
     Snake(float speed, unsigned int length);
     ~Snake() = default;
 
-    void initHeadPosition(Position position);
+    void initHeadPosition(sf::Vector2i position);
 
-    Position getHeadPosition() const { return this->body.front(); };
+    sf::Vector2i getHeadPosition() const { return this->body.front(); };
     float getSpeedPixelsPerSec() const { return this->speedTilesPerSec * this->tileSize; };
 
     void setGridSize(uint8_t x, uint8_t y);
@@ -29,8 +27,8 @@ public:
     void grow(unsigned int lengthToGrow);
     void move();
 
-    bool checkCollision(Position position) const;
-    bool checkHeadCollision(Position position) const;
+    bool checkCollision(sf::Vector2i position) const;
+    bool checkHeadCollision(sf::Vector2i position) const;
 
     void update(const float& dt);
     void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
@@ -49,7 +47,7 @@ private:
     float distanceTraveled;
 
     sf::RectangleShape bodyFragment;
-    std::deque<Position> body;
+    std::deque<sf::Vector2i> body;
 
     Direction getOppositeDirection(Direction direction) const;
 };

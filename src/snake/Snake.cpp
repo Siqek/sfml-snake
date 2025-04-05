@@ -12,7 +12,7 @@ Snake::Snake(float speedTilesPerSec, unsigned int length)
     this->bodyFragment.setFillColor(sf::Color::Green);
 }
 
-void Snake::initHeadPosition(Position position)
+void Snake::initHeadPosition(sf::Vector2i position)
 {
     if (this->body.empty())
         this->body.push_front(position);
@@ -54,28 +54,28 @@ void Snake::grow(unsigned int lengthToGrow)
 
 void Snake::move()
 {
-    Position head = this->getHeadPosition();
+    sf::Vector2i head = this->getHeadPosition();
 
     switch (this->direction)
     {
     case Direction::RIGHT:
-        head.first++;
+        head.x++;
         break;
     case Direction::LEFT:
-        head.first--;
+        head.x--;
         break;
     case Direction::UP:
-        head.second--;
+        head.y--;
         break;
     case Direction::DOWN:
-        head.second++;
+        head.y++;
         break;
     }
 
     // Ensure the snake stays within grid boundaries
-    if (head.first >= this->gridSizeX || head.first < 0)
+    if (head.x >= this->gridSizeX || head.x < 0)
         return;
-    if (head.second >= this->gridSizeY || head.second < 0)
+    if (head.y >= this->gridSizeY || head.y < 0)
         return;
 
     this->prevDirection = this->direction;
@@ -89,7 +89,7 @@ void Snake::move()
         this->body.pop_back();
 }
 
-bool Snake::checkCollision(Position position) const
+bool Snake::checkCollision(sf::Vector2i position) const
 {
     for (auto b : this->body) {
         if (b == position)
@@ -99,7 +99,7 @@ bool Snake::checkCollision(Position position) const
     return false;
 }
 
-bool Snake::checkHeadCollision(Position position) const
+bool Snake::checkHeadCollision(sf::Vector2i position) const
 {
     return this->getHeadPosition() == position;
 }
@@ -120,8 +120,8 @@ void Snake::render(sf::RenderTarget& target, float offsetX, float offsetY)
     for (auto b : this->body)
     {
         this->bodyFragment.setPosition(sf::Vector2f(
-            offsetX + this->tileSize * b.first,
-            offsetY + this->tileSize * b.second
+            offsetX + this->tileSize * b.x,
+            offsetY + this->tileSize * b.y
         ));
         target.draw(this->bodyFragment);
     }

@@ -74,7 +74,7 @@ GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::str
     this->updateUIScaling();
 
     this->snake.setGridSize(this->gridSizeX, this->gridSizeY);
-    this->snake.initHeadPosition(Position(
+    this->snake.initHeadPosition(sf::Vector2i(
         static_cast<int>(this->gridSizeX / 2),
         static_cast<int>(this->gridSizeY / 2)
     ));
