@@ -21,50 +21,73 @@ void GameState::initKeyStateTracker()
     this->keyStateTracker = new KeyStateTracker(this->keybinds);
 }
 
+void GameState::updateUIScaling()
+{
+    // Recalculates the size and position of all UI elements based on the new window size
+    // such as: tile size, text size/position, and grid offsets
+
+    // new window size
+    const sf::Vector2f windowSize(
+        static_cast<float>(this->window->getSize().x),
+        static_cast<float>(this->window->getSize().y)
+    );
+
+    // tile size
+    this->tileSize = std::min(
+        windowSize.x * 0.95f / static_cast<float>(this->gridSizeX),
+        windowSize.y * UIConfig::GridHeightRatio / static_cast<float>(this->gridSizeY)
+    );
+    this->snake.setTileSize(this->tileSize);
+    this->tile.setSize(sf::Vector2f(this->tileSize, this->tileSize));
+
+    // score text
+    this->scoreText.setCharacterSize(GameState::convertToFontSize(windowSize.y * UIConfig::ScoreHeightRatio * 0.25f));
+    this->scoreText.setPosition(sf::Vector2f(
+        static_cast<float>(windowSize.x) / 2.f,
+        static_cast<float>(windowSize.y) * UIConfig::ScoreHeightRatio / 2.f
+    ));
+
+    // centerize score text
+    auto lb = this->scoreText.getLocalBounds();
+    this->scoreText.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
+
+    // grid offsets
+    this->gridOffsetX = windowSize.x / 2.f - static_cast<float>(this->gridSizeX) / 2.f * this->tileSize;
+    this->gridOffsetY =
+        windowSize.y * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f )
+        - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
+}
+
+int GameState::convertToFontSize(float height)
+{
+    // Converts pixel height to font size (75 px ~= 100 font size)
+    // Formula: fontSize = (4/3) * height
+    static constexpr float factor = 100.f / 75.f;
+    return static_cast<int>(height * factor);
+}
+
 GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font)
     : State(window, supportedKeys, font),
     gridSizeX(40), gridSizeY(10),
     snake(4.f, 3u)
 {
-    const auto windowSize = [](const auto& ws) -> sf::Vector2f {
-        return sf::Vector2f(static_cast<float>(ws.x), static_cast<float>(ws.y));
-    }(this->window->getSize());
-    this->tileSize = std::min(
-        windowSize.x * 0.95f / static_cast<float>(this->gridSizeX),
-        windowSize.y * UIConfig::GridHeightRatio / static_cast<float>(this->gridSizeY)
-    );
+    this->updateUIScaling();
 
     this->snake.setGridSize(this->gridSizeX, this->gridSizeY);
-    this->snake.setTileSize(this->tileSize);
     this->snake.initHeadPosition(Position(
         static_cast<int>(this->gridSizeX / 2),
         static_cast<int>(this->gridSizeY / 2)
     ));
 
-    this->tile.setSize(sf::Vector2f(this->tileSize, this->tileSize));
     this->tile.setFillColor(sf::Color(100, 0, 0));
     this->tile.setOutlineThickness(2.f);
     this->tile.setOutlineColor(sf::Color::Magenta);
 
     this->scoreText.setFont(this->font);
     this->scoreText.setString("0");
-    const auto convertToFontSize = [](float height) -> int {
-        // Converts pixel height to font size (75 px ~= 100 font size)
-        // Formula: fontSize = (4/3) * height
-        static constexpr float factor = 100.f / 75.f;
-        return static_cast<int>(height * factor);
-    };
-    this->scoreText.setCharacterSize(convertToFontSize(windowSize.y * UIConfig::ScoreHeightRatio * 0.25f));
-    this->scoreText.setPosition(sf::Vector2f(
-        static_cast<float>(windowSize.x) / 2.f,
-        static_cast<float>(windowSize.y) * UIConfig::ScoreHeightRatio / 2.f
-    ));
     this->scoreText.setFillColor(sf::Color::Black);
     this->scoreText.setOutlineThickness(2.f);
     this->scoreText.setOutlineColor(sf::Color::White);
-    // centerize text
-    auto lb = this->scoreText.getLocalBounds();
-    this->scoreText.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
 
     this->initKeybinds();
     this->initKeyStateTracker();
@@ -73,6 +96,11 @@ GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::str
 GameState::~GameState()
 {
     delete this->keyStateTracker;
+}
+
+void GameState::onWindowResize()
+{
+    this->updateUIScaling();
 }
 
 void GameState::updateInput()
@@ -104,27 +132,19 @@ void GameState::render(sf::RenderTarget* target)
     if (!target)
         target = this->window;
 
-    const auto windowSize = this->window->getSize();
-    float offsetX = static_cast<float>(windowSize.x) / 2.f - static_cast<float>(this->gridSizeX) / 2.f * this->tileSize;
-    float offsetY =
-        static_cast<float>(windowSize.y)
-            * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f )
-        - static_cast<float>(this->gridSizeY) / 2.f
-            * this->tileSize;
-
     for (uint8_t x = 0; x < this->gridSizeX; ++x)
     {
         for (uint8_t y = 0; y < this->gridSizeY; ++y)
         {
             this->tile.setPosition(sf::Vector2f(
-                offsetX + static_cast<float>(x) * this->tileSize,
-                offsetY + static_cast<float>(y) * this->tileSize
+                this->gridOffsetX + static_cast<float>(x) * this->tileSize,
+                this->gridOffsetY + static_cast<float>(y) * this->tileSize
             ));
             target->draw(this->tile);
         }
     }
 
-    this->snake.render(*target, offsetX, offsetY);
+    this->snake.render(*target, this->gridOffsetX, this->gridOffsetY);
 
     target->draw(this->scoreText);
 }

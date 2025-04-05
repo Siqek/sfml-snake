@@ -12,6 +12,8 @@ public:
 
     virtual void render(sf::RenderTarget* target = nullptr) = 0;
 
+    virtual void onWindowResize() {};
+
 protected:
     sf::RenderWindow* window;
     const std::unordered_map<std::string, int>& supportedKeys;

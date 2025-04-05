@@ -59,7 +59,7 @@ void Game::initStates()
 }
 
 Game::Game()
-    : dt(0.f)
+    : dt(0.f), states{}, supportedKeys{}
 {
     this->initWindow();
     this->initSupportedKeys();
@@ -94,9 +94,15 @@ void Game::updateDeltaTime()
 
 void Game::updateSFMLEvent()
 {
-    while (this->window->pollEvent(this->sfEvent)) {
-        if (this->sfEvent.type == sf::Event::Closed) {
+    sf::Event event;
+    while (this->window->pollEvent(event)) {
+        if (event.type == sf::Event::Closed) {
             this->end();
+        } else if (event.type == sf::Event::Resized) {
+            sf::FloatRect visibleArea(0.f, 0.f, event.size.width, event.size.height);
+            this->window->setView(sf::View(visibleArea));
+
+            this->states.top()->onWindowResize();
         }
     }
 }

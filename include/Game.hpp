@@ -27,8 +27,6 @@ private:
 
     sf::Font font;
 
-    sf::Event sfEvent;
-
     std::stack<State*> states;
 
     std::unordered_map<std::string, int> supportedKeys;
