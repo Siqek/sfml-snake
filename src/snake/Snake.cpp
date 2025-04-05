@@ -101,6 +101,10 @@ void Snake::move()
     if (head.y >= this->gridSizeY || head.y < 0)
         return;
 
+    // Ensure the snake doesn't overlap
+    if (this->checkCollision(head))
+        return;
+
     this->prevDirection = this->direction;
     this->direction = this->nextDirection;
 
