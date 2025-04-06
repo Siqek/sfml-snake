@@ -118,7 +118,7 @@ void Snake::move()
 
 bool Snake::checkCollision(sf::Vector2i position) const
 {
-    for (auto b : this->body) {
+    for (const auto& b : this->body) {
         if (b == position)
             return true;
     }
@@ -144,7 +144,7 @@ void Snake::update(const float& dt)
 
 void Snake::render(sf::RenderTarget& target, float offsetX, float offsetY)
 {
-    for (auto b : this->body)
+    for (const auto& b : this->body)
     {
         this->bodyFragment.setPosition(sf::Vector2f(
             offsetX + this->tileSize * b.x,
