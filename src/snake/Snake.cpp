@@ -9,7 +9,8 @@ Snake::Snake(float speedTilesPerSec, unsigned int length)
     distanceTraveled(0.f),
     body{}
 {
-    this->bodyFragment.setFillColor(sf::Color::Green);
+    this->bodySegment.setFillColor(sf::Color::Green);
+    this->bodyBorder.setFillColor(sf::Color(0, 50, 0));
 }
 
 void Snake::initHeadPosition(sf::Vector2i position)
@@ -50,7 +51,10 @@ void Snake::setGridSize(uint8_t x, uint8_t y)
 void Snake::setTileSize(float size)
 {
     this->tileSize = size;
-    this->bodyFragment.setSize(sf::Vector2f(this->tileSize, this->tileSize));
+    this->bodySegment.setSize(sf::Vector2f(this->tileSize, this->tileSize));
+
+    this->bodyBorder.setSize(sf::Vector2f(this->tileSize, std::max(2.f, this->tileSize / 10.f)));
+    this->bodyBorder.setOrigin(this->bodySegment.getSize() / 2.f);
 }
 
 void Snake::setDirection(Direction direction)
@@ -144,13 +148,128 @@ void Snake::update(const float& dt)
 
 void Snake::render(sf::RenderTarget& target, float offsetX, float offsetY)
 {
-    for (const auto& b : this->body)
+    enum class BorderSide {
+        TOP,
+        BOTTOM,
+        RIGHT,
+        LEFT,
+        HORIZONTAL,
+        VERTICAL,
+        ALL
+    };
+
+    static std::function<void(BorderSide)> renderBorder = [&target, this](BorderSide side) -> void {
+        switch (side)
+        {
+        case BorderSide::TOP:
+            this->bodyBorder.setRotation(0.f);
+            target.draw(this->bodyBorder);
+            break;
+        case BorderSide::BOTTOM:
+            this->bodyBorder.setRotation(180.f);
+            target.draw(this->bodyBorder);
+            break;
+        case BorderSide::RIGHT:
+            this->bodyBorder.setRotation(90.f);
+            target.draw(this->bodyBorder);
+            break;
+        case BorderSide::LEFT:
+            this->bodyBorder.setRotation(270.f);
+            target.draw(this->bodyBorder);
+            break;
+        case BorderSide::HORIZONTAL:
+            renderBorder(BorderSide::TOP);
+            renderBorder(BorderSide::BOTTOM);
+            break;
+        case BorderSide::VERTICAL:
+            renderBorder(BorderSide::RIGHT);
+            renderBorder(BorderSide::LEFT);
+            break;
+        case BorderSide::ALL:
+            renderBorder(BorderSide::HORIZONTAL);
+            renderBorder(BorderSide::VERTICAL);
+            break;
+        }
+    };
+
+    auto borderOrigin = this->bodyBorder.getOrigin();
+
+    for (size_t i = 0; i < this->body.size(); ++i)
     {
-        this->bodyFragment.setPosition(sf::Vector2f(
-            offsetX + this->tileSize * b.x,
-            offsetY + this->tileSize * b.y
-        ));
-        target.draw(this->bodyFragment);
+        const auto& curSegment = this->body[i];
+        float xPos = offsetX + this->tileSize * curSegment.x;
+        float yPos = offsetY + this->tileSize * curSegment.y;
+
+        this->bodySegment.setPosition(sf::Vector2f(xPos, yPos));
+        this->bodyBorder.setPosition(sf::Vector2f(xPos, yPos) + borderOrigin);
+
+        // snake's body
+        target.draw(this->bodySegment);
+
+        // snake's head border
+        if (i == 0) {
+            renderBorder(BorderSide::ALL);
+            continue;
+        }
+
+        // snake's tail border
+        const auto& prevSegment = this->body[i - 1];
+        if (i == this->body.size() - 1)
+        {
+            if (prevSegment.x == curSegment.x)
+            {
+                renderBorder(BorderSide::VERTICAL);
+
+                if (prevSegment.y + 1 == curSegment.y)
+                    renderBorder(BorderSide::BOTTOM);
+                else if (prevSegment.y - 1 == curSegment.y)
+                    renderBorder(BorderSide::TOP);
+
+            } else if (prevSegment.y == curSegment.y)
+            {
+                renderBorder(BorderSide::HORIZONTAL);
+
+                if (prevSegment.x + 1 == curSegment.x)
+                    renderBorder(BorderSide::RIGHT);
+                else if (prevSegment.x - 1 == curSegment.x)
+                    renderBorder(BorderSide::LEFT);
+            }
+            continue;
+        }
+
+        const auto& nextSegment = this->body[i + 1];
+
+        // Render borders based on adjacent segments
+        if (prevSegment.x == curSegment.x && nextSegment.x == curSegment.x) {
+            // Vertical segments (right & left)
+            renderBorder(BorderSide::VERTICAL);
+        } else if (prevSegment.y == curSegment.y && nextSegment.y == curSegment.y) {
+            // Horizontal segments (top & bottom)
+            renderBorder(BorderSide::HORIZONTAL);
+        } else {
+            // Diagonal segments: right-top, right-bottom, left-top, left-bottom
+            if ((prevSegment.x + 1 == curSegment.x && nextSegment.y + 1 == curSegment.y) ||
+                (nextSegment.x + 1 == curSegment.x && prevSegment.y + 1 == curSegment.y))
+            {
+                renderBorder(BorderSide::RIGHT);
+                renderBorder(BorderSide::BOTTOM);
+            } else if ((prevSegment.x + 1 == curSegment.x && nextSegment.y - 1 == curSegment.y) ||
+                       (nextSegment.x + 1 == curSegment.x && prevSegment.y - 1 == curSegment.y))
+            {
+                renderBorder(BorderSide::RIGHT);
+                renderBorder(BorderSide::TOP);
+            } else if ((prevSegment.x - 1 == curSegment.x && nextSegment.y + 1 == curSegment.y) ||
+                       (nextSegment.x - 1 == curSegment.x && prevSegment.y + 1 == curSegment.y))
+            {
+                renderBorder(BorderSide::LEFT);
+                renderBorder(BorderSide::BOTTOM);
+            } else if ((prevSegment.x - 1 == curSegment.x && nextSegment.y - 1 == curSegment.y) ||
+                       (nextSegment.x - 1 == curSegment.x && prevSegment.y - 1 == curSegment.y))
+            {
+                renderBorder(BorderSide::LEFT);
+                renderBorder(BorderSide::TOP);
+            }
+        }
     }
 }
 

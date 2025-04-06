@@ -20,6 +20,7 @@
 #include <stdexcept>
 #include <memory>
 #include <random>
+#include <functional>
 
 // SFML headers
 #include <SFML/Graphics.hpp>

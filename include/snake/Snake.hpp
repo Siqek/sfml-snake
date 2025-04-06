@@ -48,7 +48,8 @@ private:
     unsigned int lengthToGrow;
     float distanceTraveled;
 
-    sf::RectangleShape bodyFragment;
+    sf::RectangleShape bodySegment;
+    sf::RectangleShape bodyBorder;
     std::deque<sf::Vector2i> body;
 
     Direction getOppositeDirection(Direction direction) const;
