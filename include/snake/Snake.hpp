@@ -36,6 +36,16 @@ public:
     void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
 
 private:
+    enum class BorderSide {
+        TOP,
+        BOTTOM,
+        RIGHT,
+        LEFT,
+        HORIZONTAL,
+        VERTICAL,
+        ALL
+    };
+
     float speedTilesPerSec;
     Direction direction;
     Direction prevDirection;
@@ -53,6 +63,12 @@ private:
     std::deque<sf::Vector2i> body;
 
     Direction getOppositeDirection(Direction direction) const;
+
+    void renderHeadBorder(sf::RenderTarget& target, const sf::Vector2f& position);
+    void renderTailBorder(sf::RenderTarget& target, const sf::Vector2f& position, size_t tailIndex);
+    void renderSegmentBorder(sf::RenderTarget& target, const sf::Vector2f& position, size_t segmentIndex);
+
+    void renderBorder(sf::RenderTarget& target, BorderSide side);
 };
 
 #endif // SNAKE_HPP
