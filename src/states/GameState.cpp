@@ -81,7 +81,7 @@ GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::str
         static_cast<int>(this->gridSizeY / 2)
     ));
 
-    this->apple.spawn(this->snake.getUnoccupiedTiles());
+    this->apple.spawn(this->snake.getFreeTiles());
 
     this->tile.setFillColor(sf::Color(0, 0, 100));
     this->tile.setOutlineThickness(2.f);
@@ -130,9 +130,9 @@ void GameState::update(const float& dt)
 
     this->snake.update(dt);
 
-    if (this->snake.checkHeadCollision(this->apple.getPosition()))
+    if (this->snake.isHeadCollidingAt(this->apple.getPosition()))
     {
-        this->apple.spawn(this->snake.getUnoccupiedTiles());
+        this->apple.spawn(this->snake.getFreeTiles());
         this->snake.grow(1u);
         this->score++;
         this->scoreText.setString(std::to_string(this->score));

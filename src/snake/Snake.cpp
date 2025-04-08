@@ -19,10 +19,10 @@ void Snake::initHeadPosition(sf::Vector2i position)
         this->body.push_front(position);
 }
 
-std::vector<sf::Vector2i> Snake::getUnoccupiedTiles() const
+std::vector<sf::Vector2i> Snake::getFreeTiles() const
 {
-    std::vector<sf::Vector2i> unoccupiedTiles{};
-    unoccupiedTiles.reserve(this->gridSizeX * this->gridSizeY - this->body.size());
+    std::vector<sf::Vector2i> freeTiles{};
+    freeTiles.reserve(this->gridSizeX * this->gridSizeY - this->body.size());
 
     std::vector<std::vector<bool>> occupiedTiles(this->gridSizeX, std::vector<bool>(this->gridSizeY, false));
 
@@ -35,11 +35,11 @@ std::vector<sf::Vector2i> Snake::getUnoccupiedTiles() const
     for (size_t x = 0; x < this->gridSizeX; ++x) {
         for (size_t y = 0; y < this->gridSizeY; ++y) {
             if (!occupiedTiles[x][y])
-                unoccupiedTiles.emplace_back(sf::Vector2i(static_cast<int>(x), static_cast<int>(y)));
+                freeTiles.emplace_back(sf::Vector2i(static_cast<int>(x), static_cast<int>(y)));
         }
     }
 
-    return unoccupiedTiles;
+    return freeTiles;
 }
 
 void Snake::setGridSize(uint8_t x, uint8_t y)
@@ -106,7 +106,7 @@ void Snake::move()
         return;
 
     // Ensure the snake doesn't overlap
-    if (this->checkCollision(head))
+    if (this->isCollidingAt(head))
         return;
 
     this->prevDirection = this->direction;
@@ -120,7 +120,7 @@ void Snake::move()
         this->body.pop_back();
 }
 
-bool Snake::checkCollision(sf::Vector2i position) const
+bool Snake::isCollidingAt(sf::Vector2i position) const
 {
     for (const auto& b : this->body) {
         if (b == position)
@@ -130,7 +130,7 @@ bool Snake::checkCollision(sf::Vector2i position) const
     return false;
 }
 
-bool Snake::checkHeadCollision(sf::Vector2i position) const
+bool Snake::isHeadCollidingAt(sf::Vector2i position) const
 {
     return this->getHeadPosition() == position;
 }

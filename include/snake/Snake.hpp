@@ -20,7 +20,7 @@ public:
     sf::Vector2i getHeadPosition() const { return this->body.front(); };
     float getSpeedPixelsPerSec() const { return this->speedTilesPerSec * this->tileSize; };
 
-    std::vector<sf::Vector2i> getUnoccupiedTiles() const;
+    std::vector<sf::Vector2i> getFreeTiles() const;
 
     void setGridSize(uint8_t x, uint8_t y);
     void setTileSize(float size);
@@ -29,8 +29,8 @@ public:
     void grow(unsigned int lengthToGrow);
     void move();
 
-    bool checkCollision(sf::Vector2i position) const;
-    bool checkHeadCollision(sf::Vector2i position) const;
+    bool isCollidingAt(sf::Vector2i position) const;
+    bool isHeadCollidingAt(sf::Vector2i position) const;
 
     void update(const float& dt);
     void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
