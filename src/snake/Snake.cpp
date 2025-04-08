@@ -105,8 +105,8 @@ void Snake::move()
     if (head.y >= this->gridSizeY || head.y < 0)
         return;
 
-    // Ensure the snake doesn't overlap
-    if (this->isCollidingAt(head))
+    // Ensure the snake doesn't collide with itself, except for the tail (since the snake can follow its own tail)
+    if (this->isCollidingAt(head) && !this->isTailCollidingAt(head))
         return;
 
     this->prevDirection = this->direction;
@@ -133,6 +133,11 @@ bool Snake::isCollidingAt(sf::Vector2i position) const
 bool Snake::isHeadCollidingAt(sf::Vector2i position) const
 {
     return this->getHeadPosition() == position;
+}
+
+bool Snake::isTailCollidingAt(sf::Vector2i position) const
+{
+    return this->getTailPosition() == position;
 }
 
 void Snake::update(const float& dt)

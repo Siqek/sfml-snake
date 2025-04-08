@@ -18,6 +18,7 @@ public:
     void initHeadPosition(sf::Vector2i position);
 
     sf::Vector2i getHeadPosition() const { return this->body.front(); };
+    sf::Vector2i getTailPosition() const { return this->body.back(); };
     float getSpeedPixelsPerSec() const { return this->speedTilesPerSec * this->tileSize; };
 
     std::vector<sf::Vector2i> getFreeTiles() const;
@@ -31,6 +32,7 @@ public:
 
     bool isCollidingAt(sf::Vector2i position) const;
     bool isHeadCollidingAt(sf::Vector2i position) const;
+    bool isTailCollidingAt(sf::Vector2i position) const;
 
     void update(const float& dt);
     void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
