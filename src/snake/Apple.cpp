@@ -2,7 +2,7 @@
 #include "snake/Apple.hpp"
 
 Apple::Apple()
-    : position{}, tileSize(0.f)
+    : position{}, tileSize(0.f), isSpawned(false)
 {
     this->appleShape.setFillColor(sf::Color::Red);
 }
@@ -24,14 +24,21 @@ void Apple::spawn(std::vector<sf::Vector2i> freeTiles)
     static std::mt19937 gen(rd());
     std::uniform_int_distribution<> distr(0, freeTiles.size() - 1);
 
-    if (freeTiles.empty())
+    if (freeTiles.empty()) {
+        this->position = sf::Vector2i(-1, -1);
+        this->isSpawned = false;
         return;
+    }
 
     this->position = freeTiles[distr(gen)];
+    this->isSpawned = true;
 }
 
 void Apple::render(sf::RenderTarget &target, float offsetX, float offsetY)
 {
+    if (!isSpawned)
+        return;
+
     this->appleShape.setPosition(
         offsetX + static_cast<float>(this->position.x) * this->tileSize,
         offsetY + static_cast<float>(this->position.y) * this->tileSize

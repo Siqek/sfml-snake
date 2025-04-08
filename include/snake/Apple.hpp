@@ -19,6 +19,8 @@ private:
     sf::RectangleShape appleShape;
 
     float tileSize;
+
+    bool isSpawned;
 };
 
 #endif // APPLE_HPP
