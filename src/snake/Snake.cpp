@@ -9,8 +9,8 @@ Snake::Snake(float speedTilesPerSec, unsigned int length)
     distanceTraveled(0.f),
     body{}
 {
-    this->bodySegment.setFillColor(sf::Color::Green);
-    this->bodyBorder.setFillColor(sf::Color(0, 50, 0));
+    this->bodySegment.setFillColor(sf::Color(0xCCFFBDFF));
+    this->bodyBorder.setFillColor(sf::Color(0x7ECA9CFF));
 }
 
 void Snake::initHeadPosition(sf::Vector2i position)

@@ -84,8 +84,6 @@ GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::str
     this->apple.spawn(this->snake.getFreeTiles());
 
     this->tile.setFillColor(sf::Color(0, 0, 100));
-    this->tile.setOutlineThickness(2.f);
-    this->tile.setOutlineColor(sf::Color::Magenta);
 
     this->scoreText.setFont(this->font);
     this->scoreText.setString("0");
@@ -148,6 +146,11 @@ void GameState::render(sf::RenderTarget* target)
     {
         for (uint8_t y = 0; y < this->gridSizeY; ++y)
         {
+            if (x % 2 == y % 2)
+                this->tile.setFillColor(sf::Color(0x40394AFF));
+            else
+                this->tile.setFillColor(sf::Color(0x1C1427FF));
+
             this->tile.setPosition(sf::Vector2f(
                 this->gridOffsetX + static_cast<float>(x) * this->tileSize,
                 this->gridOffsetY + static_cast<float>(y) * this->tileSize
