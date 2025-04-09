@@ -5,6 +5,7 @@ Apple::Apple()
     : position{}, tileSize(0.f), isSpawned(false)
 {
     this->appleShape.setFillColor(sf::Color::Red);
+    this->appleShape.setOutlineColor(sf::Color(170, 0, 0));
 }
 
 sf::Vector2i Apple::getPosition() const
@@ -16,6 +17,7 @@ void Apple::setTileSize(float tileSize)
 {
     this->tileSize = tileSize;
     this->appleShape.setSize(sf::Vector2f(this->tileSize, this->tileSize));
+    this->appleShape.setOutlineThickness(-std::max(2.f, this->tileSize / 10.f));
 }
 
 void Apple::spawn(std::vector<sf::Vector2i> freeTiles)
