@@ -87,7 +87,7 @@ void Snake::move()
         return;
 
     // Ensure the snake doesn't collide with itself, except for the tail (since the snake can follow its own tail)
-    if (this->isCollidingAt(head) && !this->isTailCollidingAt(head))
+    if (this->isCollidingAt(head) && (!this->isTailCollidingAt(head) || this->lengthToGrow > 0))
         return;
 
     this->prevDirection = this->direction;
