@@ -11,7 +11,7 @@ public:
 
     void setTileSize(float tileSize);
 
-    void spawn(std::vector<sf::Vector2i> freeTiles);
+    void spawn(const std::vector<sf::Vector2i>& freeTiles);
     void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
 
 private:

@@ -20,7 +20,7 @@ void Apple::setTileSize(float tileSize)
     this->appleShape.setOutlineThickness(-std::max(2.f, this->tileSize / 10.f));
 }
 
-void Apple::spawn(std::vector<sf::Vector2i> freeTiles)
+void Apple::spawn(const std::vector<sf::Vector2i>& freeTiles)
 {
     static std::random_device rd;
     static std::mt19937 gen(rd());
