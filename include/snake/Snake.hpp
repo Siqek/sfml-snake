@@ -21,7 +21,7 @@ public:
     sf::Vector2i getTailPosition() const { return this->body.back(); };
     float getSpeedPixelsPerSec() const { return this->speedTilesPerSec * this->tileSize; };
 
-    std::vector<sf::Vector2i> getFreeTiles() const;
+    const std::vector<sf::Vector2i>& getFreeTiles() const { return this->freeTiles; };
 
     void setGridSize(uint8_t x, uint8_t y);
     void setTileSize(float size);
@@ -63,8 +63,12 @@ private:
     sf::RectangleShape bodySegment;
     sf::RectangleShape bodyBorder;
     std::deque<sf::Vector2i> body;
+    std::vector<sf::Vector2i> freeTiles;
 
     Direction getOppositeDirection(Direction direction) const;
+
+    void resetFreeTiles();
+    void removeFromFreeTiles(const sf::Vector2i& position);
 
     void renderHeadBorder(sf::RenderTarget& target, const sf::Vector2f& position);
     void renderTailBorder(sf::RenderTarget& target, const sf::Vector2f& position, size_t tailIndex);

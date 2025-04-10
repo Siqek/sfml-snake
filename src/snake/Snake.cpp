@@ -7,7 +7,7 @@ Snake::Snake(float speedTilesPerSec, unsigned int length)
     gridSizeX(0), gridSizeY(0), tileSize(0.f),
     lengthToGrow(std::max(0u, length - 1)), /* prevent underflow */
     distanceTraveled(0.f),
-    body{}
+    body{}, freeTiles{}
 {
     this->bodySegment.setFillColor(sf::Color(0xCCFFBDFF));
     this->bodyBorder.setFillColor(sf::Color(0x7ECA9CFF));
@@ -15,37 +15,18 @@ Snake::Snake(float speedTilesPerSec, unsigned int length)
 
 void Snake::initHeadPosition(sf::Vector2i position)
 {
-    if (this->body.empty())
+    if (this->body.empty()) {
         this->body.push_front(position);
-}
-
-std::vector<sf::Vector2i> Snake::getFreeTiles() const
-{
-    std::vector<sf::Vector2i> freeTiles{};
-    freeTiles.reserve(this->gridSizeX * this->gridSizeY - this->body.size());
-
-    std::vector<std::vector<bool>> occupiedTiles(this->gridSizeX, std::vector<bool>(this->gridSizeY, false));
-
-    for (const auto& b : this->body) {
-        assert(b.x >= 0 && b.x < this->gridSizeX);
-        assert(b.y >= 0 && b.y < this->gridSizeY);
-        occupiedTiles[b.x][b.y] = true;
+        this->removeFromFreeTiles(position);
     }
-
-    for (size_t x = 0; x < this->gridSizeX; ++x) {
-        for (size_t y = 0; y < this->gridSizeY; ++y) {
-            if (!occupiedTiles[x][y])
-                freeTiles.emplace_back(sf::Vector2i(static_cast<int>(x), static_cast<int>(y)));
-        }
-    }
-
-    return freeTiles;
 }
 
 void Snake::setGridSize(uint8_t x, uint8_t y)
 {
     this->gridSizeX = x;
     this->gridSizeY = y;
+
+    this->resetFreeTiles();
 }
 
 void Snake::setTileSize(float size)
@@ -113,11 +94,14 @@ void Snake::move()
     this->direction = this->nextDirection;
 
     this->body.push_front(head);
+    this->removeFromFreeTiles(head);
 
-    if (this->lengthToGrow > 0)
+    if (this->lengthToGrow > 0) {
         this->lengthToGrow--;
-    else
+    } else {
+        this->freeTiles.push_back(this->body.back());
         this->body.pop_back();
+    }
 }
 
 bool Snake::isCollidingAt(sf::Vector2i position) const
@@ -172,6 +156,33 @@ void Snake::render(sf::RenderTarget& target, float offsetX, float offsetY)
             this->renderTailBorder(target, position, i);
         } else {
             this->renderSegmentBorder(target, position, i);
+        }
+    }
+}
+
+void Snake::resetFreeTiles()
+{
+    this->freeTiles.clear();
+    // Swap to release memory and set the vector's capacity to a minimum (after clearing).
+    std::vector<sf::Vector2i>(this->freeTiles).swap(this->freeTiles);
+    this->freeTiles.reserve(this->gridSizeX * this->gridSizeY);
+
+    for (int x = 0; x < this->gridSizeX; ++x) {
+        for (int y = 0; y < this->gridSizeY; ++y) {
+            this->freeTiles.emplace_back(x, y);
+        }
+    }
+}
+
+void Snake::removeFromFreeTiles(const sf::Vector2i& position)
+{
+    for (size_t i = 0; i < this->freeTiles.size(); ++i) {
+        if (this->freeTiles[i] == position) {
+            // swap with the last element to save time
+            this->freeTiles[i] = this->freeTiles.back();
+            // remove swapped element from the end
+            this->freeTiles.pop_back();
+            break;
         }
     }
 }
