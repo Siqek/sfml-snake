@@ -99,7 +99,8 @@ void Snake::move()
     if (this->lengthToGrow > 0) {
         this->lengthToGrow--;
     } else {
-        this->freeTiles.push_back(this->body.back());
+        if (head != this->body.back())
+            this->freeTiles.push_back(this->body.back());
         this->body.pop_back();
     }
 }
