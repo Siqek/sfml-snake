@@ -134,21 +134,18 @@ void GameState::render(sf::RenderTarget* target)
     if (!target)
         target = this->window;
 
-    for (uint8_t x = 0; x < this->gridSizeX; ++x)
+    for (const auto& tile : this->snake.getFreeTiles())
     {
-        for (uint8_t y = 0; y < this->gridSizeY; ++y)
-        {
-            if (x % 2 == y % 2)
-                this->tile.setFillColor(sf::Color(0x40394AFF));
-            else
-                this->tile.setFillColor(sf::Color(0x1C1427FF));
+        if (tile.x % 2 == tile.y % 2)
+            this->tile.setFillColor(sf::Color(0x40394AFF));
+        else
+            this->tile.setFillColor(sf::Color(0x1C1427FF));
 
-            this->tile.setPosition(sf::Vector2f(
-                this->gridOffsetX + static_cast<float>(x) * this->tileSize,
-                this->gridOffsetY + static_cast<float>(y) * this->tileSize
-            ));
-            target->draw(this->tile);
-        }
+        this->tile.setPosition(sf::Vector2f(
+            this->gridOffsetX + static_cast<float>(tile.x) * this->tileSize,
+            this->gridOffsetY + static_cast<float>(tile.y) * this->tileSize
+        ));
+        target->draw(this->tile);
     }
 
     this->snake.render(*target, this->gridOffsetX, this->gridOffsetY);
