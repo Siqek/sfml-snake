@@ -50,8 +50,6 @@ private:
     void initKeyStateTracker();
 
     void updateUIScaling();
-
-    static int convertToFontSize(float height);
 };
 
 #endif

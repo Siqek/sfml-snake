@@ -42,7 +42,7 @@ void GameState::updateUIScaling()
     this->tile.setSize(sf::Vector2f(this->tileSize, this->tileSize));
 
     // score text
-    this->scoreText.setCharacterSize(GameState::convertToFontSize(windowSize.y * UIConfig::ScoreHeightRatio * 0.25f));
+    this->scoreText.setCharacterSize(static_cast<unsigned int>(windowSize.y * UIConfig::ScoreHeightRatio * 0.25f));
     this->scoreText.setPosition(sf::Vector2f(
         static_cast<float>(windowSize.x) / 2.f,
         static_cast<float>(windowSize.y) * UIConfig::ScoreHeightRatio / 2.f
@@ -57,14 +57,6 @@ void GameState::updateUIScaling()
     this->gridOffsetY =
         windowSize.y * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f )
         - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
-}
-
-int GameState::convertToFontSize(float height)
-{
-    // Converts pixel height to font size (75 px ~= 100 font size)
-    // Formula: fontSize = (4/3) * height
-    static constexpr float factor = 100.f / 75.f;
-    return static_cast<int>(height * factor);
 }
 
 GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font)
