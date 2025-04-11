@@ -58,6 +58,12 @@ void Game::initStates()
     this->states.push(new GameState(this->window, this->supportedKeys, this->font));
 }
 
+void Game::updateFPS()
+{
+    this->fpsCounter.update(this->dt);
+    this->fpsText.setString(std::to_string(this->fpsCounter.getFPS()) + " fps");
+}
+
 Game::Game()
     : dt(0.f), states{}, supportedKeys{}
 {
@@ -65,6 +71,11 @@ Game::Game()
     this->initSupportedKeys();
     this->initFont();
     this->initStates();
+
+    this->fpsText.setFont(this->font);
+    this->fpsText.setPosition(sf::Vector2f(5.f, 5.f));
+    this->fpsText.setCharacterSize(16u);
+    this->fpsText.setFillColor(sf::Color::Green);
 }
 
 Game::~Game()
@@ -111,6 +122,7 @@ void Game::update()
 {
     this->updateDeltaTime();
     this->updateSFMLEvent();
+    this->updateFPS();
 
     if (this->states.empty()) {
         this->end();
@@ -140,6 +152,8 @@ void Game::render()
     }
 
     this->states.top()->render();
+
+    this->window->draw(this->fpsText);
 
     this->window->display();
 }
