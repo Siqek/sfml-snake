@@ -139,7 +139,7 @@ void Game::update()
 
 void Game::render()
 {
-    this->window->clear();
+    this->window->clear(sf::Color(0x404040FF));
 
     if (this->states.empty()) {
         this->end();
