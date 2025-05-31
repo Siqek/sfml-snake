@@ -1,5 +1,7 @@
 #include "stdafx.hpp"
 #include "states/GameState.hpp"
+
+#include "utils/KeyStateTracker.hpp"
 #include "utils/IniParser.hpp"
 
 void GameState::initKeybinds()

@@ -1,8 +1,6 @@
 #ifndef MAINMENUSTATE_HPP
 #define MAINMENUSTATE_HPP
 
-class State;
-
 #include "states/State.hpp"
 
 class MainMenuState

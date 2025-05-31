@@ -2,11 +2,7 @@
 #define GAME_HPP
 
 class State;
-class GameState;
-class FPSCounter;
 
-#include "states/State.hpp"
-#include "states/GameState.hpp"
 #include "utils/FPSCounter.hpp"
 
 class Game

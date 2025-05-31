@@ -1,5 +1,9 @@
 #include "stdafx.hpp"
 #include "Game.hpp"
+
+#include "states/State.hpp"
+#include "states/GameState.hpp"
+
 #include "utils/IniParser.hpp"
 
 void Game::initWindow()

@@ -6,13 +6,9 @@ namespace UIConfig {
     static constexpr float GridHeightRatio = 0.75;
 }
 
-class State;
 class KeyStateTracker;
-class Snake;
-class Apple;
 
 #include "states/State.hpp"
-#include "utils/KeyStateTracker.hpp"
 #include "snake/Snake.hpp"
 #include "snake/Apple.hpp"
 
