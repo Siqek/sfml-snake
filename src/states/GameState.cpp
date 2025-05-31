@@ -4,6 +4,8 @@
 #include "utils/KeyStateTracker.hpp"
 #include "utils/IniParser.hpp"
 
+#include "config/Colors.hpp"
+
 void GameState::initKeybinds()
 {
     IniParser iniParser("config/gamestateKeybinds.ini");
@@ -77,13 +79,11 @@ GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::str
 
     this->apple.spawn(this->snake.getFreeTiles());
 
-    this->tile.setFillColor(sf::Color(0, 0, 100));
-
     this->scoreText.setFont(this->font);
     this->scoreText.setString("0");
-    this->scoreText.setFillColor(sf::Color::Black);
+    this->scoreText.setFillColor(sf::Color(Colors::Hex::TextMain));
     this->scoreText.setOutlineThickness(2.f);
-    this->scoreText.setOutlineColor(sf::Color::White);
+    this->scoreText.setOutlineColor(sf::Color(Colors::Hex::TextMainOutline));
 
     this->initKeybinds();
     this->initKeyStateTracker();
@@ -139,9 +139,9 @@ void GameState::render(sf::RenderTarget* target)
     for (const auto& tile : this->snake.getFreeTiles())
     {
         if (tile.x % 2 == tile.y % 2)
-            this->tile.setFillColor(sf::Color(0x40394AFF));
+            this->tile.setFillColor(sf::Color(Colors::Hex::BoardCellPrimary));
         else
-            this->tile.setFillColor(sf::Color(0x1C1427FF));
+            this->tile.setFillColor(sf::Color(Colors::Hex::BoardCellSecondary));
 
         this->tile.setPosition(sf::Vector2f(
             this->gridOffsetX + static_cast<float>(tile.x) * this->tileSize,

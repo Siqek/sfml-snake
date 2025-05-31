@@ -6,6 +6,8 @@
 
 #include "utils/IniParser.hpp"
 
+#include "config/Colors.hpp"
+
 void Game::initWindow()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
@@ -143,7 +145,7 @@ void Game::update()
 
 void Game::render()
 {
-    this->window->clear(sf::Color(0x404040FF));
+    this->window->clear(sf::Color(Colors::Hex::Background));
 
     if (this->states.empty()) {
         this->end();
