@@ -16,7 +16,7 @@ class GameState
     : public State
 {
 public:
-    GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font);
+    GameState(StateData* stateData);
     ~GameState();
 
     void onWindowResize() override;

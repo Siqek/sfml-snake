@@ -7,7 +7,7 @@ class MainMenuState
     : public State
 {
 public:
-    MainMenuState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font);
+    MainMenuState(StateData* stateData);
 
     void onWindowResize() override;
 

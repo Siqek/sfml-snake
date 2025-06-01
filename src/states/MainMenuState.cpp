@@ -1,14 +1,14 @@
 #include "stdafx.hpp"
 #include "states/MainMenuState.hpp"
 
-MainMenuState::MainMenuState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font)
-    : State(window, supportedKeys, font)
+MainMenuState::MainMenuState(StateData* stateData)
+    : State(stateData)
 {
     rs.setFillColor(sf::Color::Red);
     rs.setSize(sf::Vector2f(20.f, 20.f));
 
     this->startButtonText.setString("Play");
-    this->startButtonText.setFont(font);
+    this->startButtonText.setFont(this->font);
     this->startButtonText.setFillColor(sf::Color(0x1C1427FF));
 
     this->startButton.setFillColor(sf::Color(0x40394AFF));

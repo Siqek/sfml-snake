@@ -63,8 +63,8 @@ void GameState::updateUIScaling()
         - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
 }
 
-GameState::GameState(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font)
-    : State(window, supportedKeys, font),
+GameState::GameState(StateData* stateData)
+    : State(stateData),
     gridSizeX(20), gridSizeY(20),
     snake(4.f, 3u),
     score(0u)

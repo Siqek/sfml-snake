@@ -1,7 +1,7 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-class State;
+#include "states/State.hpp"
 
 #include "utils/FPSCounter.hpp"
 
@@ -26,6 +26,8 @@ private:
 
     sf::Font font;
 
+    StateData stateData;
+
     std::stack<State*> states;
 
     std::unordered_map<std::string, int> supportedKeys;
@@ -33,6 +35,7 @@ private:
     void initWindow();
     void initSupportedKeys();
     void initFont();
+    void initStateData();
     void initStates();
 
     void updateDeltaTime();

@@ -1,7 +1,6 @@
 #include "stdafx.hpp"
 #include "Game.hpp"
 
-#include "states/State.hpp"
 #include "states/GameState.hpp"
 
 #include "utils/IniParser.hpp"
@@ -59,9 +58,16 @@ void Game::initFont()
     }
 }
 
+void Game::initStateData()
+{
+    this->stateData.window = this->window;
+    this->stateData.supportedKeys = &this->supportedKeys;
+    this->stateData.font = &this->font;
+}
+
 void Game::initStates()
 {
-    this->states.push(new GameState(this->window, this->supportedKeys, this->font));
+    this->states.push(new GameState(&this->stateData));
 }
 
 void Game::updateFPS()
@@ -76,6 +82,7 @@ Game::Game()
     this->initWindow();
     this->initSupportedKeys();
     this->initFont();
+    this->initStateData();
     this->initStates();
 
     this->fpsText.setFont(this->font);

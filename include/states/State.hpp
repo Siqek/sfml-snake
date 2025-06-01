@@ -1,10 +1,16 @@
 #ifndef STATE_HPP
 #define STATE_HPP
 
+struct StateData {
+    sf::RenderWindow* window;
+    const std::unordered_map<std::string, int>* supportedKeys;
+    const sf::Font* font;
+};
+
 class State
 {
 public:
-    State(sf::RenderWindow* window, const std::unordered_map<std::string, int>& supportedKeys, const sf::Font& font);
+    State(StateData* stateData);
     virtual ~State();
 
     virtual void updateInput() = 0;
