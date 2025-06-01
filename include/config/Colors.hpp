@@ -1,6 +1,8 @@
 #ifndef COLORS_HPP
 #define COLORS_HPP
 
+#include "stdafx.hpp"
+
 namespace Colors::Hex {
     static constexpr std::uint32_t Background          = 0x0F0E17FF;
 
