@@ -16,8 +16,6 @@ public:
     virtual void updateInput() = 0;
     virtual void update(const float& dt) = 0;
 
-    virtual void updateMousePosition();
-
     virtual void render(sf::RenderTarget* target = nullptr) = 0;
 
     virtual void onWindowResize() {};
@@ -26,9 +24,6 @@ protected:
     sf::RenderWindow* window;
     const std::unordered_map<std::string, int>& supportedKeys;
     const sf::Font& font;
-
-    sf::Vector2i mouseScreenPos;
-    sf::Vector2i mouseWindowPos;
 };
 
 #endif

@@ -24,9 +24,7 @@ void MainMenuState::updateInput()
 {
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
     {
-        if (this->startButton.getGlobalBounds().contains(sf::Vector2f(
-            static_cast<float>(this->mouseScreenPos.x),
-            static_cast<float>(this->mouseScreenPos.y))))
+        if (this->startButton.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(*this->window))))
         {
             // push GameState to state stack (Game::states)
         }
@@ -35,12 +33,7 @@ void MainMenuState::updateInput()
 
 void MainMenuState::update(const float& dt)
 {
-    this->updateMousePosition();
-
-    rs.setPosition(sf::Vector2f(
-        static_cast<float>(this->mouseWindowPos.x),
-        static_cast<float>(this->mouseWindowPos.y)
-    ));
+    rs.setPosition(sf::Vector2f(sf::Mouse::getPosition(*this->window)));
 }
 
 void MainMenuState::render(sf::RenderTarget* target)
