@@ -23,11 +23,18 @@ public:
 
     virtual void onWindowResize() {};
 
+    bool getQuit() const { return quit; }
+
 protected:
     sf::RenderWindow* window;
     const std::unordered_map<std::string, int>& supportedKeys;
     const sf::Font& font;
     StateData* stateData;
+
+    void endState() { quit = true; }
+
+private:
+    bool quit;
 };
 
 #endif

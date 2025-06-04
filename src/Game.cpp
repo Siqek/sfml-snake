@@ -157,6 +157,11 @@ void Game::update()
     }
 
     this->states.top()->update(this->dt);
+
+    if (this->states.top()->getQuit()) {
+        delete this->states.top();
+        this->states.pop();
+    }
 }
 
 void Game::render()
