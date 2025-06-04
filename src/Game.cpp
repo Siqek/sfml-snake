@@ -7,6 +7,10 @@
 
 #include "config/Colors.hpp"
 
+#ifdef __linux__
+    #include <X11/Xlib.h>
+#endif // __linux__
+
 void Game::initWindow()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
@@ -123,7 +127,7 @@ void Game::updateSFMLEvent()
         if (event.type == sf::Event::Closed) {
             this->end();
         } else if (event.type == sf::Event::Resized) {
-            sf::FloatRect visibleArea(0.f, 0.f, event.size.width, event.size.height);
+            sf::FloatRect visibleArea(0.f, 0.f, static_cast<float>(event.size.width), static_cast<float>(event.size.height));
             this->window->setView(sf::View(visibleArea));
 
             this->states.top()->onWindowResize();
@@ -133,6 +137,9 @@ void Game::updateSFMLEvent()
 
 void Game::update()
 {
+#ifdef __linux__
+    this->ensureMinimumWindowSize();
+#endif // __linux__
     this->updateDeltaTime();
     this->updateSFMLEvent();
     this->updateFPS();
@@ -175,3 +182,61 @@ void Game::end()
 {
     this->window->close();
 }
+
+#ifdef __linux__
+
+/*
+This function exists as a workaround for a known issue on Linux/X11 platforms
+where the window size cannot be programmatically changed while the user is actively
+resizing the window by holding its edge. During such interactions, SFML's
+sf::RenderWindow::setSize or setView might not behave as expected.
+
+The problem is discussed in more detail on the SFML forum:
+https://en.sfml-dev.org/forums/index.php?topic=28956.0
+
+There are two potential solutions:
+
+1. Upgrade to SFML 3.0.x and use `sf::WindowBase::setMinimumSize`, which was introduced
+   to address this issue. However, this requires building SFML manually from source,
+   which I’m not confident doing.
+
+2. Use a workaround, as implemented here: on each frame, we check if the window has been
+   resized below the desired minimum size (320x240). If so, we use Xlib directly to resize
+   the window back to the minimum dimensions. This approach waits until the user has
+   released the window edge before applying the change, which aligns with how X11 handles
+   resize events.
+
+Note: Direct use of Xlib is necessary because SFML's setSize function sometimes fails to
+apply the desired size reliably in this edge case.
+*/
+void Game::ensureMinimumWindowSize()
+{
+    const auto& windowSize = this->window->getSize();
+    if (windowSize.x < 320u || windowSize.y < 240u) {
+        ::Window x11Window = this->window->getSystemHandle();
+
+        // Open connection to the X server
+        Display* display = XOpenDisplay(nullptr);
+        if (!display) {
+            std::cerr << "Failed to open X display\n";
+            return;
+        }
+
+        const auto newWidth = std::max(windowSize.x, 320u);
+        const auto newHeight = std::max(windowSize.y, 240u);
+
+        // Resize the window using Xlib
+        XResizeWindow(display, x11Window, newWidth, newHeight);
+
+        // Flush the request to the X server
+        XFlush(display);
+
+        // Close the connection
+        XCloseDisplay(display);
+
+        sf::FloatRect visibleArea(0.f, 0.f, static_cast<float>(newWidth), static_cast<float>(newHeight));
+        this->window->setView(sf::View(visibleArea));
+    }
+}
+
+#endif // __linux__

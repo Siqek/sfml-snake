@@ -41,6 +41,11 @@ private:
     void updateDeltaTime();
     void updateSFMLEvent();
     void updateFPS();
+
+#ifdef __linux__
+    void ensureMinimumWindowSize();
+#endif // __linux__
+
 };
 
 #endif

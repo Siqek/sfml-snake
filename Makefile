@@ -1,6 +1,6 @@
 CC = g++
-CPPFLAGS = -std=c++17 -Wall -Iinclude
-LDFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
+CPPFLAGS = -std=c++17 -Wall -Wextra -Iinclude
+LDFLAGS = -lX11 -lsfml-graphics -lsfml-window -lsfml-system
 
 DEBUG ?= false
 
