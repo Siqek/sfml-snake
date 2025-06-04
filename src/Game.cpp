@@ -1,7 +1,7 @@
 #include "stdafx.hpp"
 #include "Game.hpp"
 
-#include "states/GameState.hpp"
+#include "states/MainMenuState.hpp"
 
 #include "utils/IniParser.hpp"
 
@@ -76,7 +76,7 @@ void Game::initStateData()
 
 void Game::initStates()
 {
-    this->states.push(new GameState(&this->stateData));
+    this->states.push(new MainMenuState(&this->stateData));
 }
 
 void Game::updateFPS()
