@@ -9,6 +9,7 @@
 
 #ifdef __linux__
     #include <X11/Xlib.h>
+    #include <X11/Xutil.h>
 #endif // __linux__
 
 void Game::initWindow()
@@ -35,6 +36,9 @@ void Game::initWindow()
     );
     this->window->setFramerateLimit(iniParser.getInt("Graphics", "iFramerateLimit", 60));
     this->window->setVerticalSyncEnabled(iniParser.getBool("Graphics", "bVSync", true));
+#ifdef __linux__
+    this->setMinimumWindowSize(sf::Vector2i(320, 240));
+#endif // __linux__
 }
 
 void Game::initSupportedKeys()
@@ -137,9 +141,6 @@ void Game::updateSFMLEvent()
 
 void Game::update()
 {
-#ifdef __linux__
-    this->ensureMinimumWindowSize();
-#endif // __linux__
     this->updateDeltaTime();
     this->updateSFMLEvent();
     this->updateFPS();
@@ -185,58 +186,32 @@ void Game::end()
 
 #ifdef __linux__
 
-/*
-This function exists as a workaround for a known issue on Linux/X11 platforms
-where the window size cannot be programmatically changed while the user is actively
-resizing the window by holding its edge. During such interactions, SFML's
-sf::RenderWindow::setSize or setView might not behave as expected.
-
-The problem is discussed in more detail on the SFML forum:
-https://en.sfml-dev.org/forums/index.php?topic=28956.0
-
-There are two potential solutions:
-
-1. Upgrade to SFML 3.0.x and use `sf::WindowBase::setMinimumSize`, which was introduced
-   to address this issue. However, this requires building SFML manually from source,
-   which I’m not confident doing.
-
-2. Use a workaround, as implemented here: on each frame, we check if the window has been
-   resized below the desired minimum size (320x240). If so, we use Xlib directly to resize
-   the window back to the minimum dimensions. This approach waits until the user has
-   released the window edge before applying the change, which aligns with how X11 handles
-   resize events.
-
-Note: Direct use of Xlib is necessary because SFML's setSize function sometimes fails to
-apply the desired size reliably in this edge case.
-*/
-void Game::ensureMinimumWindowSize()
+void Game::setMinimumWindowSize(const sf::Vector2i& minimumSize)
 {
-    const auto& windowSize = this->window->getSize();
-    if (windowSize.x < 320u || windowSize.y < 240u) {
-        ::Window x11Window = this->window->getSystemHandle();
+    ::Window x11Window = this->window->getSystemHandle();
 
-        // Open connection to the X server
-        Display* display = XOpenDisplay(nullptr);
-        if (!display) {
-            std::cerr << "Failed to open X display\n";
-            return;
-        }
-
-        const auto newWidth = std::max(windowSize.x, 320u);
-        const auto newHeight = std::max(windowSize.y, 240u);
-
-        // Resize the window using Xlib
-        XResizeWindow(display, x11Window, newWidth, newHeight);
-
-        // Flush the request to the X server
-        XFlush(display);
-
-        // Close the connection
-        XCloseDisplay(display);
-
-        sf::FloatRect visibleArea(0.f, 0.f, static_cast<float>(newWidth), static_cast<float>(newHeight));
-        this->window->setView(sf::View(visibleArea));
+    Display* display = XOpenDisplay(nullptr);
+    if (!display) {
+        std::cerr << "Failed to open X display\n";
+        return;
     }
+
+    XSizeHints* hints = XAllocSizeHints();
+    if (!hints) {
+        std::cerr << "Failed to allocate XSizeHints\n";
+        XCloseDisplay(display);
+        return;
+    }
+
+    hints->flags = PMinSize;
+    hints->min_width = minimumSize.x;
+    hints->min_height = minimumSize.y;
+
+    XSetNormalHints(display, x11Window, hints);
+    XFlush(display);
+
+    XFree(hints);
+    XCloseDisplay(display);
 }
 
 #endif // __linux__

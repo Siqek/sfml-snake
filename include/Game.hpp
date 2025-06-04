@@ -43,7 +43,7 @@ private:
     void updateFPS();
 
 #ifdef __linux__
-    void ensureMinimumWindowSize();
+    void setMinimumWindowSize(const sf::Vector2i& minimumSize);
 #endif // __linux__
 
 };
