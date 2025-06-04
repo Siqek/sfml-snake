@@ -5,7 +5,7 @@ LDFLAGS = -lX11 -lsfml-graphics -lsfml-window -lsfml-system
 DEBUG ?= false
 
 ifeq ($(DEBUG), true)
-CPPFLAGS += -g -O0
+CPPFLAGS += -g -O0 -fsanitize=address
 else
 CPPFLAGS += -O2 -DNDEBUG
 endif
