@@ -12,8 +12,14 @@ MainMenuState::MainMenuState(StateData* stateData)
     this->startButton.setFont(this->font);
     this->startButton.setText("Play");
 
+    this->exitButton.setFont(this->font);
+    this->exitButton.setText("Exit");
+
     this->startButton.setAccentColor(mgui::ButtonState::Hover, sf::Color::Green);
     this->startButton.setAccentColor(mgui::ButtonState::Active, sf::Color::Red);
+
+    this->exitButton.setAccentColor(mgui::ButtonState::Hover, sf::Color::Green);
+    this->exitButton.setAccentColor(mgui::ButtonState::Active, sf::Color::Red);
 }
 
 void MainMenuState::onWindowResize()
@@ -38,6 +44,7 @@ void MainMenuState::render(sf::RenderTarget* target)
         target = this->window;
 
     this->startButton.render(*target);
+    this->exitButton.render(*target);
 
     target->draw(this->rs);
 }
@@ -45,9 +52,14 @@ void MainMenuState::render(sf::RenderTarget* target)
 void MainMenuState::updateButtons()
 {
     this->startButton.update(*this->window);
+    this->exitButton.update(*this->window);
 
     if (this->startButton.isReleased()) {
         this->stateData->states->push(new GameState(this->stateData));
+    }
+
+    if (this->exitButton.isReleased()) {
+        this->endState();
     }
 }
 
@@ -58,15 +70,22 @@ void MainMenuState::updateUIScaling()
         static_cast<float>(this->window->getSize().y)
     );
 
-    this->startButton.setCharacterSize(static_cast<unsigned>(std::min(windowSize.x / 32.f, windowSize.y / 32.f)));
-    this->startButton.setPosition(windowSize / 2.f);
+    const unsigned characterSize = static_cast<unsigned>(std::min(windowSize.x / 32.f, windowSize.y / 32.f));
+    this->startButton.setCharacterSize(characterSize);
+    this->exitButton.setCharacterSize(characterSize);
 
     const auto tlb = this->startButton.geTextLocalBounds();
 
     const float buttonWidth = tlb.width * 8.f;
     const float buttonHeight = tlb.height * 1.8f;
 
+    this->startButton.setPosition(windowSize / 2.f);
     this->startButton.setSize(sf::Vector2f(buttonWidth, buttonHeight));
     this->startButton.setOrigin(this->startButton.getSize() / 2.f);
     this->startButton.setOutlineThickness(buttonHeight / 16.f);
+
+    this->exitButton.setPosition(sf::Vector2f(windowSize.x / 2.f, windowSize.y / 2.f + buttonHeight * 1.8f));
+    this->exitButton.setSize(sf::Vector2f(buttonWidth, buttonHeight));
+    this->exitButton.setOrigin(this->exitButton.getSize() / 2.f);
+    this->exitButton.setOutlineThickness(buttonHeight / 16.f);
 }

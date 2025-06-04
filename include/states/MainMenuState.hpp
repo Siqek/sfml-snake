@@ -21,6 +21,7 @@ private:
     sf::RectangleShape rs;
 
     mgui::Button startButton;
+    mgui::Button exitButton;
 
     void updateButtons();
     void updateUIScaling();
