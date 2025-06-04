@@ -21,14 +21,14 @@ namespace Colors::Hex {
     static constexpr std::uint32_t BoardCellSecondary  = 0x1C1427FF;
 
 
-    static constexpr std::uint32_t ButtonIdleBg        = 0xFFFFFFFF;
-    static constexpr std::uint32_t ButtonIdleOutline   = 0xFFFFFFFF;
+    static constexpr std::uint32_t ButtonIdleBg        = 0x18151CFF;
+    static constexpr std::uint32_t ButtonIdleOutline   = 0x3D6B5BFF;
 
-    static constexpr std::uint32_t ButtonHoverBg       = 0xFFFFFFFF;
-    static constexpr std::uint32_t ButtonHoverOutline  = 0xFFFFFFFF;
+    static constexpr std::uint32_t ButtonHoverBg       = 0x0F0E17FF;
+    static constexpr std::uint32_t ButtonHoverOutline  = 0x7ECA9CFF;
 
-    static constexpr std::uint32_t ButtonActiveBg      = 0xFFFFFFFF;
-    static constexpr std::uint32_t ButtonActiveOutline = 0xFFFFFFFF;
+    static constexpr std::uint32_t ButtonActiveBg      = 0x1E3B33FF;
+    static constexpr std::uint32_t ButtonActiveOutline = 0xCCFFBDFF;
 }
 
 #endif // COLORS_HPP

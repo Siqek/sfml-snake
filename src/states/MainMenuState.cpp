@@ -3,6 +3,8 @@
 
 #include "states/GameState.hpp"
 
+#include "config/Colors.hpp"
+
 MainMenuState::MainMenuState(StateData* stateData)
     : State(stateData)
 {
@@ -15,11 +17,21 @@ MainMenuState::MainMenuState(StateData* stateData)
     this->exitButton.setFont(this->font);
     this->exitButton.setText("Exit");
 
-    this->startButton.setAccentColor(mgui::ButtonState::Hover, sf::Color::Green);
-    this->startButton.setAccentColor(mgui::ButtonState::Active, sf::Color::Red);
+    this->startButton.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
+    this->startButton.setFillColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverBg));
+    this->startButton.setFillColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveBg));
 
-    this->exitButton.setAccentColor(mgui::ButtonState::Hover, sf::Color::Green);
-    this->exitButton.setAccentColor(mgui::ButtonState::Active, sf::Color::Red);
+    this->startButton.setAccentColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleOutline));
+    this->startButton.setAccentColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverOutline));
+    this->startButton.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
+
+    this->exitButton.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
+    this->exitButton.setFillColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverBg));
+    this->exitButton.setFillColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveBg));
+
+    this->exitButton.setAccentColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleOutline));
+    this->exitButton.setAccentColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverOutline));
+    this->exitButton.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
 }
 
 void MainMenuState::onWindowResize()
