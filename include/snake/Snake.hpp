@@ -15,7 +15,7 @@ public:
     Snake(float speed, unsigned int length);
     ~Snake() = default;
 
-    void initHeadPosition(sf::Vector2i position);
+    void initHeadPosition(const sf::Vector2i& position);
 
     sf::Vector2i getHeadPosition() const { return this->body.front(); };
     sf::Vector2i getTailPosition() const { return this->body.back(); };
@@ -32,9 +32,9 @@ public:
     void grow(unsigned int lengthToGrow);
     void move();
 
-    bool isCollidingAt(sf::Vector2i position) const;
-    bool isHeadCollidingAt(sf::Vector2i position) const;
-    bool isTailCollidingAt(sf::Vector2i position) const;
+    bool isCollidingAt(const sf::Vector2i& position) const;
+    bool isHeadCollidingAt(const sf::Vector2i& position) const;
+    bool isTailCollidingAt(const sf::Vector2i& position) const;
 
     void update(const float& dt);
     void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);

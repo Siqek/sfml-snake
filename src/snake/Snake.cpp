@@ -13,7 +13,7 @@ Snake::Snake(float speedTilesPerSec, unsigned int length)
     this->bodyBorder.setFillColor(sf::Color(0x7ECA9CFF));
 }
 
-void Snake::initHeadPosition(sf::Vector2i position)
+void Snake::initHeadPosition(const sf::Vector2i& position)
 {
     if (this->body.empty()) {
         this->body.push_front(position);
@@ -103,7 +103,7 @@ void Snake::move()
     }
 }
 
-bool Snake::isCollidingAt(sf::Vector2i position) const
+bool Snake::isCollidingAt(const sf::Vector2i& position) const
 {
     for (const auto& b : this->body) {
         if (b == position)
@@ -113,12 +113,12 @@ bool Snake::isCollidingAt(sf::Vector2i position) const
     return false;
 }
 
-bool Snake::isHeadCollidingAt(sf::Vector2i position) const
+bool Snake::isHeadCollidingAt(const sf::Vector2i& position) const
 {
     return this->getHeadPosition() == position;
 }
 
-bool Snake::isTailCollidingAt(sf::Vector2i position) const
+bool Snake::isTailCollidingAt(const sf::Vector2i& position) const
 {
     return this->getTailPosition() == position;
 }
