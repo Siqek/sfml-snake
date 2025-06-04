@@ -41,6 +41,7 @@ namespace mgui
         void setAccentColor(ButtonState state, const sf::Color& color);
 
         const sf::Vector2f& getSize() const { return shape.getSize(); };
+        sf::FloatRect geTextLocalBounds() const { return label.getLocalBounds(); };
 
         bool isPressed() const { return state == ButtonState::Active; };
         bool isReleased() const { return prevState == ButtonState::Active && state == ButtonState::Hover; };
