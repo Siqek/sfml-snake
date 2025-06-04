@@ -23,6 +23,8 @@ public:
 
     const std::vector<sf::Vector2i>& getFreeTiles() const { return this->freeTiles; };
 
+    bool getIsAlive() const { return isAlive; };
+
     void setGridSize(uint8_t x, uint8_t y);
     void setTileSize(float size);
 
@@ -64,6 +66,10 @@ private:
     sf::RectangleShape bodyBorder;
     std::deque<sf::Vector2i> body;
     std::vector<sf::Vector2i> freeTiles;
+
+    bool isAlive;
+
+    void die() { isAlive = false; };
 
     Direction getOppositeDirection(Direction direction) const;
 

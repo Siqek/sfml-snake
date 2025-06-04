@@ -7,7 +7,7 @@ Snake::Snake(float speedTilesPerSec, unsigned int length)
     gridSizeX(0), gridSizeY(0), tileSize(0.f),
     lengthToGrow(std::max(0u, length - 1)), /* prevent underflow */
     distanceTraveled(0.f),
-    body{}, freeTiles{}
+    body{}, freeTiles{}, isAlive(true)
 {
     this->bodySegment.setFillColor(sf::Color(0xCCFFBDFF));
     this->bodyBorder.setFillColor(sf::Color(0x7ECA9CFF));
@@ -66,29 +66,27 @@ void Snake::move()
 
     switch (this->direction)
     {
-    case Direction::RIGHT:
-        head.x++;
-        break;
-    case Direction::LEFT:
-        head.x--;
-        break;
-    case Direction::UP:
-        head.y--;
-        break;
-    case Direction::DOWN:
-        head.y++;
-        break;
+    case Direction::RIGHT: head.x++; break;
+    case Direction::LEFT:  head.x--; break;
+    case Direction::UP:    head.y--; break;
+    case Direction::DOWN:  head.y++; break;
     }
 
     // Ensure the snake stays within grid boundaries
-    if (head.x >= this->gridSizeX || head.x < 0)
+    if (head.x >= this->gridSizeX || head.x < 0) {
+        this->die();
         return;
-    if (head.y >= this->gridSizeY || head.y < 0)
+    }
+    if (head.y >= this->gridSizeY || head.y < 0) {
+        this->die();
         return;
+    }
 
     // Ensure the snake doesn't collide with itself, except for the tail (since the snake can follow its own tail)
-    if (this->isCollidingAt(head) && (!this->isTailCollidingAt(head) || this->lengthToGrow > 0))
+    if (this->isCollidingAt(head) && (!this->isTailCollidingAt(head) || this->lengthToGrow > 0)) {
+        this->die();
         return;
+    }
 
     this->prevDirection = this->direction;
     this->direction = this->nextDirection;
@@ -127,6 +125,9 @@ bool Snake::isTailCollidingAt(sf::Vector2i position) const
 
 void Snake::update(const float& dt)
 {
+    if (!this->isAlive)
+        return;
+
     this->distanceTraveled += this->getSpeedPixelsPerSec() * dt;
 
     if (this->distanceTraveled > this->tileSize)

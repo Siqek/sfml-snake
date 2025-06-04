@@ -122,7 +122,9 @@ void GameState::update(const float& dt)
 
     this->snake.update(dt);
 
-    if (this->snake.isHeadCollidingAt(this->apple.getPosition()))
+    if (!this->snake.getIsAlive()) {
+        this->endState();
+    } else if (this->snake.isHeadCollidingAt(this->apple.getPosition()))
     {
         this->apple.spawn(this->snake.getFreeTiles());
         this->snake.grow(1u);
