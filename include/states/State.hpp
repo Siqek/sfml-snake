@@ -1,10 +1,13 @@
 #ifndef STATE_HPP
 #define STATE_HPP
 
+class State;
+
 struct StateData {
     sf::RenderWindow* window;
     const std::unordered_map<std::string, int>* supportedKeys;
     const sf::Font* font;
+    std::stack<State*>* states;
 };
 
 class State
@@ -24,6 +27,7 @@ protected:
     sf::RenderWindow* window;
     const std::unordered_map<std::string, int>& supportedKeys;
     const sf::Font& font;
+    StateData* stateData;
 };
 
 #endif

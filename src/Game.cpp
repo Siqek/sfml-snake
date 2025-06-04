@@ -71,6 +71,7 @@ void Game::initStateData()
     this->stateData.window = this->window;
     this->stateData.supportedKeys = &this->supportedKeys;
     this->stateData.font = &this->font;
+    this->stateData.states = &this->states;
 }
 
 void Game::initStates()
