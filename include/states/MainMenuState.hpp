@@ -2,6 +2,7 @@
 #define MAINMENUSTATE_HPP
 
 #include "states/State.hpp"
+#include "mgui/Button.hpp"
 
 class MainMenuState
     : public State
@@ -19,9 +20,9 @@ public:
 private:
     sf::RectangleShape rs;
 
-    sf::RectangleShape startButton;
-    sf::Text startButtonText;
+    mgui::Button startButton;
 
+    void updateButtons();
     void updateUIScaling();
 };
 
