@@ -55,6 +55,7 @@ namespace mgui
         default:
             break;
         }
+        this->updateColor();
     }
 
     void Button::setAccentColor(ButtonState state, const sf::Color& color)
@@ -73,6 +74,7 @@ namespace mgui
         default:
             break;
         }
+        this->updateColor();
     }
 
     void Button::update(const sf::RenderWindow& window)
