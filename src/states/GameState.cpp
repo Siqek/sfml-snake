@@ -109,13 +109,13 @@ void GameState::updateInput()
 
     this->keyStateTracker->updateKeyStates();
 
-    if (this->keyStateTracker->isKeyDown("MoveUp"))
+    if (this->keyStateTracker->isKeyDown("MoveUp") || this->keyStateTracker->isKeyDown("AltMoveUp"))
         this->snake.setDirection(Direction::UP);
-    else if (this->keyStateTracker->isKeyDown("MoveDown"))
+    else if (this->keyStateTracker->isKeyDown("MoveDown") || this->keyStateTracker->isKeyDown("AltMoveDown"))
         this->snake.setDirection(Direction::DOWN);
-    else if (this->keyStateTracker->isKeyDown("MoveRight"))
+    else if (this->keyStateTracker->isKeyDown("MoveRight") || this->keyStateTracker->isKeyDown("AltMoveRight"))
         this->snake.setDirection(Direction::RIGHT);
-    else if (this->keyStateTracker->isKeyDown("MoveLeft"))
+    else if (this->keyStateTracker->isKeyDown("MoveLeft") || this->keyStateTracker->isKeyDown("AltMoveLeft"))
         this->snake.setDirection(Direction::LEFT);
 }
 
