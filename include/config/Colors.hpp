@@ -6,7 +6,7 @@
 namespace Colors::Hex {
     static constexpr std::uint32_t Background          = 0x0F0E17FF;
 
-    static constexpr std::uint32_t OverlayBackground   = 0x00000080;
+    static constexpr std::uint32_t OverlayBackground   = 0x000000A0;
 
 
     static constexpr std::uint32_t TextMain            = 0xE9FFE0FF;
