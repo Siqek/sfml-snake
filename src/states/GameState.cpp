@@ -61,13 +61,16 @@ void GameState::updateUIScaling()
     this->gridOffsetY =
         windowSize.y * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f )
         - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
+
+    this->gameOverOverlay.onWindowResize(windowSize);
 }
 
 GameState::GameState(StateData* stateData)
     : State(stateData),
     gridSizeX(20), gridSizeY(20),
     snake(4.f, 3u),
-    score(0u)
+    score(0u),
+    gameOverOverlay(sf::Vector2f(this->window->getSize()), this->font)
 {
     this->updateUIScaling();
 
@@ -120,16 +123,22 @@ void GameState::update(const float& dt)
 {
     this->updateInput();
 
-    this->snake.update(dt);
+    if (this->gameOverOverlay.getIsActive()) {
+        this->gameOverOverlay.update(*this->window);
+        if (this->gameOverOverlay.isBackToMenuButtonReleased())
+            this->endState();
+    } else {
+        this->snake.update(dt);
 
-    if (!this->snake.getIsAlive()) {
-        this->endState();
-    } else if (this->snake.isHeadCollidingAt(this->apple.getPosition()))
-    {
-        this->apple.spawn(this->snake.getFreeTiles());
-        this->snake.grow(1u);
-        this->score++;
-        this->scoreText.setString(std::to_string(this->score));
+        if (!this->snake.getIsAlive()) {
+            this->gameOverOverlay.show();
+        } else if (this->snake.isHeadCollidingAt(this->apple.getPosition()))
+        {
+            this->apple.spawn(this->snake.getFreeTiles());
+            this->snake.grow(1u);
+            this->score++;
+            this->scoreText.setString(std::to_string(this->score));
+        }
     }
 }
 
@@ -157,4 +166,6 @@ void GameState::render(sf::RenderTarget* target)
     this->apple.render(*target, this->gridOffsetX, this->gridOffsetY);
 
     target->draw(this->scoreText);
+
+    this->gameOverOverlay.render(*target);
 }
