@@ -16,7 +16,7 @@ public:
 
     void onWindowResize(const sf::Vector2f& newWindowSize);
 
-    virtual void update() = 0;
+    virtual void update(const sf::RenderWindow& window) = 0;
     virtual void render(sf::RenderTarget& target) = 0;
 
 protected:
