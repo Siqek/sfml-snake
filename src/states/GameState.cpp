@@ -63,14 +63,16 @@ void GameState::updateUIScaling()
         - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
 
     this->gameOverOverlay.onWindowResize(windowSize);
+    this->victoryOverlay.onWindowResize(windowSize);
 }
 
 GameState::GameState(StateData* stateData)
     : State(stateData),
-    gridSizeX(10), gridSizeY(10),
+    gridSizeX(4), gridSizeY(4),
     snake(4.f, 3u),
     score(0u),
-    gameOverOverlay(sf::Vector2f(this->window->getSize()), this->font)
+    gameOverOverlay(sf::Vector2f(this->window->getSize()), this->font),
+    victoryOverlay(sf::Vector2f(this->window->getSize()), this->font)
 {
     this->updateUIScaling();
 
@@ -123,14 +125,21 @@ void GameState::update(const float& dt)
 {
     this->updateInput();
 
-    if (this->gameOverOverlay.getIsActive()) {
+
+    if (this->victoryOverlay.getIsActive()) {
+        this->victoryOverlay.update(*this->window);
+        if (this->victoryOverlay.isBackToMenuButtonReleased())
+            this->endState();
+    } else if (this->gameOverOverlay.getIsActive()) {
         this->gameOverOverlay.update(*this->window);
         if (this->gameOverOverlay.isBackToMenuButtonReleased())
             this->endState();
     } else {
         this->snake.update(dt);
 
-        if (!this->snake.getIsAlive()) {
+        if (this->snake.hasFilledGrid()) {
+            this->victoryOverlay.show();
+        } else if (!this->snake.getIsAlive()) {
             this->gameOverOverlay.show();
         } else if (this->snake.isHeadCollidingAt(this->apple.getPosition()))
         {
@@ -163,9 +172,11 @@ void GameState::render(sf::RenderTarget* target)
 
     this->snake.render(*target, this->gridOffsetX, this->gridOffsetY);
 
-    this->apple.render(*target, this->gridOffsetX, this->gridOffsetY);
+    if (!this->snake.hasFilledGrid())
+        this->apple.render(*target, this->gridOffsetX, this->gridOffsetY);
 
     target->draw(this->scoreText);
 
     this->gameOverOverlay.render(*target);
+    this->victoryOverlay.render(*target);
 }

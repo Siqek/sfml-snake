@@ -13,6 +13,7 @@ class KeyStateTracker;
 #include "snake/Apple.hpp"
 
 #include "states/overlays/GameOverOverlay.hpp"
+#include "states/overlays/VictoryOverlay.hpp"
 
 class GameState
     : public State
@@ -45,6 +46,7 @@ private:
     sf::Text scoreText;
 
     GameOverOverlay gameOverOverlay;
+    VictoryOverlay victoryOverlay;
 
     void initKeybinds();
     void initKeyStateTracker();
