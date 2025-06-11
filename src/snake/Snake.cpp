@@ -13,6 +13,7 @@ Snake::Snake(float speedTilesPerSec, unsigned int length)
 {
     this->bodySegment.setFillColor(sf::Color(Colors::Hex::SnakeBody));
     this->bodyBorder.setFillColor(sf::Color(Colors::Hex::SnakeOutline));
+    this->bodyBorderCorner.setFillColor(sf::Color(Colors::Hex::SnakeOutline));
 }
 
 void Snake::initHeadPosition(const sf::Vector2i& position)
@@ -36,8 +37,13 @@ void Snake::setTileSize(float size)
     this->tileSize = size;
     this->bodySegment.setSize(sf::Vector2f(this->tileSize, this->tileSize));
 
-    this->bodyBorder.setSize(sf::Vector2f(this->tileSize, std::max(2.f, this->tileSize / 10.f)));
+    const auto borderThickness = std::max(2.f, this->tileSize / 10.f);
+
+    this->bodyBorder.setSize(sf::Vector2f(this->tileSize, borderThickness));
     this->bodyBorder.setOrigin(this->bodySegment.getSize() / 2.f);
+
+    this->bodyBorderCorner.setSize(sf::Vector2f(borderThickness, borderThickness));
+    this->bodyBorderCorner.setOrigin(this->bodySegment.getSize() / 2.f);
 }
 
 void Snake::setDirection(Direction direction)
@@ -241,6 +247,7 @@ void Snake::renderSegmentBorder(sf::RenderTarget& target, const sf::Vector2f& po
     const auto& nextSegment = this->body[segmentIndex + 1];
 
     this->bodyBorder.setPosition(position + this->bodyBorder.getOrigin());
+    this->bodyBorderCorner.setPosition(position + this->bodyBorderCorner.getOrigin());
 
     // Render borders based on adjacent segments
     if (prevSegment.x == curSegment.x && nextSegment.x == curSegment.x) {
@@ -256,21 +263,40 @@ void Snake::renderSegmentBorder(sf::RenderTarget& target, const sf::Vector2f& po
         {
             renderBorder(target, BorderSide::RIGHT);
             renderBorder(target, BorderSide::BOTTOM);
-        } else if ((prevSegment.x + 1 == curSegment.x && nextSegment.y - 1 == curSegment.y) ||
-                   (nextSegment.x + 1 == curSegment.x && prevSegment.y - 1 == curSegment.y))
+
+            // Draw the border corner at the top-left
+            this->bodyBorderCorner.setRotation(0.f);
+            target.draw(this->bodyBorderCorner);
+        }
+        else if ((prevSegment.x + 1 == curSegment.x && nextSegment.y - 1 == curSegment.y) ||
+                 (nextSegment.x + 1 == curSegment.x && prevSegment.y - 1 == curSegment.y))
         {
             renderBorder(target, BorderSide::RIGHT);
             renderBorder(target, BorderSide::TOP);
-        } else if ((prevSegment.x - 1 == curSegment.x && nextSegment.y + 1 == curSegment.y) ||
-                   (nextSegment.x - 1 == curSegment.x && prevSegment.y + 1 == curSegment.y))
+
+            // Draw the border corner at the bottom-left
+            this->bodyBorderCorner.setRotation(270.f);
+            target.draw(this->bodyBorderCorner);
+        }
+        else if ((prevSegment.x - 1 == curSegment.x && nextSegment.y + 1 == curSegment.y) ||
+                 (nextSegment.x - 1 == curSegment.x && prevSegment.y + 1 == curSegment.y))
         {
             renderBorder(target, BorderSide::LEFT);
             renderBorder(target, BorderSide::BOTTOM);
-        } else if ((prevSegment.x - 1 == curSegment.x && nextSegment.y - 1 == curSegment.y) ||
-                   (nextSegment.x - 1 == curSegment.x && prevSegment.y - 1 == curSegment.y))
+
+            // Draw the border corner at the top-right
+            this->bodyBorderCorner.setRotation(90.f);
+            target.draw(this->bodyBorderCorner);
+        }
+        else if ((prevSegment.x - 1 == curSegment.x && nextSegment.y - 1 == curSegment.y) ||
+                 (nextSegment.x - 1 == curSegment.x && prevSegment.y - 1 == curSegment.y))
         {
             renderBorder(target, BorderSide::LEFT);
             renderBorder(target, BorderSide::TOP);
+
+            // Draw the border corner at the bottom-right
+            this->bodyBorderCorner.setRotation(180.f);
+            target.draw(this->bodyBorderCorner);
         }
     }
 }

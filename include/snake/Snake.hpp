@@ -64,6 +64,8 @@ private:
 
     sf::RectangleShape bodySegment;
     sf::RectangleShape bodyBorder;
+    sf::RectangleShape bodyBorderCorner;
+
     std::deque<sf::Vector2i> body;
     std::vector<sf::Vector2i> freeTiles;
 
