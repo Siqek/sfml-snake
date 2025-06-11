@@ -249,17 +249,22 @@ void Snake::renderSegmentBorder(sf::RenderTarget& target, const sf::Vector2f& po
     this->bodyBorder.setPosition(position + this->bodyBorder.getOrigin());
     this->bodyBorderCorner.setPosition(position + this->bodyBorderCorner.getOrigin());
 
+    const int deltaXToPrev = prevSegment.x - curSegment.x;
+    const int deltaXToNext = nextSegment.x - curSegment.x;
+
+    const int deltaYToPrev = prevSegment.y - curSegment.y;
+    const int deltaYToNext = nextSegment.y - curSegment.y;
+
     // Render borders based on adjacent segments
-    if (prevSegment.x == curSegment.x && nextSegment.x == curSegment.x) {
+    if (deltaXToPrev == 0 && deltaXToNext == 0) {
         // Vertical segments (right & left)
         renderBorder(target, BorderSide::VERTICAL);
-    } else if (prevSegment.y == curSegment.y && nextSegment.y == curSegment.y) {
+    } else if (deltaYToPrev == 0 && deltaYToNext == 0) {
         // Horizontal segments (top & bottom)
         renderBorder(target, BorderSide::HORIZONTAL);
     } else {
         // Diagonal segments: right-top, right-bottom, left-top, left-bottom
-        if ((prevSegment.x + 1 == curSegment.x && nextSegment.y + 1 == curSegment.y) ||
-            (nextSegment.x + 1 == curSegment.x && prevSegment.y + 1 == curSegment.y))
+        if ((deltaXToPrev == -1 && deltaYToNext == -1) || (deltaXToNext == -1 && deltaYToPrev == -1))
         {
             renderBorder(target, BorderSide::RIGHT);
             renderBorder(target, BorderSide::BOTTOM);
@@ -268,8 +273,7 @@ void Snake::renderSegmentBorder(sf::RenderTarget& target, const sf::Vector2f& po
             this->bodyBorderCorner.setRotation(0.f);
             target.draw(this->bodyBorderCorner);
         }
-        else if ((prevSegment.x + 1 == curSegment.x && nextSegment.y - 1 == curSegment.y) ||
-                 (nextSegment.x + 1 == curSegment.x && prevSegment.y - 1 == curSegment.y))
+        else if ((deltaXToPrev == -1 && deltaYToNext == 1) || (deltaXToNext == -1 && deltaYToPrev == 1))
         {
             renderBorder(target, BorderSide::RIGHT);
             renderBorder(target, BorderSide::TOP);
@@ -278,8 +282,7 @@ void Snake::renderSegmentBorder(sf::RenderTarget& target, const sf::Vector2f& po
             this->bodyBorderCorner.setRotation(270.f);
             target.draw(this->bodyBorderCorner);
         }
-        else if ((prevSegment.x - 1 == curSegment.x && nextSegment.y + 1 == curSegment.y) ||
-                 (nextSegment.x - 1 == curSegment.x && prevSegment.y + 1 == curSegment.y))
+        else if ((deltaXToPrev == 1 && deltaYToNext == -1) || (deltaXToNext == 1 && deltaYToPrev == -1))
         {
             renderBorder(target, BorderSide::LEFT);
             renderBorder(target, BorderSide::BOTTOM);
@@ -288,8 +291,7 @@ void Snake::renderSegmentBorder(sf::RenderTarget& target, const sf::Vector2f& po
             this->bodyBorderCorner.setRotation(90.f);
             target.draw(this->bodyBorderCorner);
         }
-        else if ((prevSegment.x - 1 == curSegment.x && nextSegment.y - 1 == curSegment.y) ||
-                 (nextSegment.x - 1 == curSegment.x && prevSegment.y - 1 == curSegment.y))
+        else if ((deltaXToPrev == 1 && deltaYToNext == 1) || (deltaXToNext == 1 && deltaYToPrev == 1))
         {
             renderBorder(target, BorderSide::LEFT);
             renderBorder(target, BorderSide::TOP);
