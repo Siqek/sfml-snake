@@ -18,7 +18,7 @@ public:
     void render(sf::RenderTarget& target) override;
 
 private:
-    void updateUIScaling(const sf::Vector2f& newWindowSize);
+    void updateUIScaling(const sf::Vector2f& newWindowSize) override;
 
     sf::Text gameOverText;
 

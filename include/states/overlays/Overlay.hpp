@@ -20,14 +20,16 @@ public:
     virtual void render(sf::RenderTarget& target) = 0;
 
 protected:
-    sf::RectangleShape windowOverlay;
-
     void renderWindowOverlay(sf::RenderTarget& target) { target.draw(windowOverlay); }
 
 private:
-    bool isActive;
-
     virtual void updateUIScaling(const sf::Vector2f& newWindowSize) = 0;
+
+protected:
+    sf::RectangleShape windowOverlay;
+
+private:
+    bool isActive;
 };
 
 #endif // OVERLAY_HPP
