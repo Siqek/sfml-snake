@@ -31,11 +31,10 @@ public:
 
     void setDirection(Direction direction);
     void grow(unsigned int lengthToGrow);
-    void move();
 
     bool isCollidingAt(const sf::Vector2i& position) const;
-    bool isHeadCollidingAt(const sf::Vector2i& position) const;
-    bool isTailCollidingAt(const sf::Vector2i& position) const;
+    bool isHeadCollidingAt(const sf::Vector2i& position) const { return getHeadPosition() == position; };
+    bool isTailCollidingAt(const sf::Vector2i& position) const { return getTailPosition() == position; };
 
     void update(const float& dt);
     void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
@@ -71,6 +70,8 @@ private:
     bool isAlive;
 
     void die() { isAlive = false; };
+
+    void move();
 
     Direction getOppositeDirection(Direction direction) const;
 

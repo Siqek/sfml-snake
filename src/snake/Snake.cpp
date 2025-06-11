@@ -113,16 +113,6 @@ bool Snake::isCollidingAt(const sf::Vector2i& position) const
     return false;
 }
 
-bool Snake::isHeadCollidingAt(const sf::Vector2i& position) const
-{
-    return this->getHeadPosition() == position;
-}
-
-bool Snake::isTailCollidingAt(const sf::Vector2i& position) const
-{
-    return this->getTailPosition() == position;
-}
-
 void Snake::update(const float& dt)
 {
     if (this->hasFilledGrid())
