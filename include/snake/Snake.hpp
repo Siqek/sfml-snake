@@ -24,6 +24,7 @@ public:
     const std::vector<sf::Vector2i>& getFreeTiles() const { return this->freeTiles; };
 
     bool getIsAlive() const { return isAlive; };
+    bool hasFilledGrid() const { return freeTiles.size() == 0; };
 
     void setGridSize(uint8_t x, uint8_t y);
     void setTileSize(float size);

@@ -125,6 +125,9 @@ bool Snake::isTailCollidingAt(const sf::Vector2i& position) const
 
 void Snake::update(const float& dt)
 {
+    if (this->hasFilledGrid())
+        return;
+
     if (!this->isAlive)
         return;
 
