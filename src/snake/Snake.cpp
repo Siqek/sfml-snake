@@ -1,6 +1,8 @@
 #include "stdafx.hpp"
 #include "snake/Snake.hpp"
 
+#include "config/Colors.hpp"
+
 Snake::Snake(float speedTilesPerSec, unsigned int length)
     : speedTilesPerSec(speedTilesPerSec),
     direction(Direction::RIGHT), prevDirection(Direction::RIGHT), nextDirection(Direction::RIGHT),
@@ -9,8 +11,8 @@ Snake::Snake(float speedTilesPerSec, unsigned int length)
     distanceTraveled(0.f),
     body{}, freeTiles{}, isAlive(true)
 {
-    this->bodySegment.setFillColor(sf::Color(0xCCFFBDFF));
-    this->bodyBorder.setFillColor(sf::Color(0x7ECA9CFF));
+    this->bodySegment.setFillColor(sf::Color(Colors::Hex::SnakeBody));
+    this->bodyBorder.setFillColor(sf::Color(Colors::Hex::SnakeOutline));
 }
 
 void Snake::initHeadPosition(const sf::Vector2i& position)
