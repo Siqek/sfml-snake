@@ -68,7 +68,7 @@ void GameState::updateUIScaling()
 
 GameState::GameState(StateData* stateData)
     : State(stateData),
-    gridSizeX(4), gridSizeY(4),
+    gridSizeX(10), gridSizeY(10),
     snake(4.f, 3u),
     score(0u),
     gameOverOverlay(sf::Vector2f(this->window->getSize()), this->font),
