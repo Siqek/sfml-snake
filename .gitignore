@@ -1,11 +1,19 @@
 # Visual Studio Code settings folder
 .vscode/
 
+# Visual Studio project files
+*.sln
+*.vcxproj*
+.vs/
+
 # Build artifacts and binaries
-/bin
-/build
+bin/
+build/
 *.o
 *.d
+
+# External libraries
+external/
 
 # Todo list file
 todo
