@@ -12,6 +12,10 @@ build/
 *.o
 *.d
 
+# Build system files
+Makefile
+*.make
+
 # External libraries
 external/
 
