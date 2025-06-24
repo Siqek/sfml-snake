@@ -8,9 +8,6 @@
 MainMenuState::MainMenuState(StateData* stateData)
     : State(stateData)
 {
-    rs.setFillColor(sf::Color::Red);
-    rs.setSize(sf::Vector2f(20.f, 20.f));
-
     this->startButton.setFont(this->font);
     this->startButton.setText("Play");
 
@@ -45,8 +42,6 @@ void MainMenuState::updateInput()
 
 void MainMenuState::update(const float& /*dt*/)
 {
-    rs.setPosition(sf::Vector2f(sf::Mouse::getPosition(*this->window)));
-
     this->updateButtons();
 }
 
@@ -57,8 +52,6 @@ void MainMenuState::render(sf::RenderTarget* target)
 
     this->startButton.render(*target);
     this->exitButton.render(*target);
-
-    target->draw(this->rs);
 }
 
 void MainMenuState::updateButtons()

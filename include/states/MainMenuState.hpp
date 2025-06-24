@@ -18,8 +18,6 @@ public:
     void render(sf::RenderTarget* target = nullptr) override;
 
 private:
-    sf::RectangleShape rs;
-
     mgui::Button startButton;
     mgui::Button exitButton;
 
