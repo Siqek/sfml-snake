@@ -10,7 +10,7 @@ class KeyStateTracker;
 
 #include "states/State.hpp"
 #include "snake/Snake.hpp"
-#include "snake/Apple.hpp"
+#include "snake/AppleCluster.hpp"
 
 #include "states/overlays/GameOverOverlay.hpp"
 #include "states/overlays/VictoryOverlay.hpp"
@@ -40,7 +40,7 @@ private:
 
     Snake snake;
 
-    Apple apple;
+    AppleCluster appleCluster;
 
     unsigned int score;
     sf::Text scoreText;

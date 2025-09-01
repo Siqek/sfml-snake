@@ -42,7 +42,7 @@ void GameState::updateUIScaling()
         windowSize.y * UIConfig::GridHeightRatio / static_cast<float>(this->gridSizeY)
     );
     this->snake.setTileSize(this->tileSize);
-    this->apple.setTileSize(this->tileSize);
+    this->appleCluster.setTileSize(this->tileSize);
     this->tile.setSize(sf::Vector2f(this->tileSize, this->tileSize));
 
     // score text
@@ -82,7 +82,8 @@ GameState::GameState(StateData* stateData)
         static_cast<int>(this->gridSizeY / 2)
     ));
 
-    this->apple.spawn(this->snake.getFreeTiles());
+    this->appleCluster.setAppleLimit(3u);
+    this->appleCluster.spawnAll(this->snake.getFreeTiles());
 
     this->scoreText.setFont(this->font);
     this->scoreText.setString("0");
@@ -141,9 +142,9 @@ void GameState::update(const float& dt)
             this->victoryOverlay.show();
         } else if (!this->snake.getIsAlive()) {
             this->gameOverOverlay.show();
-        } else if (this->snake.isHeadCollidingAt(this->apple.getPosition()))
+        } else if (this->appleCluster.eatAppleAt(this->snake.getHeadPosition()))
         {
-            this->apple.spawn(this->snake.getFreeTiles());
+            this->appleCluster.spawn(this->snake.getFreeTiles());
             this->snake.grow(1u);
             this->score++;
             this->scoreText.setString(std::to_string(this->score));
@@ -173,7 +174,7 @@ void GameState::render(sf::RenderTarget* target)
     this->snake.render(*target, this->gridOffsetX, this->gridOffsetY);
 
     if (!this->snake.hasFilledGrid())
-        this->apple.render(*target, this->gridOffsetX, this->gridOffsetY);
+        this->appleCluster.render(*target, this->gridOffsetX, this->gridOffsetY);
 
     target->draw(this->scoreText);
 
