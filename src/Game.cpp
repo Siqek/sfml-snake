@@ -161,6 +161,8 @@ void Game::update()
     if (this->states.top()->getQuit()) {
         delete this->states.top();
         this->states.pop();
+        if (!this->states.empty())
+            this->states.top()->onWindowResize(); // Reapply UI scaling if window size changed in the previous state
     }
 }
 
