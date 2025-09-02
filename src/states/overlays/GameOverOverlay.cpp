@@ -51,13 +51,12 @@ void GameOverOverlay::updateUIScaling(const sf::Vector2f& newWindowSize)
     const auto lb = this->gameOverText.getLocalBounds();
     this->gameOverText.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
 
-    this->backToMenuButton.setCharacterSize(static_cast<unsigned>(std::min(newWindowSize.x / 32.f, newWindowSize.y / 32.f)));
-
     this->backToMenuButton.setPosition(sf::Vector2f(newWindowSize.x / 2.f, newWindowSize.y * (2.f / 3.f)));
-    this->backToMenuButton.setOrigin(this->backToMenuButton.getSize() / 2.f);
+    this->backToMenuButton.setCharacterSize(static_cast<unsigned>(std::min(newWindowSize.x / 32.f, newWindowSize.y / 32.f)));
 
     const auto tlb = this->backToMenuButton.geTextLocalBounds();
     this->backToMenuButton.setSize(sf::Vector2f(tlb.width * 2.5f, tlb.height * 1.8f));
 
+    this->backToMenuButton.setOrigin(this->backToMenuButton.getSize() / 2.f);
     this->backToMenuButton.setOutlineThickness(this->backToMenuButton.getSize().y / 16.f);
 }
