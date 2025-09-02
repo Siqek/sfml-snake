@@ -29,10 +29,10 @@ bool AppleCluster::spawn(const std::vector<sf::Vector2i>& freeTiles)
 
     for (const auto& freeTile : freeTiles) {
         bool isFree = true;
-        for (const auto& applePosition : applePositions) {
+        for (auto& applePosition : applePositions) {
             if (freeTile == applePosition) {
                 isFree = false;
-                applePosition == applePositions.back();
+                applePosition = applePositions.back();
                 applePositions.pop_back();
                 break;
             }
