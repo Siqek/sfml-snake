@@ -78,8 +78,8 @@ GameState::GameState(StateData* stateData)
 
     this->snake.setGridSize(this->gridSizeX, this->gridSizeY);
     this->snake.initHeadPosition(sf::Vector2i(
-        static_cast<int>(this->gridSizeX / 2),
-        static_cast<int>(this->gridSizeY / 2)
+        static_cast<int>(this->gridSizeX / 2) - 1,
+        static_cast<int>(this->gridSizeY / 2) - 1
     ));
 
     this->appleCluster.setAppleLimit(3u);

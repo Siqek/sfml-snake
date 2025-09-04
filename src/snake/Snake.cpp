@@ -8,6 +8,7 @@ Snake::Snake(float speedTilesPerSec, unsigned int length)
     direction(Direction::RIGHT), prevDirection(Direction::RIGHT), nextDirection(Direction::RIGHT),
     gridSizeX(0), gridSizeY(0), tileSize(0.f),
     lengthToGrow(std::max(0u, length - 1)), /* prevent underflow */
+    initialLengthToGrow(lengthToGrow),
     distanceTraveled(0.f),
     body{}, freeTiles{}, isAlive(true)
 {
@@ -66,6 +67,26 @@ void Snake::setDirection(Direction direction)
 void Snake::grow(unsigned int lengthToGrow)
 {
     this->lengthToGrow += lengthToGrow;
+}
+
+void Snake::reset()
+{
+    direction     = Direction::RIGHT;
+    prevDirection = Direction::RIGHT;
+    nextDirection = Direction::RIGHT;
+
+    distanceTraveled = 0.f;
+
+    body.clear();
+    resetFreeTiles();
+
+    isAlive = true;
+
+    lengthToGrow = initialLengthToGrow;
+    this->initHeadPosition(sf::Vector2i(
+        static_cast<int>(this->gridSizeX) / 2 - 1,
+        static_cast<int>(this->gridSizeY) / 2 - 1
+    ));
 }
 
 void Snake::move()

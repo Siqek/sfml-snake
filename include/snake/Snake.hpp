@@ -32,6 +32,8 @@ public:
     void setDirection(Direction direction);
     void grow(unsigned int lengthToGrow);
 
+    void reset();
+
     bool isCollidingAt(const sf::Vector2i& position) const;
     bool isHeadCollidingAt(const sf::Vector2i& position) const { return getHeadPosition() == position; };
     bool isTailCollidingAt(const sf::Vector2i& position) const { return getTailPosition() == position; };
@@ -60,6 +62,8 @@ private:
     float tileSize;
 
     unsigned int lengthToGrow;
+    unsigned int initialLengthToGrow;
+
     float distanceTraveled;
 
     sf::RectangleShape bodySegment;
