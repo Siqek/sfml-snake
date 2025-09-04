@@ -52,6 +52,8 @@ private:
     void initKeyStateTracker();
 
     void updateUIScaling();
+
+    void restart();
 };
 
 #endif

@@ -181,3 +181,11 @@ void GameState::render(sf::RenderTarget* target)
     this->gameOverOverlay.render(*target);
     this->victoryOverlay.render(*target);
 }
+
+void GameState::restart()
+{
+    this->snake.reset();
+
+    this->appleCluster.reset();
+    this->appleCluster.spawnAll(this->snake.getFreeTiles());
+}

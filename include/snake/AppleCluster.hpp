@@ -17,6 +17,8 @@ public:
 
     bool eatAppleAt(sf::Vector2i snakeHead);
 
+    void reset() { apples.clear(); }
+
     void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
 
 private:
