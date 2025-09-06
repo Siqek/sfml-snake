@@ -12,6 +12,10 @@
     #include <X11/Xutil.h>
 #endif // __linux__
 
+#ifdef _WIN32
+    #include <windows.h>
+#endif // _WIN32
+
 void Game::initWindow()
 {
     sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
@@ -36,9 +40,9 @@ void Game::initWindow()
     );
     this->window->setFramerateLimit(iniParser.getInt("Graphics", "iFramerateLimit", 60));
     this->window->setVerticalSyncEnabled(iniParser.getBool("Graphics", "bVSync", true));
-#ifdef __linux__
+#if defined(__linux__) || defined(_WIN32)
     this->setMinimumWindowSize(sf::Vector2i(320, 240));
-#endif // __linux__
+#endif // __linux__ || _WIN32
 }
 
 void Game::initSupportedKeys()
@@ -194,7 +198,7 @@ void Game::end()
 
 #ifdef __linux__
 
-void Game::setMinimumWindowSize(const sf::Vector2i& minimumSize)
+void Game::setMinimumWindowSize(sf::Vector2i minimumSize)
 {
     ::Window x11Window = this->window->getSystemHandle();
 
@@ -223,3 +227,30 @@ void Game::setMinimumWindowSize(const sf::Vector2i& minimumSize)
 }
 
 #endif // __linux__
+
+#ifdef _WIN32
+
+void Game::setMinimumWindowSize(sf::Vector2i minimumSize)
+{
+    Game::MIN_WINDOW_WIDTH = minimumSize.x;
+    Game::MIN_WINDOW_HEIGHT = minimumSize.y;
+
+    ::HWND hwnd = this->window->getSystemHandle();
+
+    static WNDPROC oldProc = reinterpret_cast<WNDPROC>(
+        GetWindowLongPtr(hwnd, GWLP_WNDPROC)
+    );
+
+    auto windowProc = [](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
+        if (uMsg == WM_GETMINMAXINFO) {
+            MINMAXINFO* mmi = reinterpret_cast<MINMAXINFO*>(lParam);
+            mmi->ptMinTrackSize.x = Game::MIN_WINDOW_WIDTH;
+            mmi->ptMinTrackSize.y = Game::MIN_WINDOW_HEIGHT;
+        }
+        return CallWindowProc(oldProc, hwnd, uMsg, wParam, lParam);
+    };
+
+    SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(+windowProc));
+}
+
+#endif

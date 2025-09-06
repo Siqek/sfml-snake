@@ -42,9 +42,14 @@ private:
     void updateSFMLEvent();
     void updateFPS();
 
-#ifdef __linux__
-    void setMinimumWindowSize(const sf::Vector2i& minimumSize);
-#endif // __linux__
+#ifdef _WIN32
+    inline static int MIN_WINDOW_WIDTH = 0;
+    inline static int MIN_WINDOW_HEIGHT = 0;
+#endif // _WIN32
+
+#if defined(__linux__) || defined(_WIN32)
+    void setMinimumWindowSize(sf::Vector2i minimumSize);
+#endif // __linux__ || _WIN32
 
 };
 
