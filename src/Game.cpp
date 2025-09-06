@@ -81,6 +81,7 @@ void Game::initStateData()
 void Game::initStates()
 {
     this->states.push(new MainMenuState(&this->stateData));
+    this->states.top()->onWindowResize();
 }
 
 void Game::updateFPS()
