@@ -12,7 +12,8 @@ public:
     VictoryOverlay(const sf::Vector2f& windowSize, const sf::Font& font);
     ~VictoryOverlay() = default;
 
-    bool isBackToMenuButtonReleased() { return backToMenuButton.isReleased(); }
+    bool isBackToMenuButtonReleased() const { return backToMenuButton.isReleased(); }
+    bool isRestartButtonReleased() const { return restartButton.isReleased(); }
 
     void update(const sf::RenderWindow& window) override;
     void render(sf::RenderTarget& target) override;
@@ -23,6 +24,7 @@ private:
     sf::Text victoryText;
 
     mgui::Button backToMenuButton;
+    mgui::Button restartButton;
 };
 
 #endif // VICTORYOVERLAY_HPP

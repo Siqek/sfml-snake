@@ -129,12 +129,24 @@ void GameState::update(const float& dt)
 
     if (this->victoryOverlay.getIsActive()) {
         this->victoryOverlay.update(*this->window);
+
         if (this->victoryOverlay.isBackToMenuButtonReleased())
             this->endState();
+
+        if (this->victoryOverlay.isRestartButtonReleased()) {
+            this->victoryOverlay.close();
+            this->restart();
+        }
     } else if (this->gameOverOverlay.getIsActive()) {
         this->gameOverOverlay.update(*this->window);
+
         if (this->gameOverOverlay.isBackToMenuButtonReleased())
             this->endState();
+
+        if (this->gameOverOverlay.isRestartButtonReleased()) {
+            this->gameOverOverlay.close();
+            this->restart();
+        }
     } else {
         this->snake.update(dt);
 
