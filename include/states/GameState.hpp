@@ -2,8 +2,8 @@
 #define GAMESTATE_HPP
 
 namespace UIConfig {
-    static constexpr float ScoreHeightRatio = 0.2;
-    static constexpr float GridHeightRatio = 0.75;
+    static constexpr float ScoreHeightRatio = 0.2f;
+    static constexpr float GridHeightRatio = 0.75f;
 }
 
 class KeyStateTracker;

@@ -9,10 +9,10 @@
 void GameState::initKeybinds()
 {
     IniParser iniParser("config/gamestateKeybinds.ini");
-    const auto& keybinds = iniParser.getSection("Snake");
+    const auto& keybindSection = iniParser.getSection("Snake");
 
-    this->keybinds.reserve(keybinds.size());
-    for (const auto& [bind, key] : keybinds) {
+    this->keybinds.reserve(keybindSection.size());
+    for (const auto& [bind, key] : keybindSection) {
         auto it = this->supportedKeys.find(key);
         if (it != this->supportedKeys.end()) {
             this->keybinds[bind] = it->second;
@@ -169,16 +169,16 @@ void GameState::render(sf::RenderTarget* target)
     if (!target)
         target = this->window;
 
-    for (const auto& tile : this->snake.getFreeTiles())
+    for (const auto& freeTile : this->snake.getFreeTiles())
     {
-        if (tile.x % 2 == tile.y % 2)
+        if (freeTile.x % 2 == freeTile.y % 2)
             this->tile.setFillColor(sf::Color(Colors::Hex::BoardCellPrimary));
         else
             this->tile.setFillColor(sf::Color(Colors::Hex::BoardCellSecondary));
 
         this->tile.setPosition(sf::Vector2f(
-            this->gridOffsetX + static_cast<float>(tile.x) * this->tileSize,
-            this->gridOffsetY + static_cast<float>(tile.y) * this->tileSize
+            this->gridOffsetX + static_cast<float>(freeTile.x) * this->tileSize,
+            this->gridOffsetY + static_cast<float>(freeTile.y) * this->tileSize
         ));
         target->draw(this->tile);
     }
