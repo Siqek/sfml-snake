@@ -189,7 +189,7 @@ void Snake::resetFreeTiles()
     this->freeTiles.clear();
     // Swap to release memory and set the vector's capacity to a minimum (after clearing).
     std::vector<sf::Vector2i>(this->freeTiles).swap(this->freeTiles);
-    this->freeTiles.reserve(this->gridSizeX * this->gridSizeY);
+    this->freeTiles.reserve(static_cast<size_t>(this->gridSizeX) * static_cast<size_t>(this->gridSizeY));
 
     for (int x = 0; x < this->gridSizeX; ++x) {
         for (int y = 0; y < this->gridSizeY; ++y) {
