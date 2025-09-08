@@ -22,13 +22,11 @@ public:
 protected:
     void renderWindowOverlay(sf::RenderTarget& target) { target.draw(windowOverlay); }
 
-private:
-    virtual void updateUIScaling(const sf::Vector2f& newWindowSize) = 0;
-
-protected:
     sf::RectangleShape windowOverlay;
 
 private:
+    virtual void updateUIScaling(sf::Vector2f newWindowSize) = 0;
+
     bool isActive;
 };
 

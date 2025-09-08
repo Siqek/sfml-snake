@@ -62,8 +62,7 @@ void GameState::updateUIScaling()
         windowSize.y * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f )
         - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
 
-    this->gameOverOverlay.onWindowResize(windowSize);
-    this->victoryOverlay.onWindowResize(windowSize);
+    this->endGameOverlay.onWindowResize(windowSize);
 }
 
 GameState::GameState(StateData* stateData)
@@ -71,8 +70,7 @@ GameState::GameState(StateData* stateData)
     gridSizeX(10), gridSizeY(10),
     snake(4.f, 3u),
     score(0u),
-    gameOverOverlay(sf::Vector2f(this->window->getSize()), this->font),
-    victoryOverlay(sf::Vector2f(this->window->getSize()), this->font)
+    endGameOverlay(sf::Vector2f(this->window->getSize()), this->font)
 {
     this->updateUIScaling();
 
@@ -127,33 +125,25 @@ void GameState::update(const float& dt)
     this->updateInput();
 
 
-    if (this->victoryOverlay.getIsActive()) {
-        this->victoryOverlay.update(*this->window);
+    if (this->endGameOverlay.getIsActive()) {
+        this->endGameOverlay.update(*this->window);
 
-        if (this->victoryOverlay.isBackToMenuButtonReleased())
+        if (this->endGameOverlay.isBackToMenuButtonReleased())
             this->endState();
 
-        if (this->victoryOverlay.isRestartButtonReleased()) {
-            this->victoryOverlay.close();
-            this->restart();
-        }
-    } else if (this->gameOverOverlay.getIsActive()) {
-        this->gameOverOverlay.update(*this->window);
-
-        if (this->gameOverOverlay.isBackToMenuButtonReleased())
-            this->endState();
-
-        if (this->gameOverOverlay.isRestartButtonReleased()) {
-            this->gameOverOverlay.close();
+        if (this->endGameOverlay.isRestartButtonReleased()) {
+            this->endGameOverlay.close();
             this->restart();
         }
     } else {
         this->snake.update(dt);
 
         if (this->snake.hasFilledGrid()) {
-            this->victoryOverlay.show();
+            this->endGameOverlay.setTitle("Snake is full. So is your glory!");
+            this->endGameOverlay.show();
         } else if (!this->snake.getIsAlive()) {
-            this->gameOverOverlay.show();
+            this->endGameOverlay.setTitle("Game Over");
+            this->endGameOverlay.show();
         } else if (this->appleCluster.eatAppleAt(this->snake.getHeadPosition()))
         {
             this->appleCluster.spawn(this->snake.getFreeTiles());
@@ -190,8 +180,7 @@ void GameState::render(sf::RenderTarget* target)
 
     target->draw(this->scoreText);
 
-    this->gameOverOverlay.render(*target);
-    this->victoryOverlay.render(*target);
+    this->endGameOverlay.render(*target);
 }
 
 void GameState::restart()
