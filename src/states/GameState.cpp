@@ -68,17 +68,11 @@ void GameState::updateUIScaling()
 GameState::GameState(StateData* stateData)
     : State(stateData),
     gridSizeX(10), gridSizeY(10),
-    snake(4.f, 3u),
+    snake(4.f, 3u, this->gridSizeX, this->gridSizeY),
     score(0u),
     endGameOverlay(sf::Vector2f(this->window->getSize()), this->font)
 {
     this->updateUIScaling();
-
-    this->snake.setGridSize(this->gridSizeX, this->gridSizeY);
-    this->snake.initHeadPosition(sf::Vector2i(
-        static_cast<int>(this->gridSizeX / 2) - 1,
-        static_cast<int>(this->gridSizeY / 2) - 1
-    ));
 
     this->appleCluster.setAppleLimit(3u);
     this->appleCluster.spawnAll(this->snake.getFreeTiles());

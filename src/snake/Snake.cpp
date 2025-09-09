@@ -3,15 +3,21 @@
 
 #include "config/Colors.hpp"
 
-Snake::Snake(float speedTilesPerSec, unsigned int length)
+Snake::Snake(float speedTilesPerSec, unsigned int length, uint8_t gridSizeX, uint8_t gridSizeY)
     : speedTilesPerSec(speedTilesPerSec),
     direction(Direction::RIGHT), prevDirection(Direction::RIGHT), nextDirection(Direction::RIGHT),
-    gridSizeX(0), gridSizeY(0), tileSize(0.f),
+    tileSize(0.f),
     lengthToGrow(std::max(0u, length - 1)), /* prevent underflow */
     initialLengthToGrow(lengthToGrow),
     distanceTraveled(0.f),
     body{}, freeTiles{}, isAlive(true)
 {
+    this->setGridSize(gridSizeX, gridSizeY);
+    this->initHeadPosition(sf::Vector2i(
+        static_cast<int>(this->gridSizeX / 2) - 1,
+        static_cast<int>(this->gridSizeY / 2) - 1
+    ));
+
     this->bodySegment.setFillColor(sf::Color(Colors::Hex::SnakeBody));
     this->bodyBorder.setFillColor(sf::Color(Colors::Hex::SnakeOutline));
     this->bodyBorderCorner.setFillColor(sf::Color(Colors::Hex::SnakeOutline));
@@ -27,8 +33,8 @@ void Snake::initHeadPosition(const sf::Vector2i& position)
 
 void Snake::setGridSize(uint8_t x, uint8_t y)
 {
-    this->gridSizeX = x;
-    this->gridSizeY = y;
+    this->gridSizeX = std::max(x, MinGridSize);
+    this->gridSizeY = std::max(y, MinGridSize);
 
     this->resetFreeTiles();
 }
@@ -87,6 +93,12 @@ void Snake::reset()
         static_cast<int>(this->gridSizeX) / 2 - 1,
         static_cast<int>(this->gridSizeY) / 2 - 1
     ));
+}
+
+void Snake::resetAndResizeGrid(uint8_t x, uint8_t y)
+{
+    this->setGridSize(x, y);
+    this->reset();
 }
 
 void Snake::move()

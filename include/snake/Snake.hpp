@@ -12,10 +12,8 @@ enum class Direction
 class Snake
 {
 public:
-    Snake(float speed, unsigned int length);
+    Snake(float speed, unsigned int length, uint8_t gridSizeX, uint8_t gridSizeY);
     ~Snake() = default;
-
-    void initHeadPosition(const sf::Vector2i& position);
 
     sf::Vector2i getHeadPosition() const { return this->body.front(); };
     sf::Vector2i getTailPosition() const { return this->body.back(); };
@@ -26,13 +24,13 @@ public:
     bool getIsAlive() const { return isAlive; };
     bool hasFilledGrid() const { return freeTiles.size() == 0; };
 
-    void setGridSize(uint8_t x, uint8_t y);
     void setTileSize(float size);
 
     void setDirection(Direction direction);
     void grow(unsigned int lengthToGrow);
 
     void reset();
+    void resetAndResizeGrid(uint8_t x, uint8_t y);
 
     bool isCollidingAt(const sf::Vector2i& position) const;
     bool isHeadCollidingAt(const sf::Vector2i& position) const { return getHeadPosition() == position; };
@@ -42,6 +40,8 @@ public:
     void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
 
 private:
+    static constexpr uint8_t MinGridSize = 4;
+
     enum class BorderSide {
         TOP,
         BOTTOM,
@@ -75,11 +75,15 @@ private:
 
     bool isAlive;
 
+    void initHeadPosition(const sf::Vector2i& position);
+
     void die() { isAlive = false; };
 
     void move();
 
     Direction getOppositeDirection(Direction direction) const;
+
+    void setGridSize(uint8_t x, uint8_t y);
 
     void resetFreeTiles();
     void removeFromFreeTiles(const sf::Vector2i& position);
