@@ -20,7 +20,7 @@ add_alias_if_missing() {
 }
 
 add_alias_if_missing run   "$SCRIPT_DIR/run-app.sh"
-add_alias_if_missing build "make --no-print-directory -C $SCRIPT_DIR/../"
+add_alias_if_missing build "make --no-print-directory -j$(jobs=$(nproc --ignore=2); [ $jobs -lt 1 ] && echo 1 || echo $jobs) -C $SCRIPT_DIR/../"
 add_alias_if_missing clean "make --no-print-directory -C $SCRIPT_DIR/../ clean"
 
 if [ -f "$HOME/.bashrc" ]; then
