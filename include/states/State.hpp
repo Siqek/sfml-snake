@@ -16,7 +16,6 @@ public:
     State(StateData* stateData);
     virtual ~State();
 
-    virtual void updateInput() = 0;
     virtual void update(const float& dt) = 0;
 
     virtual void render(sf::RenderTarget* target = nullptr) = 0;

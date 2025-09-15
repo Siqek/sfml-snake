@@ -36,10 +36,6 @@ void MainMenuState::onWindowResize()
     this->updateUIScaling();
 }
 
-void MainMenuState::updateInput()
-{
-}
-
 void MainMenuState::update(const float& /*dt*/)
 {
     this->updateButtons();

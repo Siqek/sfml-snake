@@ -22,7 +22,7 @@ public:
     ~GameState();
 
     void onWindowResize() override;
-    void updateInput() override;
+    void updateInput();
     void update(const float& dt) override;
     void render(sf::RenderTarget* target = nullptr) override;
 
