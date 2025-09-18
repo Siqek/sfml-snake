@@ -39,6 +39,8 @@ public:
     T getActiveValue() const { return options.at(activeOptionIndex).value; }
     const T& getActiveValueRef() const { return options.at(activeOptionIndex).value; }
 
+    bool hasActiveOptionChanged() const { return activeOptionChanged; }
+
     void update(const sf::RenderWindow& window);
     void render(sf::RenderTarget& target);
 
@@ -46,7 +48,7 @@ private:
     void nextOption();
     void prevOption();
 
-    void setOptionLabelString(const std::string& string);
+    void updateOptionLabelString();
 
     const std::vector<Option>& options;
 
@@ -60,11 +62,13 @@ private:
 
     sf::Vector2f size;
     sf::Vector2f origin;
+
+    bool activeOptionChanged;
 };
 
 template<typename T>
 ArrowSelector<T>::ArrowSelector(const std::vector<Option>& options, const sf::Font& font)
-    : options(options), activeOptionIndex(0)
+    : options(options), activeOptionIndex(0), activeOptionChanged(false)
 {
     assert(!this->options.empty());
 
@@ -74,7 +78,7 @@ ArrowSelector<T>::ArrowSelector(const std::vector<Option>& options, const sf::Fo
 
     this->leftArrow.setText("<");
     this->rightArrow.setText(">");
-    this->setOptionLabelString(this->options.at(0).label);
+    this->updateOptionLabelString();
 }
 
 template<typename T>
@@ -160,6 +164,8 @@ void ArrowSelector<T>::setAccentColor(mgui::ButtonState state, const sf::Color& 
 template<typename T>
 void ArrowSelector<T>::update(const sf::RenderWindow& window)
 {
+    this->activeOptionChanged = false;
+
     this->leftArrow.update(window);
     this->rightArrow.update(window);
 
@@ -168,6 +174,9 @@ void ArrowSelector<T>::update(const sf::RenderWindow& window)
 
     if (this->rightArrow.isReleased())
         this->nextOption();
+
+    if (this->activeOptionChanged)
+        this->updateOptionLabelString();
 }
 
 template<typename T>
@@ -187,7 +196,7 @@ void ArrowSelector<T>::nextOption()
         return;
 
     this->activeOptionIndex++;
-    this->setOptionLabelString(this->options.at(this->activeOptionIndex).label);
+    this->activeOptionChanged = true;
 }
 
 template<typename T>
@@ -197,13 +206,13 @@ void ArrowSelector<T>::prevOption()
         return;
 
     this->activeOptionIndex--;
-    this->setOptionLabelString(this->options.at(this->activeOptionIndex).label);
+    this->activeOptionChanged = true;
 }
 
 template<typename T>
-void ArrowSelector<T>::setOptionLabelString(const std::string& string)
+void ArrowSelector<T>::updateOptionLabelString()
 {
-    this->optionLabel.setString(string);
+    this->optionLabel.setString(this->options.at(this->activeOptionIndex).label);
     auto tlb = this->optionLabel.getLocalBounds();
     this->optionLabel.setOrigin(origin + sf::Vector2f(-1 * size.x / 2.f, -1 * size.y / 2.f) + sf::Vector2f(tlb.left + tlb.width / 2.f, tlb.top + tlb.height / 2.f));
 }
