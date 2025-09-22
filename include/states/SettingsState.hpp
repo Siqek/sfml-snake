@@ -22,12 +22,15 @@ private:
 
     static const std::vector<mgui::ArrowSelector<sf::Vector2<uint8_t>>::Option> gridSizeOptions;
     mgui::ArrowSelector<sf::Vector2<uint8_t>> gridSizeSelector;
+    sf::Text gridSizeLabel;
 
     static const std::vector<mgui::ArrowSelector<float>::Option> snakeSpeedOptions;
     mgui::ArrowSelector<float> snakeSpeedSelector;
+    sf::Text snakeSpeedLabel;
 
     static const std::vector<mgui::ArrowSelector<unsigned>::Option> maxAppleCountOptions;
     mgui::ArrowSelector<unsigned> maxAppleCountSelector;
+    sf::Text maxAppleCountLabel;
 
     GameSettings gameSettings;
 };

@@ -41,6 +41,15 @@ SettingsState::SettingsState(StateData* stateData)
     setSelectorColors(this->snakeSpeedSelector);
     setSelectorColors(this->maxAppleCountSelector);
 
+    this->gridSizeLabel.setFont(this->font);
+    this->gridSizeLabel.setString("Grid Size:");
+
+    this->snakeSpeedLabel.setFont(this->font);
+    this->snakeSpeedLabel.setString("Snake Speed:");
+
+    this->maxAppleCountLabel.setFont(this->font);
+    this->maxAppleCountLabel.setString("Max Apple Count:");
+
     this->updateUIScaling();
 }
 
@@ -70,6 +79,10 @@ void SettingsState::render(sf::RenderTarget* target)
     if (target == nullptr)
         target = this->window;
 
+    target->draw(this->gridSizeLabel);
+    target->draw(this->snakeSpeedLabel);
+    target->draw(this->maxAppleCountLabel);
+
     this->gridSizeSelector.render(*target);
     this->snakeSpeedSelector.render(*target);
     this->maxAppleCountSelector.render(*target);
@@ -79,20 +92,53 @@ void SettingsState::updateUIScaling()
 {
     auto windowSize = sf::Vector2f(this->window->getSize());
 
-    auto selectorSize = sf::Vector2f(windowSize.x / 4.f, windowSize.y / 18.f);
+    auto selectorSize = sf::Vector2f(windowSize.x / 3.5f, windowSize.y / 18.f);
+    auto firstSelectorPosition = sf::Vector2f(windowSize.x / 3.f * 2.f, windowSize.y / 2.f - 1.5f * selectorSize.y);
+    auto selectorPositionOffset = sf::Vector2f(0.f, selectorSize.y * 1.5f);
+    auto selectorOutlineThickness = selectorSize.y / 16.f;
 
-    this->gridSizeSelector.setPosition(sf::Vector2f(windowSize.x / 2.f, windowSize.y / 2.f + 1.5f * selectorSize.y));
+    auto labelCharacterSize = selectorSize.y / 2.f;
+    auto firstLabelPosition = sf::Vector2f(windowSize.x / 3.f, windowSize.y / 2.f - 1.5f * selectorSize.y);
+    auto labelPositionOffset = selectorPositionOffset;
+
+    // Update selectors
+    this->gridSizeSelector.setPosition(firstSelectorPosition);
     this->gridSizeSelector.setSize(selectorSize);
     this->gridSizeSelector.setOrigin(selectorSize / 2.f);
-    this->gridSizeSelector.setOutlineThickness(selectorSize.y / 12.f);
+    this->gridSizeSelector.setOutlineThickness(selectorOutlineThickness);
 
-    this->snakeSpeedSelector.setPosition(windowSize / 2.f);
+    this->snakeSpeedSelector.setPosition(firstSelectorPosition + selectorPositionOffset);
     this->snakeSpeedSelector.setSize(selectorSize);
     this->snakeSpeedSelector.setOrigin(selectorSize / 2.f);
-    this->snakeSpeedSelector.setOutlineThickness(selectorSize.y / 12.f);
+    this->snakeSpeedSelector.setOutlineThickness(selectorOutlineThickness);
 
-    this->maxAppleCountSelector.setPosition(sf::Vector2f(windowSize.x / 2.f, windowSize.y / 2.f - 1.5f * selectorSize.y));
+    this->maxAppleCountSelector.setPosition(firstSelectorPosition + 2.f * selectorPositionOffset);
     this->maxAppleCountSelector.setSize(selectorSize);
     this->maxAppleCountSelector.setOrigin(selectorSize / 2.f);
-    this->maxAppleCountSelector.setOutlineThickness(selectorSize.y / 12.f);
+    this->maxAppleCountSelector.setOutlineThickness(selectorOutlineThickness);
+
+    // Update labels
+    this->gridSizeLabel.setCharacterSize(labelCharacterSize);
+    this->gridSizeLabel.setPosition(firstLabelPosition);
+
+    this->snakeSpeedLabel.setCharacterSize(labelCharacterSize);
+    this->snakeSpeedLabel.setPosition(firstLabelPosition + labelPositionOffset);
+
+    this->maxAppleCountLabel.setCharacterSize(labelCharacterSize);
+    this->maxAppleCountLabel.setPosition(firstLabelPosition + 2.f * labelPositionOffset);
+
+    float maxLabelWidth = std::max({
+        this->gridSizeLabel.getLocalBounds().width,
+        this->snakeSpeedLabel.getLocalBounds().width,
+        this->maxAppleCountLabel.getLocalBounds().width
+    });
+
+    const auto updateLabelOrigin = [maxLabelWidth](sf::Text& label) {
+        auto lb = label.getLocalBounds();
+        label.setOrigin(sf::Vector2f(maxLabelWidth / 2.f, lb.height / 2.f + lb.top));
+    };
+
+    updateLabelOrigin(this->gridSizeLabel);
+    updateLabelOrigin(this->snakeSpeedLabel);
+    updateLabelOrigin(this->maxAppleCountLabel);
 }
