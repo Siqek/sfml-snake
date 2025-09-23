@@ -25,10 +25,8 @@ Snake::Snake(float speedTilesPerSec, unsigned int length, uint8_t gridSizeX, uin
 
 void Snake::initHeadPosition(const sf::Vector2i& position)
 {
-    if (this->body.empty()) {
-        this->body.push_front(position);
-        this->removeFromFreeTiles(position);
-    }
+    if (this->body.empty())
+        this->addHead(position);
 }
 
 void Snake::setGridSize(uint8_t x, uint8_t y)
@@ -132,16 +130,36 @@ void Snake::move()
     this->prevDirection = this->direction;
     this->direction = this->nextDirection;
 
-    this->body.push_front(head);
-    this->removeFromFreeTiles(head);
+    // Snake follows its tail
+    if (this->isTailCollidingAt(head)) {
+        this->body.push_front(head);
+        this->body.pop_back();
+        return;
+    }
 
+    // Snake occupies a new tile
+    this->addHead(head);
+
+    // Snake grows
     if (this->lengthToGrow > 0) {
         this->lengthToGrow--;
-    } else {
-        if (head != this->body.back())
-            this->freeTiles.push_back(this->body.back());
-        this->body.pop_back();
+        return;
     }
+
+    // Snake moves without growing
+    this->removeTail();
+}
+
+void Snake::addHead(const sf::Vector2i& head)
+{
+    this->body.push_front(head);
+    this->removeFromFreeTiles(head);
+}
+
+void Snake::removeTail()
+{
+    this->freeTiles.push_back(this->body.back());
+    this->body.pop_back();
 }
 
 bool Snake::isCollidingAt(const sf::Vector2i& position) const

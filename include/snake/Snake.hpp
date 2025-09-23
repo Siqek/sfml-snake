@@ -81,6 +81,9 @@ private:
 
     void move();
 
+    void addHead(const sf::Vector2i& head);
+    void removeTail();
+
     Direction getOppositeDirection(Direction direction) const;
 
     void setGridSize(uint8_t x, uint8_t y);
