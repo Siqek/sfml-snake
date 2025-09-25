@@ -33,6 +33,10 @@ private:
     sf::Text maxAppleCountLabel;
 
     GameSettings gameSettings;
+
+    static constexpr size_t DefaultGridSizeOptionIndex      = 1;
+    static constexpr size_t DefaultSnakeSpeedOptionIndex    = 1;
+    static constexpr size_t DefaultMaxAppleCountOptionIndex = 0;
 };
 
 #endif // SETTINGSSTATE_HPP

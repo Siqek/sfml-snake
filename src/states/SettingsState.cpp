@@ -23,9 +23,9 @@ const std::vector<mgui::ArrowSelector<unsigned>::Option> SettingsState::maxApple
 
 SettingsState::SettingsState(StateData* stateData)
     : State(stateData),
-    gridSizeSelector(gridSizeOptions, this->font),
-    snakeSpeedSelector(snakeSpeedOptions, this->font),
-    maxAppleCountSelector(maxAppleCountOptions, this->font)
+    gridSizeSelector(gridSizeOptions, this->font, DefaultGridSizeOptionIndex),
+    snakeSpeedSelector(snakeSpeedOptions, this->font, DefaultSnakeSpeedOptionIndex),
+    maxAppleCountSelector(maxAppleCountOptions, this->font, DefaultMaxAppleCountOptionIndex)
 {
     const auto setSelectorColors = [](auto& selector){
         selector.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));

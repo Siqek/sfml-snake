@@ -22,7 +22,7 @@ public:
         T value;
     };
 
-    ArrowSelector(const std::vector<Option>& options, const sf::Font& font);
+    ArrowSelector(const std::vector<Option>& options, const sf::Font& font, size_t initialOptionIndex = 0);
     ~ArrowSelector() = default;
 
     void setSize(const sf::Vector2f& size);
@@ -67,10 +67,14 @@ private:
 };
 
 template<typename T>
-ArrowSelector<T>::ArrowSelector(const std::vector<Option>& options, const sf::Font& font)
-    : options(options), activeOptionIndex(0), activeOptionChanged(false)
+ArrowSelector<T>::ArrowSelector(const std::vector<Option>& options, const sf::Font& font, size_t initialOptionIndex)
+    : options(options), activeOptionIndex(initialOptionIndex), activeOptionChanged(false)
 {
     assert(!this->options.empty());
+    assert(this->activeOptionIndex < this->options.size());
+
+    if (this->activeOptionIndex >= this->options.size())
+        this->activeOptionIndex = 0;
 
     this->leftArrow.setFont(font);
     this->rightArrow.setFont(font);
