@@ -34,6 +34,9 @@ private:
 
     GameSettings gameSettings;
 
+    mgui::Button saveSettingsButton;
+    mgui::Button exitButton;
+
     static constexpr size_t DefaultGridSizeOptionIndex      = 1;
     static constexpr size_t DefaultSnakeSpeedOptionIndex    = 1;
     static constexpr size_t DefaultMaxAppleCountOptionIndex = 0;

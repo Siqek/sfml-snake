@@ -7,7 +7,7 @@ Snake::Snake(float speedTilesPerSec, unsigned int length, uint8_t gridSizeX, uin
     : speedTilesPerSec(speedTilesPerSec),
     direction(Direction::RIGHT), prevDirection(Direction::RIGHT), nextDirection(Direction::RIGHT),
     tileSize(0.f),
-    lengthToGrow(std::max(1u, length ) - 1), /* prevent underflow */
+    lengthToGrow(std::max(1u, length) - 1), /* prevent underflow */
     initialLengthToGrow(lengthToGrow),
     distanceTraveled(0.f),
     body{}, freeTiles{}, isAlive(true)
