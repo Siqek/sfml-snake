@@ -18,6 +18,9 @@ public:
     void update(const float& dt) override;
     void render(sf::RenderTarget* target = nullptr) override;
 private:
+    void updateSelectors();
+    void updateButtons();
+
     void updateUIScaling();
 
     static const std::vector<mgui::ArrowSelector<sf::Vector2<uint8_t>>::Option> gridSizeOptions;

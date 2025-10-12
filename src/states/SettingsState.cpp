@@ -68,21 +68,8 @@ void SettingsState::onWindowResize()
 
 void SettingsState::update(const float& /*dt*/)
 {
-    this->gridSizeSelector.update(*this->window);
-    this->snakeSpeedSelector.update(*this->window);
-    this->maxAppleCountSelector.update(*this->window);
-
-    this->saveSettingsButton.update(*this->window);
-    this->exitButton.update(*this->window);
-
-    if (this->gridSizeSelector.hasActiveOptionChanged())
-        this->gameSettings.gridSize = this->gridSizeSelector.getActiveValue();
-
-    if (this->snakeSpeedSelector.hasActiveOptionChanged())
-        this->gameSettings.snakeSpeed = this->snakeSpeedSelector.getActiveValue();
-
-    if (this->maxAppleCountSelector.hasActiveOptionChanged())
-        this->gameSettings.maxAppleCount = this->maxAppleCountSelector.getActiveValue();
+    this->updateSelectors();
+    this->updateButtons();
 }
 
 void SettingsState::render(sf::RenderTarget* target)
@@ -100,6 +87,31 @@ void SettingsState::render(sf::RenderTarget* target)
 
     this->saveSettingsButton.render(*target);
     this->exitButton.render(*target);
+}
+
+void SettingsState::updateSelectors()
+{
+    this->gridSizeSelector.update(*this->window);
+    this->snakeSpeedSelector.update(*this->window);
+    this->maxAppleCountSelector.update(*this->window);
+
+    if (this->gridSizeSelector.hasActiveOptionChanged())
+        this->gameSettings.gridSize = this->gridSizeSelector.getActiveValue();
+
+    if (this->snakeSpeedSelector.hasActiveOptionChanged())
+        this->gameSettings.snakeSpeed = this->snakeSpeedSelector.getActiveValue();
+
+    if (this->maxAppleCountSelector.hasActiveOptionChanged())
+        this->gameSettings.maxAppleCount = this->maxAppleCountSelector.getActiveValue();
+}
+
+void SettingsState::updateButtons()
+{
+    this->saveSettingsButton.update(*this->window);
+    this->exitButton.update(*this->window);
+
+    if (this->exitButton.isReleased())
+        this->endState();
 }
 
 void SettingsState::updateUIScaling()
