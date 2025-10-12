@@ -18,6 +18,7 @@ public:
 
 private:
     mgui::Button startButton;
+    mgui::Button settingsButton;
     mgui::Button exitButton;
 
     void updateButtons();

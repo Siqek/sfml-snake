@@ -2,6 +2,7 @@
 #include "states/MainMenuState.hpp"
 
 #include "states/GameState.hpp"
+#include "states/SettingsState.hpp"
 
 #include "config/Colors.hpp"
 
@@ -11,24 +12,25 @@ MainMenuState::MainMenuState(StateData* stateData)
     this->startButton.setFont(this->font);
     this->startButton.setText("Play");
 
+    this->settingsButton.setFont(this->font);
+    this->settingsButton.setText("Settings");
+
     this->exitButton.setFont(this->font);
     this->exitButton.setText("Exit");
 
-    this->startButton.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
-    this->startButton.setFillColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverBg));
-    this->startButton.setFillColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveBg));
+    const auto setButtonColors = [](mgui::Button& button){
+        button.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
+        button.setFillColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverBg));
+        button.setFillColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveBg));
 
-    this->startButton.setAccentColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleOutline));
-    this->startButton.setAccentColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverOutline));
-    this->startButton.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
+        button.setAccentColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleOutline));
+        button.setAccentColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverOutline));
+        button.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
+    };
 
-    this->exitButton.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
-    this->exitButton.setFillColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverBg));
-    this->exitButton.setFillColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveBg));
-
-    this->exitButton.setAccentColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleOutline));
-    this->exitButton.setAccentColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverOutline));
-    this->exitButton.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
+    setButtonColors(this->startButton);
+    setButtonColors(this->settingsButton);
+    setButtonColors(this->exitButton);
 }
 
 void MainMenuState::onWindowResize()
@@ -47,16 +49,22 @@ void MainMenuState::render(sf::RenderTarget* target)
         target = this->window;
 
     this->startButton.render(*target);
+    this->settingsButton.render(*target);
     this->exitButton.render(*target);
 }
 
 void MainMenuState::updateButtons()
 {
     this->startButton.update(*this->window);
+    this->settingsButton.update(*this->window);
     this->exitButton.update(*this->window);
 
     if (this->startButton.isReleased()) {
         this->stateData->states->push(new GameState(this->stateData));
+    }
+
+    if (this->settingsButton.isReleased()) {
+        this->stateData->states->push(new SettingsState(this->stateData));
     }
 
     if (this->exitButton.isReleased()) {
@@ -66,27 +74,27 @@ void MainMenuState::updateButtons()
 
 void MainMenuState::updateUIScaling()
 {
-    sf::Vector2f windowSize(
-        static_cast<float>(this->window->getSize().x),
-        static_cast<float>(this->window->getSize().y)
-    );
+    const auto windowSize = sf::Vector2f(this->window->getSize());
 
-    const unsigned characterSize = static_cast<unsigned>(std::min(windowSize.x / 32.f, windowSize.y / 32.f));
-    this->startButton.setCharacterSize(characterSize);
-    this->exitButton.setCharacterSize(characterSize);
+    const std::array<mgui::Button*, 3> buttons{
+        &this->startButton,
+        &this->settingsButton,
+        &this->exitButton
+    };
 
-    const auto tlb = this->startButton.geTextLocalBounds();
+    const auto buttonSize = sf::Vector2f(windowSize.x / 3.5f, windowSize.y / 16.f);
+    const auto buttonCharacterSize = static_cast<unsigned>(buttonSize.y / 2.f);
+    const auto buttonOutlineThickness = buttonSize.y / 16.f;
 
-    const float buttonWidth = tlb.width * 8.f;
-    const float buttonHeight = tlb.height * 1.8f;
+    const auto buttonPositionOffset = buttonSize.y * 1.6f;
+    const auto firstButtonPosition = sf::Vector2f(windowSize.x / 2.f, windowSize.y / 2.f - buttonPositionOffset);
 
-    this->startButton.setPosition(windowSize / 2.f);
-    this->startButton.setSize(sf::Vector2f(buttonWidth, buttonHeight));
-    this->startButton.setOrigin(this->startButton.getSize() / 2.f);
-    this->startButton.setOutlineThickness(buttonHeight / 16.f);
-
-    this->exitButton.setPosition(sf::Vector2f(windowSize.x / 2.f, windowSize.y / 2.f + buttonHeight * 1.8f));
-    this->exitButton.setSize(sf::Vector2f(buttonWidth, buttonHeight));
-    this->exitButton.setOrigin(this->exitButton.getSize() / 2.f);
-    this->exitButton.setOutlineThickness(buttonHeight / 16.f);
+    for (size_t i = 0; i < buttons.size(); ++i) {
+        auto* button = buttons[i];
+        button->setPosition(sf::Vector2f(firstButtonPosition.x, firstButtonPosition.y + buttonPositionOffset * static_cast<float>(i)));
+        button->setSize(buttonSize);
+        button->setCharacterSize(buttonCharacterSize);
+        button->setOrigin(buttonSize / 2.f);
+        button->setOutlineThickness(buttonOutlineThickness);
+    }
 }
