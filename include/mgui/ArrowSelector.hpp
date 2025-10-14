@@ -35,6 +35,8 @@ public:
     void setFillColor(mgui::ButtonState state, const sf::Color& color);
     void setAccentColor(mgui::ButtonState state, const sf::Color& color);
 
+    void setActiveOption(const std::string& optionId);
+
     sf::Vector2f getSize() const { return size; };
 
     T getActiveValue() const { return options.at(activeOptionIndex).value; }
@@ -167,6 +169,19 @@ void ArrowSelector<T>::setAccentColor(mgui::ButtonState state, const sf::Color& 
 }
 
 template<typename T>
+void ArrowSelector<T>::setActiveOption(const std::string& optionId)
+{
+    for (size_t i = 0; i < this->options.size(); ++i)
+    {
+        if (this->options[i].id == optionId)
+        {
+            this->activeOptionIndex = i;
+            this->updateOptionLabelString();
+        }
+    }
+}
+
+template<typename T>
 void ArrowSelector<T>::update(const sf::RenderWindow& window)
 {
     this->activeOptionChanged = false;
@@ -179,9 +194,6 @@ void ArrowSelector<T>::update(const sf::RenderWindow& window)
 
     if (this->rightArrow.isReleased())
         this->nextOption();
-
-    if (this->activeOptionChanged)
-        this->updateOptionLabelString();
 }
 
 template<typename T>
@@ -197,21 +209,23 @@ void ArrowSelector<T>::render(sf::RenderTarget& target)
 template<typename T>
 void ArrowSelector<T>::nextOption()
 {
-    if (this->activeOptionIndex == this->options.size() - 1)
+    if (this->activeOptionIndex >= this->options.size() - 1)
         return;
 
     this->activeOptionIndex++;
     this->activeOptionChanged = true;
+    this->updateOptionLabelString();
 }
 
 template<typename T>
 void ArrowSelector<T>::prevOption()
 {
-    if (this->activeOptionIndex == 0)
+    if (this->activeOptionIndex <= 0)
         return;
 
     this->activeOptionIndex--;
     this->activeOptionChanged = true;
+    this->updateOptionLabelString();
 }
 
 template<typename T>
