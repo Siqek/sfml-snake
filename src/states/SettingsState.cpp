@@ -1,31 +1,15 @@
 #include "stdafx.hpp"
 #include "states/SettingsState.hpp"
 
+#include "config/GameSettingsOptions.hpp"
+
 #include "config/Colors.hpp"
-
-const std::vector<mgui::ArrowSelector<sf::Vector2<uint8_t>>::Option> SettingsState::gridSizeOptions = {
-    { "8x8", sf::Vector2<uint8_t>(8, 8) },
-    { "10x10", sf::Vector2<uint8_t>(10, 10) },
-    { "12x12", sf::Vector2<uint8_t>(12, 12) },
-};
-
-const std::vector<mgui::ArrowSelector<float>::Option> SettingsState::snakeSpeedOptions = {
-    { "slow", 2.f },
-    { "normal", 4.f },
-    { "fast", 6.f }
-};
-
-const std::vector<mgui::ArrowSelector<unsigned>::Option> SettingsState::maxAppleCountOptions = {
-    { "1", 1u },
-    { "2", 2u },
-    { "3", 3u }
-};
 
 SettingsState::SettingsState(StateData* stateData)
     : State(stateData),
-    gridSizeSelector(gridSizeOptions, this->font, DefaultGridSizeOptionIndex),
-    snakeSpeedSelector(snakeSpeedOptions, this->font, DefaultSnakeSpeedOptionIndex),
-    maxAppleCountSelector(maxAppleCountOptions, this->font, DefaultMaxAppleCountOptionIndex),
+    gridSizeSelector(GameSettingsOptions::GridSizeOptions, this->font, GameSettingsOptions::DefaultGridSizeOptionIndex),
+    snakeSpeedSelector(GameSettingsOptions::SnakeSpeedOptions, this->font, GameSettingsOptions::DefaultSnakeSpeedOptionIndex),
+    maxAppleCountSelector(GameSettingsOptions::MaxAppleCountOptions, this->font, GameSettingsOptions::DefaultMaxAppleCountOptionIndex),
     gameSettings(*stateData->gameSettings)
 {
     const auto setElementColors = [](auto& element){

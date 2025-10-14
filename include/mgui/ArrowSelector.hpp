@@ -18,6 +18,7 @@ class ArrowSelector
 {
 public:
     struct Option {
+        std::string id;
         std::string label;
         T value;
     };

@@ -23,26 +23,18 @@ private:
 
     void updateUIScaling();
 
-    static const std::vector<mgui::ArrowSelector<sf::Vector2<uint8_t>>::Option> gridSizeOptions;
     mgui::ArrowSelector<sf::Vector2<uint8_t>> gridSizeSelector;
-    sf::Text gridSizeLabel;
-
-    static const std::vector<mgui::ArrowSelector<float>::Option> snakeSpeedOptions;
     mgui::ArrowSelector<float> snakeSpeedSelector;
-    sf::Text snakeSpeedLabel;
-
-    static const std::vector<mgui::ArrowSelector<unsigned>::Option> maxAppleCountOptions;
     mgui::ArrowSelector<unsigned> maxAppleCountSelector;
+
+    sf::Text gridSizeLabel;
+    sf::Text snakeSpeedLabel;
     sf::Text maxAppleCountLabel;
 
     GameSettings gameSettings;
 
     mgui::Button saveSettingsButton;
     mgui::Button exitButton;
-
-    static constexpr size_t DefaultGridSizeOptionIndex      = 1;
-    static constexpr size_t DefaultSnakeSpeedOptionIndex    = 1;
-    static constexpr size_t DefaultMaxAppleCountOptionIndex = 0;
 };
 
 #endif // SETTINGSSTATE_HPP
