@@ -2,12 +2,14 @@
 #define STATE_HPP
 
 class State;
+class GameSettings;
 
 struct StateData {
     sf::RenderWindow* window;
     const std::unordered_map<std::string, int>* supportedKeys;
     const sf::Font* font;
     std::stack<State*>* states;
+    GameSettings* gameSettings;
 };
 
 class State

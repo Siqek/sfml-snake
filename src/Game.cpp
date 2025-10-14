@@ -70,12 +70,24 @@ void Game::initFont()
     }
 }
 
+void Game::initGameSettings()
+{
+    // Set default settings
+    this->gameSettings.gridSize      = sf::Vector2<uint8_t>(10u, 10u);
+    this->gameSettings.snakeSpeed    = 4.f;
+    this->gameSettings.maxAppleCount = 1u;
+
+    // Load from file (overwrite default settings)
+    // this->gameSettings.loadFromFile("game_settings_file");
+}
+
 void Game::initStateData()
 {
     this->stateData.window = this->window;
     this->stateData.supportedKeys = &this->supportedKeys;
     this->stateData.font = &this->font;
     this->stateData.states = &this->states;
+    this->stateData.gameSettings = &this->gameSettings;
 }
 
 void Game::initStates()
@@ -96,6 +108,7 @@ Game::Game()
     this->initWindow();
     this->initSupportedKeys();
     this->initFont();
+    this->initGameSettings();
     this->initStateData();
     this->initStates();
 

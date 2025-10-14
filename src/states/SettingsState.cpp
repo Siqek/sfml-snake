@@ -25,7 +25,8 @@ SettingsState::SettingsState(StateData* stateData)
     : State(stateData),
     gridSizeSelector(gridSizeOptions, this->font, DefaultGridSizeOptionIndex),
     snakeSpeedSelector(snakeSpeedOptions, this->font, DefaultSnakeSpeedOptionIndex),
-    maxAppleCountSelector(maxAppleCountOptions, this->font, DefaultMaxAppleCountOptionIndex)
+    maxAppleCountSelector(maxAppleCountOptions, this->font, DefaultMaxAppleCountOptionIndex),
+    gameSettings(*stateData->gameSettings)
 {
     const auto setElementColors = [](auto& element){
         element.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
@@ -109,6 +110,9 @@ void SettingsState::updateButtons()
 {
     this->saveSettingsButton.update(*this->window);
     this->exitButton.update(*this->window);
+
+    if (this->saveSettingsButton.isReleased())
+        *(this->stateData->gameSettings) = this->gameSettings;
 
     if (this->exitButton.isReleased())
         this->endState();

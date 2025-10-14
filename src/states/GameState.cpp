@@ -1,6 +1,8 @@
 #include "stdafx.hpp"
 #include "states/GameState.hpp"
 
+#include "settings/GameSettings.hpp"
+
 #include "utils/KeyStateTracker.hpp"
 #include "utils/IniParser.hpp"
 
@@ -67,14 +69,14 @@ void GameState::updateUIScaling()
 
 GameState::GameState(StateData* stateData)
     : State(stateData),
-    gridSizeX(10), gridSizeY(10),
-    snake(4.f, 3u, this->gridSizeX, this->gridSizeY),
+    gridSizeX(stateData->gameSettings->gridSize.x), gridSizeY(stateData->gameSettings->gridSize.y),
+    snake(stateData->gameSettings->snakeSpeed, 3u, this->gridSizeX, this->gridSizeY),
     score(0u),
     endGameOverlay(sf::Vector2f(this->window->getSize()), this->font)
 {
     this->updateUIScaling();
 
-    this->appleCluster.setAppleLimit(3u);
+    this->appleCluster.setAppleLimit(this->stateData->gameSettings->maxAppleCount);
     this->appleCluster.spawnAll(this->snake.getFreeTiles());
 
     this->scoreText.setFont(this->font);

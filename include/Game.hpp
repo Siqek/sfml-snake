@@ -3,6 +3,8 @@
 
 #include "states/State.hpp"
 
+#include "settings/GameSettings.hpp"
+
 #include "utils/FPSCounter.hpp"
 
 class Game
@@ -26,6 +28,8 @@ private:
 
     sf::Font font;
 
+    GameSettings gameSettings;
+
     StateData stateData;
 
     std::stack<State*> states;
@@ -35,6 +39,7 @@ private:
     void initWindow();
     void initSupportedKeys();
     void initFont();
+    void initGameSettings();
     void initStateData();
     void initStates();
 
