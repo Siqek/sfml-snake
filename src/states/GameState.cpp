@@ -86,6 +86,7 @@ GameState::GameState(StateData* stateData)
     this->scoreText.setFillColor(sf::Color(Colors::Hex::TextMain));
     this->scoreText.setOutlineThickness(2.f);
     this->scoreText.setOutlineColor(sf::Color(Colors::Hex::TextMainOutline));
+    this->updateScoreText();
 
     this->initKeybinds();
     this->initKeyStateTracker();
@@ -162,7 +163,7 @@ void GameState::update(const float& dt)
         this->appleCluster.spawn(this->snake.getFreeTiles());
         this->snake.grow(1u);
         this->score++;
-        this->scoreText.setString(std::to_string(this->score));
+        this->updateScoreText();
     }
 }
 
@@ -194,6 +195,13 @@ void GameState::render(sf::RenderTarget* target)
 
     this->gameInstructionsOverlay.render(*target);
     this->endGameOverlay.render(*target);
+}
+
+void GameState::updateScoreText()
+{
+    this->scoreText.setString(std::to_string(this->score));
+    const auto lb = this->scoreText.getLocalBounds();
+    this->scoreText.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
 }
 
 void GameState::restart()

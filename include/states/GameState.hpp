@@ -33,6 +33,8 @@ private:
 
     void updateUIScaling();
 
+    void updateScoreText();
+
     void restart();
 
     std::unordered_map<std::string, int> keybinds;
