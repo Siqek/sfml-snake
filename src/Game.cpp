@@ -89,7 +89,7 @@ void Game::initGameSettings()
     this->gameSettings.maxAppleCountOptionId = maxAppleCountDefaultOption.id;
 
     // Load from file (overwrite default settings)
-    // this->gameSettings.loadFromFile("game_settings_file");
+    this->gameSettings.loadFromFile("config/game_settings.ini");
 }
 
 void Game::initStateData()
