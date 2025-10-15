@@ -13,10 +13,10 @@ public:
     std::optional<std::string> maxAppleCountOptionId;
 
     GameSettings();
-    GameSettings(const std::string_view& filename);
+    GameSettings(const std::string& filename);
 
-    void loadFromFile(const std::string_view& filename);
-    void saveToFile(const std::string_view& filename);
+    void loadFromFile(const std::string& filename);
+    void saveToFile(const std::string& filename);
 };
 
 #endif // GAMESETTINGS_HPP

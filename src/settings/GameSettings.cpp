@@ -8,16 +8,15 @@
 GameSettings::GameSettings()
     : gridSize(0, 0), snakeSpeed(0.f), maxAppleCount(0u) {}
 
-GameSettings::GameSettings(const std::string_view& filename)
+GameSettings::GameSettings(const std::string& filename)
     : gridSize(0, 0), snakeSpeed(0.f), maxAppleCount(0u)
 {
     this->loadFromFile(filename);
 }
 
-void GameSettings::loadFromFile(const std::string_view& filename)
+void GameSettings::loadFromFile(const std::string& filename)
 {
-    std::string filenamestr(filename);
-    IniParser iniParser(filenamestr);
+    IniParser iniParser(filename);
 
     const auto applyOptionById = [&](const std::string& loadedOptionId, const auto& options, auto& settingValue, auto& settingOptionId) {
         if (loadedOptionId.empty())
@@ -44,7 +43,17 @@ void GameSettings::loadFromFile(const std::string_view& filename)
     applyOptionById(loadedMaxAppleCountOptionId, GameSettingsOptions::MaxAppleCountOptions, this->maxAppleCount, this->maxAppleCountOptionId);
 }
 
-void GameSettings::saveToFile(const std::string_view& /*filename*/)
+void GameSettings::saveToFile(const std::string& filename)
 {
+    std::ofstream file(filename);
 
+    if (file.is_open())
+    {
+        file << "[GameSettings]\n";
+        file << "GridSizeOptionId=" << this->gridSizeOptionId.value_or("") << "\n";
+        file << "SnakeSpeedOptionId=" << this->snakeSpeedOptionId.value_or("") << "\n";
+        file << "MaxAppleCountOptionId=" << this->maxAppleCountOptionId.value_or("") << "\n";
+    }
+
+    file.close();
 }

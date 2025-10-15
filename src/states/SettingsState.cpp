@@ -113,8 +113,10 @@ void SettingsState::updateButtons()
     this->saveSettingsButton.update(*this->window);
     this->exitButton.update(*this->window);
 
-    if (this->saveSettingsButton.isReleased())
+    if (this->saveSettingsButton.isReleased()) {
         *(this->stateData->gameSettings) = this->gameSettings;
+        this->gameSettings.saveToFile("config/game_settings.ini");
+    }
 
     if (this->exitButton.isReleased())
         this->endState();
