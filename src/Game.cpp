@@ -49,7 +49,7 @@ void Game::initWindow()
 
 void Game::initSupportedKeys()
 {
-    IniParser iniParser("config/supportedKeys.ini");
+    IniParser iniParser("config/supported_keys.ini");
     const auto& keys = iniParser.getSection("Keys");
 
     this->supportedKeys.reserve(keys.size());
