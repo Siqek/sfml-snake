@@ -26,6 +26,15 @@ SettingsState::SettingsState(StateData* stateData)
     setElementColors(this->snakeSpeedSelector);
     setElementColors(this->maxAppleCountSelector);
 
+    if (this->gameSettings.gridSizeOptionId)
+        this->gridSizeSelector.setActiveOption(*this->gameSettings.gridSizeOptionId);
+
+    if (this->gameSettings.snakeSpeedOptionId)
+        this->snakeSpeedSelector.setActiveOption(*this->gameSettings.snakeSpeedOptionId);
+
+    if (this->gameSettings.maxAppleCountOptionId)
+        this->maxAppleCountSelector.setActiveOption(*this->gameSettings.maxAppleCountOptionId);
+
     this->gridSizeLabel.setFont(this->font);
     this->gridSizeLabel.setString("Grid Size:");
 
@@ -80,14 +89,23 @@ void SettingsState::updateSelectors()
     this->snakeSpeedSelector.update(*this->window);
     this->maxAppleCountSelector.update(*this->window);
 
-    if (this->gridSizeSelector.hasActiveOptionChanged())
-        this->gameSettings.gridSize = this->gridSizeSelector.getActiveValue();
+    if (this->gridSizeSelector.hasActiveOptionChanged()) {
+        const auto& option = this->gridSizeSelector.getActiveOption();
+        this->gameSettings.gridSize = option.value;
+        this->gameSettings.gridSizeOptionId = option.id;
+    }
 
-    if (this->snakeSpeedSelector.hasActiveOptionChanged())
-        this->gameSettings.snakeSpeed = this->snakeSpeedSelector.getActiveValue();
+    if (this->snakeSpeedSelector.hasActiveOptionChanged()) {
+        const auto& option = this->snakeSpeedSelector.getActiveOption();
+        this->gameSettings.snakeSpeed = option.value;
+        this->gameSettings.snakeSpeedOptionId = option.id;
+    }
 
-    if (this->maxAppleCountSelector.hasActiveOptionChanged())
-        this->gameSettings.maxAppleCount = this->maxAppleCountSelector.getActiveValue();
+    if (this->maxAppleCountSelector.hasActiveOptionChanged()) {
+        const auto& option = this->maxAppleCountSelector.getActiveOption();
+        this->gameSettings.maxAppleCount = option.value;
+        this->gameSettings.maxAppleCountOptionId = option.id;
+    }
 }
 
 void SettingsState::updateButtons()

@@ -8,6 +8,10 @@ public:
     float snakeSpeed;
     unsigned maxAppleCount;
 
+    std::optional<std::string> gridSizeOptionId;
+    std::optional<std::string> snakeSpeedOptionId;
+    std::optional<std::string> maxAppleCountOptionId;
+
     GameSettings();
     GameSettings(const std::string_view& filename);
 

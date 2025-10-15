@@ -11,6 +11,7 @@
 #include <deque>
 #include <cctype>
 #include <cstdint>
+#include <optional>
 #include <utility>
 #include <cmath>
 #include <filesystem>

@@ -39,6 +39,8 @@ public:
 
     sf::Vector2f getSize() const { return size; };
 
+    const Option& getActiveOption() const { return options.at(activeOptionIndex); }
+
     T getActiveValue() const { return options.at(activeOptionIndex).value; }
     const T& getActiveValueRef() const { return options.at(activeOptionIndex).value; }
 

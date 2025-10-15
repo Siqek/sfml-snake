@@ -5,6 +5,8 @@
 
 #include "utils/IniParser.hpp"
 
+#include "config/GameSettingsOptions.hpp"
+
 #include "config/Colors.hpp"
 
 #ifdef __linux__
@@ -72,10 +74,19 @@ void Game::initFont()
 
 void Game::initGameSettings()
 {
-    // Set default settings
-    this->gameSettings.gridSize      = sf::Vector2<uint8_t>(10u, 10u);
-    this->gameSettings.snakeSpeed    = 4.f;
-    this->gameSettings.maxAppleCount = 1u;
+    const auto& gridSizeDefaultOption      = GameSettingsOptions::GridSizeOptions.at(GameSettingsOptions::DefaultGridSizeOptionIndex);
+    const auto& snakeSpeedDefaultOption    = GameSettingsOptions::SnakeSpeedOptions.at(GameSettingsOptions::DefaultSnakeSpeedOptionIndex);
+    const auto& maxAppleCountDefaultOption = GameSettingsOptions::MaxAppleCountOptions.at(GameSettingsOptions::DefaultMaxAppleCountOptionIndex);
+
+    // Set default grid size
+    this->gameSettings.gridSize              = gridSizeDefaultOption.value;
+    this->gameSettings.gridSizeOptionId      = gridSizeDefaultOption.id;
+    // Set default snake speed
+    this->gameSettings.snakeSpeed            = snakeSpeedDefaultOption.value;
+    this->gameSettings.snakeSpeedOptionId    = snakeSpeedDefaultOption.id;
+    // Set default max apple count
+    this->gameSettings.maxAppleCount         = maxAppleCountDefaultOption.value;
+    this->gameSettings.maxAppleCountOptionId = maxAppleCountDefaultOption.id;
 
     // Load from file (overwrite default settings)
     // this->gameSettings.loadFromFile("game_settings_file");
