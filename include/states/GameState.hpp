@@ -12,6 +12,7 @@ class KeyStateTracker;
 #include "snake/Snake.hpp"
 #include "snake/AppleCluster.hpp"
 
+#include "states/overlays/GameInstructionsOverlay.hpp"
 #include "states/overlays/EndGameOverlay.hpp"
 
 class GameState
@@ -27,6 +28,13 @@ public:
     void render(sf::RenderTarget* target = nullptr) override;
 
 private:
+    void initKeybinds();
+    void initKeyStateTracker();
+
+    void updateUIScaling();
+
+    void restart();
+
     std::unordered_map<std::string, int> keybinds;
     KeyStateTracker* keyStateTracker;
 
@@ -44,14 +52,8 @@ private:
     unsigned int score;
     sf::Text scoreText;
 
+    GameInstructionsOverlay gameInstructionsOverlay;
     EndGameOverlay endGameOverlay;
-
-    void initKeybinds();
-    void initKeyStateTracker();
-
-    void updateUIScaling();
-
-    void restart();
 };
 
 #endif

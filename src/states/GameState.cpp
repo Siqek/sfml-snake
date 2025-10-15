@@ -64,6 +64,7 @@ void GameState::updateUIScaling()
         windowSize.y * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f )
         - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
 
+    this->gameInstructionsOverlay.onWindowResize(windowSize);
     this->endGameOverlay.onWindowResize(windowSize);
 }
 
@@ -72,6 +73,7 @@ GameState::GameState(StateData* stateData)
     gridSizeX(stateData->gameSettings->gridSize.x), gridSizeY(stateData->gameSettings->gridSize.y),
     snake(stateData->gameSettings->snakeSpeed, 3u, this->gridSizeX, this->gridSizeY),
     score(0u),
+    gameInstructionsOverlay(sf::Vector2f(this->window->getSize()), this->font),
     endGameOverlay(sf::Vector2f(this->window->getSize()), this->font)
 {
     this->updateUIScaling();
@@ -87,6 +89,8 @@ GameState::GameState(StateData* stateData)
 
     this->initKeybinds();
     this->initKeyStateTracker();
+
+    this->gameInstructionsOverlay.show();
 }
 
 GameState::~GameState()
@@ -120,7 +124,6 @@ void GameState::update(const float& dt)
 {
     this->updateInput();
 
-
     if (this->endGameOverlay.getIsActive()) {
         this->endGameOverlay.update(*this->window);
 
@@ -131,22 +134,35 @@ void GameState::update(const float& dt)
             this->endGameOverlay.close();
             this->restart();
         }
-    } else {
-        this->snake.update(dt);
+        return;
+    }
 
-        if (this->snake.hasFilledGrid()) {
-            this->endGameOverlay.setTitle("Snake is full. So is your glory!");
-            this->endGameOverlay.show();
-        } else if (!this->snake.getIsAlive()) {
-            this->endGameOverlay.setTitle("Game Over");
-            this->endGameOverlay.show();
-        } else if (this->appleCluster.eatAppleAt(this->snake.getHeadPosition()))
+    if (this->gameInstructionsOverlay.getIsActive()) {
+        // Close the GameInstructionsOverlay if any key is pressed
+        for (int key = 0; key < sf::Keyboard::KeyCount; ++key)
         {
-            this->appleCluster.spawn(this->snake.getFreeTiles());
-            this->snake.grow(1u);
-            this->score++;
-            this->scoreText.setString(std::to_string(this->score));
+            if (sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(key))) {
+                this->gameInstructionsOverlay.close();
+                break;
+            }
         }
+        return;
+    }
+
+    this->snake.update(dt);
+
+    if (this->snake.hasFilledGrid()) {
+        this->endGameOverlay.setTitle("Snake is full. So is your glory!");
+        this->endGameOverlay.show();
+    } else if (!this->snake.getIsAlive()) {
+        this->endGameOverlay.setTitle("Game Over");
+        this->endGameOverlay.show();
+    } else if (this->appleCluster.eatAppleAt(this->snake.getHeadPosition()))
+    {
+        this->appleCluster.spawn(this->snake.getFreeTiles());
+        this->snake.grow(1u);
+        this->score++;
+        this->scoreText.setString(std::to_string(this->score));
     }
 }
 
@@ -176,6 +192,7 @@ void GameState::render(sf::RenderTarget* target)
 
     target->draw(this->scoreText);
 
+    this->gameInstructionsOverlay.render(*target);
     this->endGameOverlay.render(*target);
 }
 
@@ -185,4 +202,6 @@ void GameState::restart()
 
     this->appleCluster.reset();
     this->appleCluster.spawnAll(this->snake.getFreeTiles());
+
+    this->gameInstructionsOverlay.show();
 }
