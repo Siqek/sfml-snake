@@ -11,15 +11,22 @@
 void GameState::initKeybinds()
 {
     IniParser iniParser("config/gamestate_keybinds.ini");
-    const auto& keybindSection = iniParser.getSection("Snake");
+    const auto& keybindSnakeSection = iniParser.getSection("Snake");
+    const auto& keybindsGeneralSection = iniParser.getSection("General");
 
-    this->keybinds.reserve(keybindSection.size());
-    for (const auto& [bind, key] : keybindSection) {
-        auto it = this->supportedKeys.find(key);
-        if (it != this->supportedKeys.end()) {
-            this->keybinds[bind] = it->second;
+    this->keybinds.reserve(keybindSnakeSection.size() + keybindsGeneralSection.size());
+
+    const auto bindSection = [this](const auto& keybindSection) {
+        for (const auto& [bind, key] : keybindSection) {
+            auto it = this->supportedKeys.find(key);
+            if (it != this->supportedKeys.end()) {
+                this->keybinds[bind] = it->second;
+            }
         }
-    }
+    };
+
+    bindSection(keybindSnakeSection);
+    bindSection(keybindsGeneralSection);
 }
 
 void GameState::initKeyStateTracker()
@@ -65,6 +72,7 @@ void GameState::updateUIScaling()
         - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
 
     this->gameInstructionsOverlay.onWindowResize(windowSize);
+    this->pauseOverlay.onWindowResize(windowSize);
     this->endGameOverlay.onWindowResize(windowSize);
 }
 
@@ -74,6 +82,7 @@ GameState::GameState(StateData* stateData)
     snake(stateData->gameSettings->snakeSpeed, 3u, this->gridSizeX, this->gridSizeY),
     score(0u),
     gameInstructionsOverlay(sf::Vector2f(this->window->getSize()), this->font),
+    pauseOverlay(sf::Vector2f(this->window->getSize()), this->font),
     endGameOverlay(sf::Vector2f(this->window->getSize()), this->font)
 {
     this->updateUIScaling();
@@ -111,6 +120,16 @@ void GameState::updateInput()
 
     this->keyStateTracker->updateKeyStates();
 
+    if (!this->gameInstructionsOverlay.getIsActive() && !this->endGameOverlay.getIsActive())
+    {
+        if (this->keyStateTracker->isKeyDown("TogglePause")) {
+            if (this->pauseOverlay.getIsActive())
+            this->pauseOverlay.close();
+            else
+            this->pauseOverlay.show();
+        }
+    }
+
     if (this->keyStateTracker->isKeyDown("MoveUp") || this->keyStateTracker->isKeyDown("AltMoveUp"))
         this->snake.setDirection(Direction::UP);
     else if (this->keyStateTracker->isKeyDown("MoveDown") || this->keyStateTracker->isKeyDown("AltMoveDown"))
@@ -131,10 +150,9 @@ void GameState::update(const float& dt)
         if (this->endGameOverlay.isBackToMenuButtonReleased())
             this->endState();
 
-        if (this->endGameOverlay.isRestartButtonReleased()) {
-            this->endGameOverlay.close();
+        if (this->endGameOverlay.isRestartButtonReleased())
             this->restart();
-        }
+
         return;
     }
 
@@ -147,6 +165,21 @@ void GameState::update(const float& dt)
                 break;
             }
         }
+        return;
+    }
+
+    if (this->pauseOverlay.getIsActive()) {
+        this->pauseOverlay.update(*this->window);
+
+        if (this->pauseOverlay.isButtonReleased("Continue"))
+            this->pauseOverlay.close();
+
+        if (this->pauseOverlay.isButtonReleased("Restart"))
+            this->restart();
+
+        if (this->pauseOverlay.isButtonReleased("BackToMenu"))
+            this->endState();
+
         return;
     }
 
@@ -194,6 +227,7 @@ void GameState::render(sf::RenderTarget* target)
     target->draw(this->scoreText);
 
     this->gameInstructionsOverlay.render(*target);
+    this->pauseOverlay.render(*target);
     this->endGameOverlay.render(*target);
 }
 
@@ -212,4 +246,6 @@ void GameState::restart()
     this->appleCluster.spawnAll(this->snake.getFreeTiles());
 
     this->gameInstructionsOverlay.show();
+    this->pauseOverlay.close();
+    this->endGameOverlay.close();
 }

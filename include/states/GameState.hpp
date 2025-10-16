@@ -13,6 +13,7 @@ class KeyStateTracker;
 #include "snake/AppleCluster.hpp"
 
 #include "states/overlays/GameInstructionsOverlay.hpp"
+#include "states/overlays/PauseOverlay.hpp"
 #include "states/overlays/EndGameOverlay.hpp"
 
 class GameState
@@ -55,6 +56,7 @@ private:
     sf::Text scoreText;
 
     GameInstructionsOverlay gameInstructionsOverlay;
+    PauseOverlay pauseOverlay;
     EndGameOverlay endGameOverlay;
 };
 
