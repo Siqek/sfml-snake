@@ -67,6 +67,9 @@ private:
 
     std::array<KeyPrompt, 4> keyPrompts;
     std::array<ArrowPrompt, 4> arrowPrompts;
+
+    sf::Text orText;
+    sf::Text pressAnyKeyText;
 };
 
 #endif // GAMEINSTRUCTIONSOVERLAY_HPP

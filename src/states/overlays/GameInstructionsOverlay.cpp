@@ -6,18 +6,28 @@
 GameInstructionsOverlay::GameInstructionsOverlay(sf::Vector2f windowSize, const sf::Font& font)
     : Overlay(windowSize, sf::Color(Colors::Hex::OverlayBackground)),
     keyPrompts({ "W", "S", "A", "D" }),
-    arrowPrompts({ 0.f, 180.f, 90.f, 270.f })
+    arrowPrompts({ 0.f, 180.f, 270.f, 90.f })
 {
     this->keyPromptRenderer.shape.setFillColor(sf::Color(Colors::Hex::ButtonIdleBg));
-    this->keyPromptRenderer.shape.setOutlineColor(sf::Color(Colors::Hex::ButtonIdleOutline));
+    this->keyPromptRenderer.shape.setOutlineColor(sf::Color(Colors::Hex::TextMain));
     this->keyPromptRenderer.label.setFont(font);
     this->keyPromptRenderer.label.setFillColor(sf::Color(Colors::Hex::TextMain));
 
     this->arrowPromptRenderer.shape.setFillColor(sf::Color(Colors::Hex::ButtonIdleBg));
-    this->arrowPromptRenderer.shape.setOutlineColor(sf::Color(Colors::Hex::ButtonIdleOutline));
+    this->arrowPromptRenderer.shape.setOutlineColor(sf::Color(Colors::Hex::TextMain));
     this->arrowPromptRenderer.arrow.setPointCount(3);
     this->arrowPromptRenderer.arrow.setScale(sf::Vector2f(0.8f, 1.f));
     this->arrowPromptRenderer.arrow.setFillColor(sf::Color(Colors::Hex::TextMain));
+
+    this->orText.setFont(font);
+    this->orText.setString("or");
+    this->orText.setFillColor(sf::Color(Colors::Hex::TextMain));
+    this->orText.setOutlineColor(sf::Color(Colors::Hex::TextMainOutline));
+
+    this->pressAnyKeyText.setFont(font);
+    this->pressAnyKeyText.setString("Press any key to start");
+    this->pressAnyKeyText.setFillColor(sf::Color(Colors::Hex::TextMain));
+    this->pressAnyKeyText.setOutlineColor(sf::Color(Colors::Hex::TextMainOutline));
 
     this->updateUIScaling(windowSize);
 }
@@ -36,6 +46,9 @@ void GameInstructionsOverlay::render(sf::RenderTarget& target)
 
     for (const auto& arrowPrompt : this->arrowPrompts)
         this->arrowPromptRenderer.render(target, arrowPrompt);
+
+    target.draw(this->orText);
+    target.draw(this->pressAnyKeyText);
 }
 
 void GameInstructionsOverlay::updateUIScaling(sf::Vector2f newWindowSize)
@@ -84,4 +97,22 @@ void GameInstructionsOverlay::updateUIScaling(sf::Vector2f newWindowSize)
     this->arrowPrompts[1].position = sf::Vector2f(arrowPromptXPos, arrowPromptYPos + promptYOffset);
     this->arrowPrompts[2].position = sf::Vector2f(arrowPromptXPos - promptXOffset, arrowPromptYPos + promptYOffset);
     this->arrowPrompts[3].position = sf::Vector2f(arrowPromptXPos + promptXOffset, arrowPromptYPos + promptYOffset);
+
+    const auto updateTextOrigin = [](sf::Text& text) {
+        const auto lb = text.getLocalBounds();
+        text.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
+    };
+
+    const auto textCharacterSize = static_cast<unsigned>(static_cast<float>(characterSize) * 1.6f);
+    const auto textOutlineThickness = static_cast<float>(textCharacterSize) / 20.f;
+
+    this->orText.setPosition(newWindowSize / 2.f);
+    this->orText.setCharacterSize(textCharacterSize);
+    this->orText.setOutlineThickness(textOutlineThickness);
+    updateTextOrigin(this->orText);
+
+    this->pressAnyKeyText.setPosition(sf::Vector2f(newWindowSize.x / 2.f, newWindowSize.y / 3.f * 2.f));
+    this->pressAnyKeyText.setCharacterSize(textCharacterSize);
+    this->pressAnyKeyText.setOutlineThickness(textOutlineThickness);
+    updateTextOrigin(this->pressAnyKeyText);
 }
