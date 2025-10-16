@@ -12,6 +12,8 @@ PauseOverlay::PauseOverlay(const sf::Vector2f& windowSize, const sf::Font& font)
 
     this->pauseText.setFillColor(sf::Color(Colors::Hex::TextMain));
     this->pauseText.setOutlineColor(sf::Color(Colors::Hex::TextMainOutline));
+
+    this->updateUIScaling(windowSize);
 }
 
 void PauseOverlay::render(sf::RenderTarget& target)

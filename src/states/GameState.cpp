@@ -147,10 +147,10 @@ void GameState::update(const float& dt)
     if (this->endGameOverlay.getIsActive()) {
         this->endGameOverlay.update(*this->window);
 
-        if (this->endGameOverlay.isBackToMenuButtonReleased())
+        if (this->endGameOverlay.isButtonReleased("BackToMenu"))
             this->endState();
 
-        if (this->endGameOverlay.isRestartButtonReleased())
+        if (this->endGameOverlay.isButtonReleased("Restart"))
             this->restart();
 
         return;
