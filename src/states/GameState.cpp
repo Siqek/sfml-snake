@@ -240,6 +240,9 @@ void GameState::updateScoreText()
 
 void GameState::restart()
 {
+    this->score = 0;
+    this->updateScoreText();
+
     this->snake.reset();
 
     this->appleCluster.reset();
