@@ -1,11 +1,14 @@
 #include "stdafx.hpp"
 #include "snake/Snake.hpp"
 
+#include "snake/Grid.hpp"
+
 #include "config/Colors.hpp"
 
-Snake::Snake(float speedTilesPerSec, unsigned int length, uint8_t gridSizeX, uint8_t gridSizeY)
+Snake::Snake(float speedTilesPerSec, unsigned int length, uint8_t gridSizeX, uint8_t gridSizeY, Grid* grid)
     : speedTilesPerSec(speedTilesPerSec),
     direction(Direction::RIGHT), prevDirection(Direction::RIGHT), nextDirection(Direction::RIGHT),
+    grid(grid),
     tileSize(0.f),
     lengthToGrow(std::max(1u, length) - 1), /* prevent underflow */
     initialLengthToGrow(lengthToGrow),
@@ -13,6 +16,7 @@ Snake::Snake(float speedTilesPerSec, unsigned int length, uint8_t gridSizeX, uin
     body{}, freeTiles{}, isAlive(true)
 {
     assert(length != 0);
+    assert(grid != nullptr);
 
     this->setGridSize(gridSizeX, gridSizeY);
     this->initHeadPosition(sf::Vector2i(
@@ -114,14 +118,8 @@ void Snake::move()
     }
 
     // Ensure the snake stays within grid boundaries
-    if (head.x >= this->gridSizeX || head.x < 0) {
-        this->die();
-        return;
-    }
-    if (head.y >= this->gridSizeY || head.y < 0) {
-        this->die();
-        return;
-    }
+    if (!this->grid->isWithinBoundaries(head))
+        return this->die();
 
     // Ensure the snake doesn't collide with itself, except for the tail (since the snake can follow its own tail)
     if (this->isCollidingAt(head) && (!this->isTailCollidingAt(head) || this->lengthToGrow > 0)) {
@@ -154,12 +152,16 @@ void Snake::move()
 
 void Snake::addHead(const sf::Vector2i& head)
 {
+    // if (!this->grid->occupyTile(head))
+    //     throw std::runtime_error("Tile is already taken.");
     this->body.push_front(head);
     this->removeFromFreeTiles(head);
 }
 
 void Snake::removeTail()
 {
+    // if (!this->grid->freeTile(this->body.back()))
+    //     throw std::runtime_error("Tile is already freed.");
     this->freeTiles.push_back(this->body.back());
     this->body.pop_back();
 }

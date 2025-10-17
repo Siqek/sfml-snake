@@ -1,6 +1,8 @@
 #ifndef SNAKE_HPP
 #define SNAKE_HPP
 
+class Grid;
+
 enum class Direction
 {
     RIGHT,
@@ -12,7 +14,7 @@ enum class Direction
 class Snake
 {
 public:
-    Snake(float speed, unsigned int length, uint8_t gridSizeX, uint8_t gridSizeY);
+    Snake(float speed, unsigned int length, uint8_t gridSizeX, uint8_t gridSizeY, Grid* grid);
     ~Snake() = default;
 
     sf::Vector2i getHeadPosition() const { return this->body.front(); };
@@ -56,6 +58,8 @@ private:
     Direction direction;
     Direction prevDirection;
     Direction nextDirection;
+
+    Grid* grid;
 
     uint8_t gridSizeX;
     uint8_t gridSizeY;

@@ -9,6 +9,8 @@ namespace UIConfig {
 class KeyStateTracker;
 
 #include "states/State.hpp"
+
+#include "snake/Grid.hpp"
 #include "snake/Snake.hpp"
 #include "snake/AppleCluster.hpp"
 
@@ -40,6 +42,8 @@ private:
 
     std::unordered_map<std::string, int> keybinds;
     KeyStateTracker* keyStateTracker;
+
+    Grid grid;
 
     uint8_t gridSizeX;
     uint8_t gridSizeY;
