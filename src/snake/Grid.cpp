@@ -8,8 +8,8 @@ Grid::Grid(const sf::Vector2i& size)
     assert(size.y >= MinGridSize);
 
     this->freeTiles.reserve(size.x * size.y);
-    for (int x = 0; x < static_cast<int>(size.x); ++x)
-        for (int y = 0; y < static_cast<int>(size.y); ++y)
+    for (int x = 0; x < size.x; ++x)
+        for (int y = 0; y < size.y; ++y)
             this->freeTiles.emplace_back(x, y);
 }
 
@@ -17,8 +17,8 @@ bool Grid::isWithinBoundaries(const sf::Vector2i& position) const
 {
     return position.x >= 0
         && position.y >= 0
-        && position.x < static_cast<int>(size.x)
-        && position.y < static_cast<int>(size.y);
+        && position.x < size.x
+        && position.y < size.y;
 }
 
 bool Grid::freeTile(const sf::Vector2i& position)
