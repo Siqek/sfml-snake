@@ -7,7 +7,7 @@ Grid::Grid(const sf::Vector2i& size)
     assert(size.x >= MinGridSize);
     assert(size.y >= MinGridSize);
 
-    this->freeTiles.reserve(size.x * size.y);
+    this->freeTiles.reserve(this->getTotalTileCount());
     for (int x = 0; x < size.x; ++x)
         for (int y = 0; y < size.y; ++y)
             this->freeTiles.emplace_back(x, y);

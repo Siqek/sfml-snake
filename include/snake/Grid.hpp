@@ -11,7 +11,11 @@ public:
 
     bool isOccupied(const sf::Vector2i& position) const { return occupied[position.x][position.y]; }
 
+    const sf::Vector2i& getSize() const { return size; }
+
     const std::vector<sf::Vector2i>& getFreeTiles() const { return freeTiles; }
+
+    virtual size_t getTotalTileCount() const { return static_cast<size_t>(size.x * size.y); }
 
     virtual bool freeTile(const sf::Vector2i& position);
     virtual bool occupyTile(const sf::Vector2i& position);

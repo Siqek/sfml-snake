@@ -43,7 +43,7 @@ private:
     std::unordered_map<std::string, int> keybinds;
     KeyStateTracker* keyStateTracker;
 
-    Grid grid;
+    Grid* grid;
 
     uint8_t gridSizeX;
     uint8_t gridSizeY;

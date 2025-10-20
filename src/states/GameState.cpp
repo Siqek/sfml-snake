@@ -78,18 +78,16 @@ void GameState::updateUIScaling()
 
 GameState::GameState(StateData* stateData)
     : State(stateData),
-    grid(sf::Vector2i(stateData->gameSettings->gridSize)),
+    grid(new Grid(sf::Vector2i(stateData->gameSettings->gridSize))),
     gridSizeX(stateData->gameSettings->gridSize.x), gridSizeY(stateData->gameSettings->gridSize.y),
-    snake(stateData->gameSettings->snakeSpeed, 3u, this->gridSizeX, this->gridSizeY, &this->grid),
+    snake(stateData->gameSettings->snakeSpeed, 3u, this->grid),
     score(0u),
     gameInstructionsOverlay(sf::Vector2f(this->window->getSize()), this->font),
     pauseOverlay(sf::Vector2f(this->window->getSize()), this->font),
     endGameOverlay(sf::Vector2f(this->window->getSize()), this->font)
 {
-    this->updateUIScaling();
-
     this->appleCluster.setAppleLimit(this->stateData->gameSettings->maxAppleCount);
-    this->appleCluster.spawnAll(this->snake.getFreeTiles());
+    this->appleCluster.spawnAll(this->grid->getFreeTiles());
 
     this->scoreText.setFont(this->font);
     this->scoreText.setString("0");
@@ -101,12 +99,15 @@ GameState::GameState(StateData* stateData)
     this->initKeybinds();
     this->initKeyStateTracker();
 
+    this->updateUIScaling();
+
     this->gameInstructionsOverlay.show();
 }
 
 GameState::~GameState()
 {
     delete this->keyStateTracker;
+    delete this->grid;
 }
 
 void GameState::onWindowResize()
@@ -194,7 +195,7 @@ void GameState::update(const float& dt)
         this->endGameOverlay.show();
     } else if (this->appleCluster.eatAppleAt(this->snake.getHeadPosition()))
     {
-        this->appleCluster.spawn(this->snake.getFreeTiles());
+        this->appleCluster.spawn(this->grid->getFreeTiles());
         this->snake.grow(1u);
         this->score++;
         this->updateScoreText();
@@ -206,7 +207,7 @@ void GameState::render(sf::RenderTarget* target)
     if (!target)
         target = this->window;
 
-    for (const auto& freeTile : this->snake.getFreeTiles())
+    for (const auto& freeTile : this->grid->getFreeTiles())
     {
         if (freeTile.x % 2 == freeTile.y % 2)
             this->tile.setFillColor(sf::Color(Colors::Hex::BoardCellPrimary));
@@ -244,10 +245,13 @@ void GameState::restart()
     this->score = 0;
     this->updateScoreText();
 
+    delete this->grid;
+    this->grid = new Grid(sf::Vector2i(this->stateData->gameSettings->gridSize));
+
     this->snake.reset();
 
     this->appleCluster.reset();
-    this->appleCluster.spawnAll(this->snake.getFreeTiles());
+    this->appleCluster.spawnAll(this->grid->getFreeTiles());
 
     this->gameInstructionsOverlay.show();
     this->pauseOverlay.close();

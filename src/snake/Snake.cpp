@@ -5,7 +5,7 @@
 
 #include "config/Colors.hpp"
 
-Snake::Snake(float speedTilesPerSec, unsigned int length, uint8_t gridSizeX, uint8_t gridSizeY, Grid* grid)
+Snake::Snake(float speedTilesPerSec, unsigned int length, Grid*& grid)
     : speedTilesPerSec(speedTilesPerSec),
     direction(Direction::RIGHT), prevDirection(Direction::RIGHT), nextDirection(Direction::RIGHT),
     grid(grid),
@@ -13,34 +13,24 @@ Snake::Snake(float speedTilesPerSec, unsigned int length, uint8_t gridSizeX, uin
     lengthToGrow(std::max(1u, length) - 1), /* prevent underflow */
     initialLengthToGrow(lengthToGrow),
     distanceTraveled(0.f),
-    body{}, freeTiles{}, isAlive(true)
+    body{}, isAlive(true)
 {
     assert(length != 0);
     assert(grid != nullptr);
 
-    this->setGridSize(gridSizeX, gridSizeY);
-    this->initHeadPosition(sf::Vector2i(
-        static_cast<int>(this->gridSizeX / 2) - 1,
-        static_cast<int>(this->gridSizeY / 2) - 1
-    ));
+    this->initHeadPosition(this->grid->getSize() / 2 - sf::Vector2i(1, 1));
 
     this->bodySegment.setFillColor(sf::Color(Colors::Hex::SnakeBody));
     this->bodyBorder.setFillColor(sf::Color(Colors::Hex::SnakeOutline));
     this->bodyBorderCorner.setFillColor(sf::Color(Colors::Hex::SnakeOutline));
 }
 
+bool Snake::hasFilledGrid() const { return body.size() == grid->getTotalTileCount(); }
+
 void Snake::initHeadPosition(const sf::Vector2i& position)
 {
     if (this->body.empty())
         this->addHead(position);
-}
-
-void Snake::setGridSize(uint8_t x, uint8_t y)
-{
-    this->gridSizeX = std::max(x, MinGridSize);
-    this->gridSizeY = std::max(y, MinGridSize);
-
-    this->resetFreeTiles();
 }
 
 void Snake::setTileSize(float size)
@@ -88,21 +78,11 @@ void Snake::reset()
     distanceTraveled = 0.f;
 
     body.clear();
-    resetFreeTiles();
 
     isAlive = true;
 
     lengthToGrow = initialLengthToGrow;
-    this->initHeadPosition(sf::Vector2i(
-        static_cast<int>(this->gridSizeX) / 2 - 1,
-        static_cast<int>(this->gridSizeY) / 2 - 1
-    ));
-}
-
-void Snake::resetAndResizeGrid(uint8_t x, uint8_t y)
-{
-    this->setGridSize(x, y);
-    this->reset();
+    this->initHeadPosition(this->grid->getSize() / 2 - sf::Vector2i(1, 1));
 }
 
 void Snake::move()
@@ -152,17 +132,15 @@ void Snake::move()
 
 void Snake::addHead(const sf::Vector2i& head)
 {
-    // if (!this->grid->occupyTile(head))
-    //     throw std::runtime_error("Tile is already taken.");
+    if (!this->grid->occupyTile(head))
+        throw std::runtime_error("Tile is already taken.");
     this->body.push_front(head);
-    this->removeFromFreeTiles(head);
 }
 
 void Snake::removeTail()
 {
-    // if (!this->grid->freeTile(this->body.back()))
-    //     throw std::runtime_error("Tile is already freed.");
-    this->freeTiles.push_back(this->body.back());
+    if (!this->grid->freeTile(this->body.back()))
+        throw std::runtime_error("Tile is already freed.");
     this->body.pop_back();
 }
 
@@ -214,33 +192,6 @@ void Snake::render(sf::RenderTarget& target, float offsetX, float offsetY)
             this->renderTailBorder(target, position, i);
         } else {
             this->renderSegmentBorder(target, position, i);
-        }
-    }
-}
-
-void Snake::resetFreeTiles()
-{
-    this->freeTiles.clear();
-    // Swap to release memory and set the vector's capacity to a minimum (after clearing).
-    std::vector<sf::Vector2i>(this->freeTiles).swap(this->freeTiles);
-    this->freeTiles.reserve(static_cast<size_t>(this->gridSizeX) * static_cast<size_t>(this->gridSizeY));
-
-    for (int x = 0; x < this->gridSizeX; ++x) {
-        for (int y = 0; y < this->gridSizeY; ++y) {
-            this->freeTiles.emplace_back(x, y);
-        }
-    }
-}
-
-void Snake::removeFromFreeTiles(const sf::Vector2i& position)
-{
-    for (size_t i = 0; i < this->freeTiles.size(); ++i) {
-        if (this->freeTiles[i] == position) {
-            // swap with the last element to save time
-            this->freeTiles[i] = this->freeTiles.back();
-            // remove swapped element from the end
-            this->freeTiles.pop_back();
-            break;
         }
     }
 }

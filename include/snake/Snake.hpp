@@ -14,17 +14,15 @@ enum class Direction
 class Snake
 {
 public:
-    Snake(float speed, unsigned int length, uint8_t gridSizeX, uint8_t gridSizeY, Grid* grid);
+    Snake(float speed, unsigned int length, Grid*& grid);
     ~Snake() = default;
 
     sf::Vector2i getHeadPosition() const { return this->body.front(); };
     sf::Vector2i getTailPosition() const { return this->body.back(); };
     float getSpeedPixelsPerSec() const { return this->speedTilesPerSec * this->tileSize; };
 
-    const std::vector<sf::Vector2i>& getFreeTiles() const { return this->freeTiles; };
-
     bool getIsAlive() const { return isAlive; };
-    bool hasFilledGrid() const { return freeTiles.size() == 0; };
+    bool hasFilledGrid() const;
 
     void setTileSize(float size);
 
@@ -32,7 +30,6 @@ public:
     void grow(unsigned int lengthToGrow);
 
     void reset();
-    void resetAndResizeGrid(uint8_t x, uint8_t y);
 
     bool isCollidingAt(const sf::Vector2i& position) const;
     bool isHeadCollidingAt(const sf::Vector2i& position) const { return getHeadPosition() == position; };
@@ -42,8 +39,6 @@ public:
     void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
 
 private:
-    static constexpr uint8_t MinGridSize = 4;
-
     enum class BorderSide {
         TOP,
         BOTTOM,
@@ -59,10 +54,8 @@ private:
     Direction prevDirection;
     Direction nextDirection;
 
-    Grid* grid;
+    Grid*& grid;
 
-    uint8_t gridSizeX;
-    uint8_t gridSizeY;
     float tileSize;
 
     unsigned int lengthToGrow;
@@ -75,7 +68,6 @@ private:
     sf::RectangleShape bodyBorderCorner;
 
     std::deque<sf::Vector2i> body;
-    std::vector<sf::Vector2i> freeTiles;
 
     bool isAlive;
 
@@ -89,11 +81,6 @@ private:
     void removeTail();
 
     Direction getOppositeDirection(Direction direction) const;
-
-    void setGridSize(uint8_t x, uint8_t y);
-
-    void resetFreeTiles();
-    void removeFromFreeTiles(const sf::Vector2i& position);
 
     void renderHeadBorder(sf::RenderTarget& target, const sf::Vector2f& position);
     void renderTailBorder(sf::RenderTarget& target, const sf::Vector2f& position, size_t tailIndex);
