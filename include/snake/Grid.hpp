@@ -20,6 +20,7 @@ public:
     virtual bool freeTile(const sf::Vector2i& position);
     virtual bool occupyTile(const sf::Vector2i& position);
 
+protected:
     static constexpr int MinGridSize = 4;
 
 private:

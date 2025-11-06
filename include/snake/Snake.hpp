@@ -5,10 +5,10 @@ class Grid;
 
 enum class Direction
 {
-    RIGHT,
-    LEFT,
-    UP,
-    DOWN
+    Right,
+    Left,
+    Up,
+    Down
 };
 
 class Snake
@@ -17,14 +17,13 @@ public:
     Snake(float speed, unsigned int length, Grid*& grid);
     ~Snake() = default;
 
-    sf::Vector2i getHeadPosition() const { return this->body.front(); };
-    sf::Vector2i getTailPosition() const { return this->body.back(); };
-    float getSpeedPixelsPerSec() const { return this->speedTilesPerSec * this->tileSize; };
+    sf::Vector2i getHeadPosition() const { return body.front(); }
+    sf::Vector2i getTailPosition() const { return body.back(); }
+
+    const std::deque<sf::Vector2i>& getBody() const { return body; }
 
     bool getIsAlive() const { return isAlive; };
     bool hasFilledGrid() const;
-
-    void setTileSize(float size);
 
     void setDirection(Direction direction);
     void grow(unsigned int lengthToGrow);
@@ -36,41 +35,8 @@ public:
     bool isTailCollidingAt(const sf::Vector2i& position) const { return getTailPosition() == position; };
 
     void update(const float& dt);
-    void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
 
 private:
-    enum class BorderSide {
-        TOP,
-        BOTTOM,
-        RIGHT,
-        LEFT,
-        HORIZONTAL,
-        VERTICAL,
-        ALL
-    };
-
-    float speedTilesPerSec;
-    Direction direction;
-    Direction prevDirection;
-    Direction nextDirection;
-
-    Grid*& grid;
-
-    float tileSize;
-
-    unsigned int lengthToGrow;
-    unsigned int initialLengthToGrow;
-
-    float distanceTraveled;
-
-    sf::RectangleShape bodySegment;
-    sf::RectangleShape bodyBorder;
-    sf::RectangleShape bodyBorderCorner;
-
-    std::deque<sf::Vector2i> body;
-
-    bool isAlive;
-
     void initHeadPosition(const sf::Vector2i& position);
 
     void die() { isAlive = false; };
@@ -82,11 +48,21 @@ private:
 
     Direction getOppositeDirection(Direction direction) const;
 
-    void renderHeadBorder(sf::RenderTarget& target, const sf::Vector2f& position);
-    void renderTailBorder(sf::RenderTarget& target, const sf::Vector2f& position, size_t tailIndex);
-    void renderSegmentBorder(sf::RenderTarget& target, const sf::Vector2f& position, size_t segmentIndex);
+    float speedTilesPerSec;
+    Direction direction;
+    Direction prevDirection;
+    Direction nextDirection;
 
-    void renderBorder(sf::RenderTarget& target, BorderSide side);
+    Grid*& grid;
+
+    unsigned int lengthToGrow;
+    unsigned int initialLengthToGrow;
+
+    float tilesTraveled;
+
+    std::deque<sf::Vector2i> body;
+
+    bool isAlive;
 };
 
 #endif // SNAKE_HPP

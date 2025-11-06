@@ -7,22 +7,17 @@
 
 Snake::Snake(float speedTilesPerSec, unsigned int length, Grid*& grid)
     : speedTilesPerSec(speedTilesPerSec),
-    direction(Direction::RIGHT), prevDirection(Direction::RIGHT), nextDirection(Direction::RIGHT),
+    direction(Direction::Right), prevDirection(Direction::Right), nextDirection(Direction::Right),
     grid(grid),
-    tileSize(0.f),
     lengthToGrow(std::max(1u, length) - 1), /* prevent underflow */
     initialLengthToGrow(lengthToGrow),
-    distanceTraveled(0.f),
+    tilesTraveled(0.f),
     body{}, isAlive(true)
 {
     assert(length != 0);
     assert(grid != nullptr);
 
     this->initHeadPosition(this->grid->getSize() / 2 - sf::Vector2i(1, 1));
-
-    this->bodySegment.setFillColor(sf::Color(Colors::Hex::SnakeBody));
-    this->bodyBorder.setFillColor(sf::Color(Colors::Hex::SnakeOutline));
-    this->bodyBorderCorner.setFillColor(sf::Color(Colors::Hex::SnakeOutline));
 }
 
 bool Snake::hasFilledGrid() const { return body.size() == grid->getTotalTileCount(); }
@@ -31,20 +26,6 @@ void Snake::initHeadPosition(const sf::Vector2i& position)
 {
     if (this->body.empty())
         this->addHead(position);
-}
-
-void Snake::setTileSize(float size)
-{
-    this->tileSize = size;
-    this->bodySegment.setSize(sf::Vector2f(this->tileSize, this->tileSize));
-
-    const auto borderThickness = std::max(2.f, this->tileSize / 10.f);
-
-    this->bodyBorder.setSize(sf::Vector2f(this->tileSize, borderThickness));
-    this->bodyBorder.setOrigin(this->bodySegment.getSize() / 2.f);
-
-    this->bodyBorderCorner.setSize(sf::Vector2f(borderThickness, borderThickness));
-    this->bodyBorderCorner.setOrigin(this->bodySegment.getSize() / 2.f);
 }
 
 void Snake::setDirection(Direction direction)
@@ -64,18 +45,15 @@ void Snake::setDirection(Direction direction)
     }
 }
 
-void Snake::grow(unsigned int lengthToGrow)
-{
-    this->lengthToGrow += lengthToGrow;
-}
+void Snake::grow(unsigned int lengthToGrow) { this->lengthToGrow += lengthToGrow; }
 
 void Snake::reset()
 {
-    direction     = Direction::RIGHT;
-    prevDirection = Direction::RIGHT;
-    nextDirection = Direction::RIGHT;
+    direction     = Direction::Right;
+    prevDirection = Direction::Right;
+    nextDirection = Direction::Right;
 
-    distanceTraveled = 0.f;
+    tilesTraveled = 0.f;
 
     body.clear();
 
@@ -91,10 +69,10 @@ void Snake::move()
 
     switch (this->direction)
     {
-    case Direction::RIGHT: head.x++; break;
-    case Direction::LEFT:  head.x--; break;
-    case Direction::UP:    head.y--; break;
-    case Direction::DOWN:  head.y++; break;
+    case Direction::Right: head.x++; break;
+    case Direction::Left:  head.x--; break;
+    case Direction::Up:    head.y--; break;
+    case Direction::Down:  head.y++; break;
     }
 
     // Ensure the snake stays within grid boundaries
@@ -162,37 +140,12 @@ void Snake::update(const float& dt)
     if (!this->isAlive)
         return;
 
-    this->distanceTraveled += this->getSpeedPixelsPerSec() * dt;
+    this->tilesTraveled += this->speedTilesPerSec * dt;
 
-    if (this->distanceTraveled > this->tileSize)
+    if (this->tilesTraveled > 1.f)
     {
         this->move();
-        this->distanceTraveled -= this->tileSize;
-    }
-}
-
-void Snake::render(sf::RenderTarget& target, float offsetX, float offsetY)
-{
-    for (size_t i = 0; i < this->body.size(); ++i)
-    {
-        const auto& curSegment = this->body[i];
-
-        const sf::Vector2f position(
-            offsetX + this->tileSize * curSegment.x,
-            offsetY + this->tileSize * curSegment.y
-        );
-
-        // render segment
-        this->bodySegment.setPosition(position);
-        target.draw(this->bodySegment);
-
-        if (i == 0) {
-            this->renderHeadBorder(target, position);
-        } else if (i == this->body.size() - 1) {
-            this->renderTailBorder(target, position, i);
-        } else {
-            this->renderSegmentBorder(target, position, i);
-        }
+        this->tilesTraveled -= 1.f;
     }
 }
 
@@ -200,136 +153,10 @@ Direction Snake::getOppositeDirection(Direction direction) const
 {
     switch (direction)
     {
-    case Direction::RIGHT: return Direction::LEFT;
-    case Direction::LEFT:  return Direction::RIGHT;
-    case Direction::DOWN:  return Direction::UP;
-    case Direction::UP:    return Direction::DOWN;
+    case Direction::Right: return Direction::Left;
+    case Direction::Left:  return Direction::Right;
+    case Direction::Down:  return Direction::Up;
+    case Direction::Up:    return Direction::Down;
     }
     return direction;
-}
-
-void Snake::renderHeadBorder(sf::RenderTarget& target, const sf::Vector2f& position)
-{
-    this->bodyBorder.setPosition(position + this->bodyBorder.getOrigin());
-    this->renderBorder(target, BorderSide::ALL);
-}
-
-void Snake::renderTailBorder(sf::RenderTarget& target, const sf::Vector2f& position, size_t tailIndex)
-{
-    assert(tailIndex >= 1 && tailIndex < this->body.size());
-
-    const auto& curSegment = this->body[tailIndex];
-    const auto& prevSegment = this->body[tailIndex - 1];
-
-    this->bodyBorder.setPosition(position + this->bodyBorder.getOrigin());
-
-    if (prevSegment.x == curSegment.x)
-    {
-        renderBorder(target, BorderSide::VERTICAL);
-        renderBorder(
-            target,
-            prevSegment.y + 1 == curSegment.y
-            ? BorderSide::BOTTOM
-            : BorderSide::TOP
-        );
-    } else if (prevSegment.y == curSegment.y)
-    {
-        renderBorder(target, BorderSide::HORIZONTAL);
-        renderBorder(
-            target,
-            prevSegment.x + 1 == curSegment.x
-            ? BorderSide::RIGHT
-            : BorderSide::LEFT
-        );
-    }
-}
-
-void Snake::renderSegmentBorder(sf::RenderTarget& target, const sf::Vector2f& position, size_t segmentIndex)
-{
-    assert(segmentIndex >= 1 && segmentIndex < this->body.size());
-
-    const auto& curSegment = this->body[segmentIndex];
-    const auto& prevSegment = this->body[segmentIndex - 1];
-    const auto& nextSegment = this->body[segmentIndex + 1];
-
-    this->bodyBorder.setPosition(position + this->bodyBorder.getOrigin());
-    this->bodyBorderCorner.setPosition(position + this->bodyBorderCorner.getOrigin());
-
-    const int deltaXToPrev = prevSegment.x - curSegment.x;
-    const int deltaXToNext = nextSegment.x - curSegment.x;
-
-    const int deltaYToPrev = prevSegment.y - curSegment.y;
-    const int deltaYToNext = nextSegment.y - curSegment.y;
-
-    // Render borders based on adjacent segments
-    if (deltaXToPrev == 0 && deltaXToNext == 0) {
-        // Vertical segments (right & left)
-        renderBorder(target, BorderSide::VERTICAL);
-    } else if (deltaYToPrev == 0 && deltaYToNext == 0) {
-        // Horizontal segments (top & bottom)
-        renderBorder(target, BorderSide::HORIZONTAL);
-    } else {
-        // Diagonal segments: right-top, right-bottom, left-top, left-bottom
-        if ((deltaXToPrev == -1 && deltaYToNext == -1) || (deltaXToNext == -1 && deltaYToPrev == -1))
-        {
-            renderBorder(target, BorderSide::RIGHT);
-            renderBorder(target, BorderSide::BOTTOM);
-
-            // Draw the border corner at the top-left
-            this->bodyBorderCorner.setRotation(0.f);
-            target.draw(this->bodyBorderCorner);
-        }
-        else if ((deltaXToPrev == -1 && deltaYToNext == 1) || (deltaXToNext == -1 && deltaYToPrev == 1))
-        {
-            renderBorder(target, BorderSide::RIGHT);
-            renderBorder(target, BorderSide::TOP);
-
-            // Draw the border corner at the bottom-left
-            this->bodyBorderCorner.setRotation(270.f);
-            target.draw(this->bodyBorderCorner);
-        }
-        else if ((deltaXToPrev == 1 && deltaYToNext == -1) || (deltaXToNext == 1 && deltaYToPrev == -1))
-        {
-            renderBorder(target, BorderSide::LEFT);
-            renderBorder(target, BorderSide::BOTTOM);
-
-            // Draw the border corner at the top-right
-            this->bodyBorderCorner.setRotation(90.f);
-            target.draw(this->bodyBorderCorner);
-        }
-        else if ((deltaXToPrev == 1 && deltaYToNext == 1) || (deltaXToNext == 1 && deltaYToPrev == 1))
-        {
-            renderBorder(target, BorderSide::LEFT);
-            renderBorder(target, BorderSide::TOP);
-
-            // Draw the border corner at the bottom-right
-            this->bodyBorderCorner.setRotation(180.f);
-            target.draw(this->bodyBorderCorner);
-        }
-    }
-}
-
-void Snake::renderBorder(sf::RenderTarget &target, BorderSide side)
-{
-    switch (side)
-    {
-    case BorderSide::TOP:     this->bodyBorder.setRotation(0.f);   break;
-    case BorderSide::BOTTOM:  this->bodyBorder.setRotation(180.f); break;
-    case BorderSide::RIGHT:   this->bodyBorder.setRotation(90.f);  break;
-    case BorderSide::LEFT:    this->bodyBorder.setRotation(270.f); break;
-    case BorderSide::HORIZONTAL:
-        renderBorder(target, BorderSide::TOP);
-        renderBorder(target, BorderSide::BOTTOM);
-        return;
-    case BorderSide::VERTICAL:
-        renderBorder(target, BorderSide::RIGHT);
-        renderBorder(target, BorderSide::LEFT);
-        return;
-    case BorderSide::ALL:
-        renderBorder(target, BorderSide::HORIZONTAL);
-        renderBorder(target, BorderSide::VERTICAL);
-        return;
-    }
-
-    target.draw(this->bodyBorder);
 }

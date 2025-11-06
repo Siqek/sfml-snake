@@ -8,10 +8,12 @@ namespace UIConfig {
 
 class KeyStateTracker;
 
+class Grid;
+
 #include "states/State.hpp"
 
-#include "snake/Grid.hpp"
 #include "snake/Snake.hpp"
+#include "snake/SnakeRenderer.hpp"
 #include "snake/AppleCluster.hpp"
 
 #include "states/overlays/GameInstructionsOverlay.hpp"
@@ -47,12 +49,12 @@ private:
 
     uint8_t gridSizeX;
     uint8_t gridSizeY;
-    float gridOffsetX;
-    float gridOffsetY;
+    sf::Vector2f gridOffset;
     float tileSize;
     sf::RectangleShape tile;
 
     Snake snake;
+    SnakeRenderer snakeRenderer;
 
     AppleCluster appleCluster;
 

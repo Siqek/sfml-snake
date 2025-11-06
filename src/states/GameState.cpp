@@ -3,6 +3,8 @@
 
 #include "settings/GameSettings.hpp"
 
+#include "snake/Grid.hpp"
+
 #include "utils/KeyStateTracker.hpp"
 #include "utils/IniParser.hpp"
 
@@ -50,7 +52,7 @@ void GameState::updateUIScaling()
         windowSize.x * 0.95f / static_cast<float>(this->gridSizeX),
         windowSize.y * UIConfig::GridHeightRatio / static_cast<float>(this->gridSizeY)
     );
-    this->snake.setTileSize(this->tileSize);
+    this->snakeRenderer.setTileSize(this->tileSize);
     this->appleCluster.setTileSize(this->tileSize);
     this->tile.setSize(sf::Vector2f(this->tileSize, this->tileSize));
 
@@ -66,8 +68,8 @@ void GameState::updateUIScaling()
     this->scoreText.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
 
     // grid offsets
-    this->gridOffsetX = windowSize.x / 2.f - static_cast<float>(this->gridSizeX) / 2.f * this->tileSize;
-    this->gridOffsetY =
+    this->gridOffset.x = windowSize.x / 2.f - static_cast<float>(this->gridSizeX) / 2.f * this->tileSize;
+    this->gridOffset.y =
         windowSize.y * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f )
         - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
 
@@ -133,13 +135,13 @@ void GameState::updateInput()
     }
 
     if (this->keyStateTracker->isKeyDown("MoveUp") || this->keyStateTracker->isKeyDown("AltMoveUp"))
-        this->snake.setDirection(Direction::UP);
+        this->snake.setDirection(Direction::Up);
     else if (this->keyStateTracker->isKeyDown("MoveDown") || this->keyStateTracker->isKeyDown("AltMoveDown"))
-        this->snake.setDirection(Direction::DOWN);
+        this->snake.setDirection(Direction::Down);
     else if (this->keyStateTracker->isKeyDown("MoveRight") || this->keyStateTracker->isKeyDown("AltMoveRight"))
-        this->snake.setDirection(Direction::RIGHT);
+        this->snake.setDirection(Direction::Right);
     else if (this->keyStateTracker->isKeyDown("MoveLeft") || this->keyStateTracker->isKeyDown("AltMoveLeft"))
-        this->snake.setDirection(Direction::LEFT);
+        this->snake.setDirection(Direction::Left);
 }
 
 void GameState::update(const float& dt)
@@ -214,17 +216,14 @@ void GameState::render(sf::RenderTarget* target)
         else
             this->tile.setFillColor(sf::Color(Colors::Hex::BoardCellSecondary));
 
-        this->tile.setPosition(sf::Vector2f(
-            this->gridOffsetX + static_cast<float>(freeTile.x) * this->tileSize,
-            this->gridOffsetY + static_cast<float>(freeTile.y) * this->tileSize
-        ));
+        this->tile.setPosition(this->gridOffset + sf::Vector2f(freeTile) * this->tileSize);
         target->draw(this->tile);
     }
 
-    this->snake.render(*target, this->gridOffsetX, this->gridOffsetY);
+    this->snakeRenderer.render(*target, this->snake, this->gridOffset);
 
     if (!this->snake.hasFilledGrid())
-        this->appleCluster.render(*target, this->gridOffsetX, this->gridOffsetY);
+        this->appleCluster.render(*target, this->gridOffset.x, this->gridOffset.y);
 
     target->draw(this->scoreText);
 
