@@ -109,10 +109,10 @@ void ArrowSelector<T>::setSize(const sf::Vector2f& size)
     this->optionBox.setSize(sf::Vector2f(width - 2.f * height, height));
 
     this->leftArrow.setOrigin(origin);
-    this->rightArrow.setOrigin(origin + sf::Vector2f(-1 * (width - height), 0.f));
-    this->optionBox.setOrigin(origin + sf::Vector2f(-1 * height, 0.f));
+    this->rightArrow.setOrigin(origin - sf::Vector2f(width - height, 0.f));
+    this->optionBox.setOrigin(origin - sf::Vector2f(height, 0.f));
     auto tlb = this->optionLabel.getLocalBounds();
-    this->optionLabel.setOrigin(origin + sf::Vector2f(-1 * width / 2.f , -1 * height / 2.f) + sf::Vector2f(tlb.left + tlb.width / 2.f, tlb.top + tlb.height / 2.f));
+    this->optionLabel.setOrigin(origin - size / 2.f + sf::Vector2f(tlb.left + tlb.width / 2.f, tlb.top + tlb.height / 2.f));
 }
 
 template<typename T>
@@ -133,10 +133,10 @@ void ArrowSelector<T>::setOrigin(const sf::Vector2f& origin)
     float height = this->size.y;
 
     this->leftArrow.setOrigin(origin);
-    this->rightArrow.setOrigin(origin + sf::Vector2f(-1 * (width - height), 0.f));
-    this->optionBox.setOrigin(origin + sf::Vector2f(-1 * height, 0.f));
+    this->rightArrow.setOrigin(origin - sf::Vector2f(width - height, 0.f));
+    this->optionBox.setOrigin(origin - sf::Vector2f(height, 0.f));
     auto tlb = this->optionLabel.getLocalBounds();
-    this->optionLabel.setOrigin(origin + sf::Vector2f(-1 * width / 2.f, -1 * height / 2.f) + sf::Vector2f(tlb.left + tlb.width / 2.f, tlb.top + tlb.height / 2.f));
+    this->optionLabel.setOrigin(origin - size / 2.f + sf::Vector2f(tlb.left + tlb.width / 2.f, tlb.top + tlb.height / 2.f));
 }
 
 template<typename T>
@@ -235,7 +235,7 @@ void ArrowSelector<T>::updateOptionLabelString()
 {
     this->optionLabel.setString(this->options.at(this->activeOptionIndex).label);
     auto tlb = this->optionLabel.getLocalBounds();
-    this->optionLabel.setOrigin(origin + sf::Vector2f(-1 * size.x / 2.f, -1 * size.y / 2.f) + sf::Vector2f(tlb.left + tlb.width / 2.f, tlb.top + tlb.height / 2.f));
+    this->optionLabel.setOrigin(origin - size / 2.f + sf::Vector2f(tlb.left + tlb.width / 2.f, tlb.top + tlb.height / 2.f));
 }
 
 } // namespace mgui
