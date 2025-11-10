@@ -22,7 +22,7 @@ BUILD_OUTPUT_DIR="$SCRIPT_DIR/../bin/$CONFIG"
 EXECUTABLE_PATH="$BUILD_OUTPUT_DIR/$EXECUTABLE_NAME"
 
 if [ -x "$EXECUTABLE_PATH" ]; then
-    cd "$SCRIPT_DIR/../"
+    cd "$SCRIPT_DIR/../../"
     "$EXECUTABLE_PATH"
 else
     echo "Error: $EXECUTABLE_PATH can't be executed or doesn't exist!" >&2
