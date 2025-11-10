@@ -24,7 +24,8 @@ project "Game"
         includedirs { "external/SFML/include" }
         libdirs { "external/SFML/lib" }
 
-        -- Force the use of main() instead of WinMain()
+    -- Force the use of main() instead of WinMain() in Visual Studio
+    filter { "system:windows", "action:vs*" }
         linkoptions { "/ENTRY:mainCRTStartup" }
 
     -- Link SFML libraries for Release on Windows
@@ -69,7 +70,7 @@ project "Game"
         optimize "On"
 
     -- Copy SFML DLLs after build (Debug on Windows)
-    filter { "system:windows", "configurations:Debug" }
+    filter { "system:windows", "configurations:Debug", "action:vs*" }
         postbuildcommands {
             '{COPY} "external/SFML/bin/openal32.dll" "%{cfg.targetdir}"',
             '{COPY} "external/SFML/bin/sfml-graphics-d-2.dll" "%{cfg.targetdir}"',
@@ -77,11 +78,27 @@ project "Game"
             '{COPY} "external/SFML/bin/sfml-system-d-2.dll" "%{cfg.targetdir}"',
         }
 
+    filter { "system:windows", "configurations:Debug", "action:gmake" }
+        postbuildcommands {
+            'cp -u "external/SFML/bin/openal32.dll" "%{cfg.targetdir}"',
+            'cp -u "external/SFML/bin/sfml-graphics-d-2.dll" "%{cfg.targetdir}"',
+            'cp -u "external/SFML/bin/sfml-window-d-2.dll" "%{cfg.targetdir}"',
+            'cp -u "external/SFML/bin/sfml-system-d-2.dll" "%{cfg.targetdir}"',
+        }
+
     -- Copy SFML DLLs after build (Release on Windows)
-    filter { "system:windows", "configurations:Release" }
+    filter { "system:windows", "configurations:Release", "action:vs*" }
         postbuildcommands {
             '{COPY} "external/SFML/bin/openal32.dll" "%{cfg.targetdir}"',
             '{COPY} "external/SFML/bin/sfml-graphics-2.dll" "%{cfg.targetdir}"',
             '{COPY} "external/SFML/bin/sfml-window-2.dll" "%{cfg.targetdir}"',
             '{COPY} "external/SFML/bin/sfml-system-2.dll" "%{cfg.targetdir}"'
+        }
+
+    filter { "system:windows", "configurations:Release", "action:gmake" }
+        postbuildcommands {
+            'cp -u "external/SFML/bin/openal32.dll" "%{cfg.targetdir}"',
+            'cp -u "external/SFML/bin/sfml-graphics-2.dll" "%{cfg.targetdir}"',
+            'cp -u "external/SFML/bin/sfml-window-2.dll" "%{cfg.targetdir}"',
+            'cp -u "external/SFML/bin/sfml-system-2.dll" "%{cfg.targetdir}"'
         }
