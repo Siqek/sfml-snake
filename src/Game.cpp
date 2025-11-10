@@ -20,7 +20,7 @@
 
 void Game::initWindow()
 {
-    sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
+    const sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
 
     IniParser iniParser;
     iniParser.loadFromFile("config/video.ini");
@@ -34,17 +34,30 @@ void Game::initWindow()
     if (width == 0) width = desktopMode.width;
     if (height == 0) height = desktopMode.height;
 
+    bool fullscreen = (iniParser.getBool("Graphics", "bFullscreen", true);
+
     this->window = new sf::RenderWindow(
         sf::VideoMode({ width, height }),
         "SFML project",
-        (iniParser.getBool("Graphics", "bFullscreen", true) ? sf::Style::Fullscreen : sf::Style::Default),
+        fullscreen ? sf::Style::Fullscreen : sf::Style::Default),
         gfxSetting
     );
     this->window->setFramerateLimit(iniParser.getInt("Graphics", "iFramerateLimit", 60));
     this->window->setVerticalSyncEnabled(iniParser.getBool("Graphics", "bVSync", true));
+
 #if defined(__linux__) || defined(_WIN32)
     this->setMinimumWindowSize(sf::Vector2i(320, 240));
 #endif // __linux__ || _WIN32
+
+#ifdef _WIN32
+    if (desktopMode.width == this->window->getSize().x
+        && desktopMode.height == this->window->getSize().y
+        && !fullscreen)
+    {
+        HWND hwnd = this->window->getSystemHandle();
+        ShowWindow(hwnd, SW_MAXIMIZE);
+    }
+#endif // _WIN32
 }
 
 void Game::initSupportedKeys()
