@@ -34,12 +34,12 @@ void Game::initWindow()
     if (width == 0) width = desktopMode.width;
     if (height == 0) height = desktopMode.height;
 
-    bool fullscreen = (iniParser.getBool("Graphics", "bFullscreen", true);
+    bool fullscreen = iniParser.getBool("Graphics", "bFullscreen", true);
 
     this->window = new sf::RenderWindow(
         sf::VideoMode({ width, height }),
         "SFML project",
-        fullscreen ? sf::Style::Fullscreen : sf::Style::Default),
+        fullscreen ? sf::Style::Fullscreen : sf::Style::Default,
         gfxSetting
     );
     this->window->setFramerateLimit(iniParser.getInt("Graphics", "iFramerateLimit", 60));
