@@ -17,10 +17,19 @@ public:
 
     virtual size_t getTotalTileCount() const { return static_cast<size_t>(size.x * size.y); }
 
-    virtual bool freeTile(const sf::Vector2i& position);
-    virtual bool occupyTile(const sf::Vector2i& position);
+    bool freeTile(const sf::Vector2i& position);
+    bool occupyTile(const sf::Vector2i& position);
 
 protected:
+    enum class InitMode {
+        Full,
+        Partial // derived class completes the initialization
+    };
+
+    Grid(const sf::Vector2i& size, InitMode initMode);
+
+    void initFreeTiles();
+
     static constexpr int MinGridSize = 4;
 
 private:

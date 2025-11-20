@@ -2,15 +2,16 @@
 #include "snake/Grid.hpp"
 
 Grid::Grid(const sf::Vector2i& size)
+    : Grid(size, InitMode::Full) {}
+
+Grid::Grid(const sf::Vector2i& size, InitMode initMode)
     : size(size), occupied(size.x, std::vector<bool>(size.y, false))
 {
     assert(size.x >= MinGridSize);
     assert(size.y >= MinGridSize);
 
-    this->freeTiles.reserve(this->getTotalTileCount());
-    for (int x = 0; x < size.x; ++x)
-        for (int y = 0; y < size.y; ++y)
-            this->freeTiles.emplace_back(x, y);
+    if (initMode == InitMode::Full)
+        initFreeTiles();
 }
 
 bool Grid::isWithinBoundaries(const sf::Vector2i& position) const
@@ -39,6 +40,19 @@ bool Grid::occupyTile(const sf::Vector2i& position)
     this->removeFromFreeTiles(position);
     this->occupied[position.x][position.y] = true;
     return true;
+}
+
+void Grid::initFreeTiles()
+{
+    this->freeTiles.reserve(this->getTotalTileCount());
+    for (int x = 0; x < size.x; ++x) {
+        for (int y = 0; y < size.y; ++y) {
+            const sf::Vector2i pos{x, y};
+            if (isWithinBoundaries(pos)) {
+                this->freeTiles.emplace_back(pos);
+            }
+        }
+    }
 }
 
 void Grid::removeFromFreeTiles(const sf::Vector2i &position)
