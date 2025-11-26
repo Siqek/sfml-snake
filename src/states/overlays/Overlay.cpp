@@ -2,14 +2,35 @@
 #include "states/overlays/Overlay.hpp"
 
 Overlay::Overlay(const sf::Vector2f& windowSize, sf::Color backgroundColor)
-    : isActive(false)
+    : bIsActive(false)
 {
-    this->windowOverlay.setSize(windowSize);
-    this->windowOverlay.setFillColor(backgroundColor);
+    WindowOverlay.setSize(windowSize);
+    WindowOverlay.setFillColor(backgroundColor);
 }
 
-void Overlay::onWindowResize(const sf::Vector2f& newWindowSize)
+void Overlay::SetBackgroundColor(sf::Color color)
 {
-    this->windowOverlay.setSize(newWindowSize);
-    this->updateUIScaling(newWindowSize);
+    WindowOverlay.setFillColor(color);
+}
+
+void Overlay::Close()
+{
+    bIsActive = false;
+}
+
+void Overlay::Show()
+{
+    bIsActive = true;
+}
+
+void Overlay::OnWindowResize(const sf::Vector2f& windowSize)
+{
+    WindowOverlay.setSize(windowSize);
+}
+
+void Overlay::Update(const sf::RenderWindow& /*window*/) {}
+
+void Overlay::Render(sf::RenderTarget &target)
+{
+    target.draw(WindowOverlay);
 }

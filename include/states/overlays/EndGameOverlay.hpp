@@ -12,14 +12,16 @@ public:
     EndGameOverlay(sf::Vector2f widnowSize, const sf::Font& font);
     ~EndGameOverlay() = default;
 
-    void setTitle(const std::string& text);
+    void SetTitle(const std::string& text);
 
-    void render(sf::RenderTarget& target) override;
+    void OnWindowResize(const sf::Vector2f& windowSize) override;
+
+    void Render(sf::RenderTarget& target) override;
 
 private:
-    void updateUIScaling(sf::Vector2f newWindowSize) override;
+    void UpdateUIScaling(sf::Vector2f windowSize);
 
-    sf::Text title;
+    sf::Text Title;
 };
 
 #endif // ENDGAMEOVERLAY_HPP

@@ -10,66 +10,67 @@ public:
     GameInstructionsOverlay(sf::Vector2f windowSize, const sf::Font& font);
     ~GameInstructionsOverlay() = default;
 
-    void update(const sf::RenderWindow& window);
-    void render(sf::RenderTarget& target);
+    void OnWindowResize(const sf::Vector2f& windowSize) override;
+
+    void Render(sf::RenderTarget& target) override;
 
 private:
-    void updateUIScaling(sf::Vector2f newWindowSize);
+    void UpdateUIScaling(sf::Vector2f windowSize);
 
     struct KeyPrompt {
-        sf::Vector2f position;
-        sf::Vector2f labelOrigin;
-        std::string label;
+        sf::Vector2f Position;
+        sf::Vector2f LabelOrigin;
+        std::string Label;
 
         KeyPrompt(const char* label)
-            : position(0.f, 0.f), labelOrigin(0.f, 0.f), label(label) {}
+            : Position(0.f, 0.f), LabelOrigin(0.f, 0.f), Label(label) {}
     };
 
     struct ArrowPrompt {
-        float rotation;
-        sf::Vector2f position;
+        float Rotation;
+        sf::Vector2f Position;
 
         ArrowPrompt(float rotation, sf::Vector2f position = sf::Vector2f(0.f, 0.f))
-            : rotation(rotation), position(position) {}
+            : Rotation(rotation), Position(position) {}
     };
 
     struct KeyPromptRenderer {
-        sf::RectangleShape shape;
-        sf::Text label;
+        sf::RectangleShape Shape;
+        sf::Text Label;
 
-        void render(sf::RenderTarget& target, const KeyPrompt& keyPrompt)
+        void Render(sf::RenderTarget& target, const KeyPrompt& keyPrompt)
         {
-            shape.setPosition(keyPrompt.position);
-            label.setPosition(keyPrompt.position);
-            label.setOrigin(keyPrompt.labelOrigin);
-            label.setString(keyPrompt.label);
-            target.draw(shape);
-            target.draw(label);
+            Shape.setPosition(keyPrompt.Position);
+            Label.setPosition(keyPrompt.Position);
+            Label.setOrigin(keyPrompt.LabelOrigin);
+            Label.setString(keyPrompt.Label);
+            target.draw(Shape);
+            target.draw(Label);
         }
     };
 
     struct ArrowPromptRenderer {
-        sf::RectangleShape shape;
-        sf::CircleShape arrow;
+        sf::RectangleShape Shape;
+        sf::CircleShape Arrow;
 
-        void render(sf::RenderTarget& target, const ArrowPrompt& arrowPrompt)
+        void Render(sf::RenderTarget& target, const ArrowPrompt& arrowPrompt)
         {
-            shape.setPosition(arrowPrompt.position);
-            arrow.setPosition(arrowPrompt.position);
-            arrow.setRotation(arrowPrompt.rotation);
-            target.draw(shape);
-            target.draw(arrow);
+            Shape.setPosition(arrowPrompt.Position);
+            Arrow.setPosition(arrowPrompt.Position);
+            Arrow.setRotation(arrowPrompt.Rotation);
+            target.draw(Shape);
+            target.draw(Arrow);
         }
     };
 
-    KeyPromptRenderer keyPromptRenderer;
-    ArrowPromptRenderer arrowPromptRenderer;
+    KeyPromptRenderer KeyPromptRendererInstance;
+    ArrowPromptRenderer ArrowPromptRendererInstance;
 
-    std::array<KeyPrompt, 4> keyPrompts;
-    std::array<ArrowPrompt, 4> arrowPrompts;
+    std::array<KeyPrompt, 4> KeyPrompts;
+    std::array<ArrowPrompt, 4> ArrowPrompts;
 
-    sf::Text orText;
-    sf::Text pressAnyKeyText;
+    sf::Text OrText;
+    sf::Text PressAnyKeyText;
 };
 
 #endif // GAMEINSTRUCTIONSOVERLAY_HPP

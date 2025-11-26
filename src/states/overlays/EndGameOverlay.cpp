@@ -7,42 +7,46 @@ EndGameOverlay::EndGameOverlay(sf::Vector2f windowSize, const sf::Font& font)
     : ButtonOverlayBase(windowSize, font,
         {{ { "Restart", "Restart" }, { "BackToMenu", "Back to Menu" } }})
 {
-    this->title.setFont(font);
-    this->title.setFillColor(sf::Color(Colors::Hex::TextMain));
-    this->title.setOutlineColor(sf::Color(Colors::Hex::TextMainOutline));
+    Title.setFont(font);
+    Title.setFillColor(sf::Color(Colors::Hex::TextMain));
+    Title.setOutlineColor(sf::Color(Colors::Hex::TextMainOutline));
 
-    this->updateUIScaling(windowSize);
+    UpdateUIScaling(windowSize);
 }
 
-void EndGameOverlay::setTitle(const std::string& text)
+void EndGameOverlay::SetTitle(const std::string& text)
 {
-    this->title.setString(text);
-    auto lb = this->title.getLocalBounds();
-    this->title.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
+    Title.setString(text);
+    auto lb = Title.getLocalBounds();
+    Title.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
 }
 
-void EndGameOverlay::render(sf::RenderTarget& target)
+void EndGameOverlay::OnWindowResize(const sf::Vector2f& windowSize)
 {
-    if (!this->getIsActive())
+    ButtonOverlayBase::OnWindowResize(windowSize);
+    UpdateUIScaling(windowSize);
+}
+
+void EndGameOverlay::Render(sf::RenderTarget& target)
+{
+    if (!GetIsActive())
         return;
 
-    ButtonOverlayBase::render(target);
+    ButtonOverlayBase::Render(target);
 
-    target.draw(this->title);
+    target.draw(Title);
 }
 
-void EndGameOverlay::updateUIScaling(sf::Vector2f newWindowSize)
+void EndGameOverlay::UpdateUIScaling(sf::Vector2f windowSize)
 {
-    ButtonOverlayBase::updateUIScaling(newWindowSize);
-
-    const auto position = sf::Vector2f(newWindowSize.x / 2.f, newWindowSize.y / 3.f);
-    const auto characterSize = static_cast<unsigned>(std::min(newWindowSize.x / 12.f, newWindowSize.y / 16.f));
+    const auto position = sf::Vector2f(windowSize.x / 2.f, windowSize.y / 3.f);
+    const auto characterSize = static_cast<unsigned>(std::min(windowSize.x / 12.f, windowSize.y / 16.f));
     const auto outlineThickness = static_cast<float>(characterSize) / 32.f;
 
-    this->title.setPosition(position);
-    this->title.setCharacterSize(characterSize);
-    this->title.setOutlineThickness(outlineThickness);
+    Title.setPosition(position);
+    Title.setCharacterSize(characterSize);
+    Title.setOutlineThickness(outlineThickness);
 
-    const auto lb = this->title.getLocalBounds();
-    this->title.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
+    const auto lb = Title.getLocalBounds();
+    Title.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
 }

@@ -10,12 +10,14 @@ public:
     PauseOverlay(const sf::Vector2f& windowSize, const sf::Font& font);
     ~PauseOverlay() = default;
 
-    void render(sf::RenderTarget& target) override;
+    void OnWindowResize(const sf::Vector2f& windowSize) override;
+
+    void Render(sf::RenderTarget& target) override;
 
 private:
-    void updateUIScaling(sf::Vector2f newWindowSize) override;
+    void UpdateUIScaling(sf::Vector2f windowSize);
 
-    sf::Text pauseText;
+    sf::Text PauseText;
 };
 
 #endif // PAUSEOVERLAY_HPP

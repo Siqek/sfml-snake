@@ -73,9 +73,9 @@ void GameState::updateUIScaling()
         windowSize.y * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f )
         - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
 
-    this->gameInstructionsOverlay.onWindowResize(windowSize);
-    this->pauseOverlay.onWindowResize(windowSize);
-    this->endGameOverlay.onWindowResize(windowSize);
+    this->gameInstructionsOverlay.OnWindowResize(windowSize);
+    this->pauseOverlay.OnWindowResize(windowSize);
+    this->endGameOverlay.OnWindowResize(windowSize);
 }
 
 GameState::GameState(StateData* stateData)
@@ -103,7 +103,7 @@ GameState::GameState(StateData* stateData)
 
     this->updateUIScaling();
 
-    this->gameInstructionsOverlay.show();
+    this->gameInstructionsOverlay.Show();
 }
 
 GameState::~GameState()
@@ -124,13 +124,14 @@ void GameState::updateInput()
 
     this->keyStateTracker->updateKeyStates();
 
-    if (!this->gameInstructionsOverlay.getIsActive() && !this->endGameOverlay.getIsActive())
+    const bool isOtherOverlayActive = gameInstructionsOverlay.GetIsActive() || endGameOverlay.GetIsActive() ;
+    if (!isOtherOverlayActive)
     {
         if (this->keyStateTracker->isKeyDown("TogglePause")) {
-            if (this->pauseOverlay.getIsActive())
-            this->pauseOverlay.close();
+            if (this->pauseOverlay.GetIsActive())
+            this->pauseOverlay.Close();
             else
-            this->pauseOverlay.show();
+            this->pauseOverlay.Show();
         }
     }
 
@@ -148,40 +149,40 @@ void GameState::update(const float& dt)
 {
     this->updateInput();
 
-    if (this->endGameOverlay.getIsActive()) {
-        this->endGameOverlay.update(*this->window);
+    if (this->endGameOverlay.GetIsActive()) {
+        this->endGameOverlay.Update(*this->window);
 
-        if (this->endGameOverlay.isButtonReleased("BackToMenu"))
+        if (this->endGameOverlay.IsButtonReleased("BackToMenu"))
             this->endState();
 
-        if (this->endGameOverlay.isButtonReleased("Restart"))
+        if (this->endGameOverlay.IsButtonReleased("Restart"))
             this->restart();
 
         return;
     }
 
-    if (this->gameInstructionsOverlay.getIsActive()) {
+    if (this->gameInstructionsOverlay.GetIsActive()) {
         // Close the GameInstructionsOverlay if any key is pressed
         for (int key = 0; key < sf::Keyboard::KeyCount; ++key)
         {
             if (sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(key))) {
-                this->gameInstructionsOverlay.close();
+                this->gameInstructionsOverlay.Close();
                 break;
             }
         }
         return;
     }
 
-    if (this->pauseOverlay.getIsActive()) {
-        this->pauseOverlay.update(*this->window);
+    if (this->pauseOverlay.GetIsActive()) {
+        this->pauseOverlay.Update(*this->window);
 
-        if (this->pauseOverlay.isButtonReleased("Continue"))
-            this->pauseOverlay.close();
+        if (this->pauseOverlay.IsButtonReleased("Continue"))
+            this->pauseOverlay.Close();
 
-        if (this->pauseOverlay.isButtonReleased("Restart"))
+        if (this->pauseOverlay.IsButtonReleased("Restart"))
             this->restart();
 
-        if (this->pauseOverlay.isButtonReleased("BackToMenu"))
+        if (this->pauseOverlay.IsButtonReleased("BackToMenu"))
             this->endState();
 
         return;
@@ -190,12 +191,18 @@ void GameState::update(const float& dt)
     this->snake.update(dt);
 
     if (this->snake.hasFilledGrid()) {
-        this->endGameOverlay.setTitle("Snake is full. So is your glory!");
-        this->endGameOverlay.show();
-    } else if (!this->snake.getIsAlive()) {
-        this->endGameOverlay.setTitle("Game Over");
-        this->endGameOverlay.show();
-    } else if (this->appleCluster.eatAppleAt(this->snake.getHeadPosition()))
+        this->endGameOverlay.SetTitle("Snake is full. So is your glory!");
+        this->endGameOverlay.Show();
+        return;
+    }
+
+    if (!this->snake.getIsAlive()) {
+        this->endGameOverlay.SetTitle("Game Over");
+        this->endGameOverlay.Show();
+        return;
+    }
+
+    if (this->appleCluster.eatAppleAt(this->snake.getHeadPosition()))
     {
         this->appleCluster.spawn(this->grid->getFreeTiles());
         this->snake.grow(1u);
@@ -227,9 +234,9 @@ void GameState::render(sf::RenderTarget* target)
 
     target->draw(this->scoreText);
 
-    this->gameInstructionsOverlay.render(*target);
-    this->pauseOverlay.render(*target);
-    this->endGameOverlay.render(*target);
+    this->gameInstructionsOverlay.Render(*target);
+    this->pauseOverlay.Render(*target);
+    this->endGameOverlay.Render(*target);
 }
 
 void GameState::updateScoreText()
@@ -252,7 +259,7 @@ void GameState::restart()
     this->appleCluster.reset();
     this->appleCluster.spawnAll(this->grid->getFreeTiles());
 
-    this->gameInstructionsOverlay.show();
-    this->pauseOverlay.close();
-    this->endGameOverlay.close();
+    this->gameInstructionsOverlay.Show();
+    this->pauseOverlay.Close();
+    this->endGameOverlay.Close();
 }

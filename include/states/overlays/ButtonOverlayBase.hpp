@@ -20,31 +20,32 @@ class ButtonOverlayBase
 {
 public:
     struct ButtonInit {
-        std::string id;
-        std::string text;
+        std::string Id;
+        std::string Text;
 
         ButtonInit(const char* id, const char* text)
-            : id(id), text(text) {}
+            : Id(id), Text(text) {}
     };
 
     ButtonOverlayBase(const sf::Vector2f& windowSize, const sf::Font& font, const std::array<ButtonInit, N>& buttonInits);
     virtual ~ButtonOverlayBase() = default;
 
-    bool isButtonReleased(const std::string& id) const;
+    bool IsButtonReleased(const std::string& id) const;
 
-    virtual void update(const sf::RenderWindow& window) override;
-    virtual void render(sf::RenderTarget& target) override;
+    virtual void OnWindowResize(const sf::Vector2f& windowSize) override;
 
-protected:
-    virtual void updateUIScaling(sf::Vector2f newWindowSize) override;
+    virtual void Update(const sf::RenderWindow& window) override;
+    virtual void Render(sf::RenderTarget& target) override;
 
 private:
+    void UpdateUIScaling(sf::Vector2f windowSize);
+
     struct OverlayButton {
-        std::string id;
-        mgui::Button button;
+        std::string Id;
+        mgui::Button Button;
     };
 
-    std::array<OverlayButton, N> buttons;
+    std::array<OverlayButton, N> Buttons;
 };
 
 template<size_t N>
@@ -53,65 +54,72 @@ ButtonOverlayBase<N>::ButtonOverlayBase(const sf::Vector2f& windowSize, const sf
 {
     for (size_t i = 0; i < N; ++i)
     {
-        this->buttons[i].id = buttonInits[i].id;
+        Buttons[i].Id = buttonInits[i].Id;
 
-        this->buttons[i].button.setFont(font);
-        this->buttons[i].button.setText(buttonInits[i].text);
+        Buttons[i].Button.setFont(font);
+        Buttons[i].Button.setText(buttonInits[i].Text);
 
-        this->buttons[i].button.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
-        this->buttons[i].button.setFillColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverBg));
-        this->buttons[i].button.setFillColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveBg));
+        Buttons[i].Button.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
+        Buttons[i].Button.setFillColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverBg));
+        Buttons[i].Button.setFillColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveBg));
 
-        this->buttons[i].button.setAccentColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleOutline));
-        this->buttons[i].button.setAccentColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverOutline));
-        this->buttons[i].button.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
+        Buttons[i].Button.setAccentColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleOutline));
+        Buttons[i].Button.setAccentColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverOutline));
+        Buttons[i].Button.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
     }
-    this->updateUIScaling(windowSize);
+    UpdateUIScaling(windowSize);
 }
 
 template<size_t N>
-bool ButtonOverlayBase<N>::isButtonReleased(const std::string& id) const
+bool ButtonOverlayBase<N>::IsButtonReleased(const std::string& id) const
 {
-    for (const auto& button : this->buttons)
+    for (const auto& button : Buttons)
     {
-        if (button.id == id)
-            return button.button.isReleased();
+        if (button.Id == id)
+            return button.Button.isReleased();
     }
 
     return false;
 }
 
 template<size_t N>
-void ButtonOverlayBase<N>::update(const sf::RenderWindow& window)
+void ButtonOverlayBase<N>::OnWindowResize(const sf::Vector2f& windowSize)
 {
-    for (auto& button : this->buttons)
-        button.button.update(window);
+    Overlay::OnWindowResize(windowSize);
+    UpdateUIScaling(windowSize);
 }
 
 template<size_t N>
-void ButtonOverlayBase<N>::render(sf::RenderTarget& target)
+void ButtonOverlayBase<N>::Update(const sf::RenderWindow& window)
 {
-    if (!this->getIsActive())
+    for (auto& button : Buttons)
+        button.Button.update(window);
+}
+
+template<size_t N>
+void ButtonOverlayBase<N>::Render(sf::RenderTarget& target)
+{
+    if (!GetIsActive())
         return;
 
-    this->renderWindowOverlay(target);
+    Overlay::Render(target);
 
-    for (auto& button : this->buttons)
-        button.button.render(target);
+    for (auto& button : Buttons)
+        button.Button.render(target);
 }
 
 template<size_t N>
-void ButtonOverlayBase<N>::updateUIScaling(sf::Vector2f newWindowSize)
+void ButtonOverlayBase<N>::UpdateUIScaling(sf::Vector2f windowSize)
 {
-    const auto size = sf::Vector2f(newWindowSize.x / 3.f, newWindowSize.y / 16.f);
-    const auto position = newWindowSize / 2.f;
+    const auto size = sf::Vector2f(windowSize.x / 3.f, windowSize.y / 16.f);
+    const auto position = windowSize / 2.f;
     const auto positionOffset = sf::Vector2f(0.f, size.y * 1.4f);
     const auto outlineThickness = size.y / 16.f;
     const auto characterSize = static_cast<unsigned>(std::min(size.y / 2.f, size.x / 12.f));
 
-    for (size_t i = 0; i < this->buttons.size(); ++i)
+    for (size_t i = 0; i < Buttons.size(); ++i)
     {
-        mgui::Button& button = this->buttons[i].button;
+        mgui::Button& button = Buttons[i].Button;
 
         button.setSize(size);
         button.setPosition(position + static_cast<float>(i) * positionOffset);

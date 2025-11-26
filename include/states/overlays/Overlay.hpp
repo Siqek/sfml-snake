@@ -7,27 +7,22 @@ public:
     Overlay(const sf::Vector2f& windowSize, sf::Color backgroundColor = sf::Color(0u, 0u, 0u, 128u));
     virtual ~Overlay() = default;
 
-    void setBackgroundColor(sf::Color color) { windowOverlay.setFillColor(color); }
+    void SetBackgroundColor(sf::Color color);
 
-    void close() { isActive = false; }
-    void show() { isActive = true; }
+    void Close();
+    void Show();
 
-    bool getIsActive() const { return isActive; }
+    bool GetIsActive() const { return bIsActive; }
 
-    void onWindowResize(const sf::Vector2f& newWindowSize);
+    virtual void OnWindowResize(const sf::Vector2f& windowSize);
 
-    virtual void update(const sf::RenderWindow& window) = 0;
-    virtual void render(sf::RenderTarget& target) = 0;
-
-protected:
-    void renderWindowOverlay(sf::RenderTarget& target) { target.draw(windowOverlay); }
-
-    sf::RectangleShape windowOverlay;
+    virtual void Update(const sf::RenderWindow& window);
+    virtual void Render(sf::RenderTarget& target);
 
 private:
-    virtual void updateUIScaling(sf::Vector2f newWindowSize) = 0;
+    sf::RectangleShape WindowOverlay;
 
-    bool isActive;
+    bool bIsActive;
 };
 
 #endif // OVERLAY_HPP
