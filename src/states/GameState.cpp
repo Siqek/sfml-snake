@@ -42,10 +42,7 @@ void GameState::updateUIScaling()
     // such as: tile size, text size/position, and grid offsets
 
     // new window size
-    const sf::Vector2f windowSize(
-        static_cast<float>(this->window->getSize().x),
-        static_cast<float>(this->window->getSize().y)
-    );
+    const sf::Vector2f windowSize(window->getSize());
 
     // tile size
     this->tileSize = std::min(
@@ -73,9 +70,10 @@ void GameState::updateUIScaling()
         windowSize.y * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f )
         - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
 
-    this->gameInstructionsOverlay.OnWindowResize(windowSize);
-    this->pauseOverlay.OnWindowResize(windowSize);
-    this->endGameOverlay.OnWindowResize(windowSize);
+    gridSelectionOverlay.OnWindowResize(windowSize);
+    gameInstructionsOverlay.OnWindowResize(windowSize);
+    pauseOverlay.OnWindowResize(windowSize);
+    endGameOverlay.OnWindowResize(windowSize);
 }
 
 GameState::GameState(StateData* stateData)
@@ -84,6 +82,7 @@ GameState::GameState(StateData* stateData)
     gridSizeX(stateData->gameSettings->gridSize.x), gridSizeY(stateData->gameSettings->gridSize.y),
     snake(stateData->gameSettings->snakeSpeed, 3u, this->grid),
     score(0u),
+    gridSelectionOverlay(sf::Vector2f(window->getSize()), font),
     gameInstructionsOverlay(sf::Vector2f(this->window->getSize()), this->font),
     pauseOverlay(sf::Vector2f(this->window->getSize()), this->font),
     endGameOverlay(sf::Vector2f(this->window->getSize()), this->font)
@@ -103,7 +102,10 @@ GameState::GameState(StateData* stateData)
 
     this->updateUIScaling();
 
-    this->gameInstructionsOverlay.Show();
+    gameInstructionsOverlay.Show();
+
+    // TODO(siqek): at the beginning, open the grid selection overlay instead of the game instructions.
+    // gridSelectionOverlay.Show();
 }
 
 GameState::~GameState()
@@ -124,14 +126,15 @@ void GameState::updateInput()
 
     this->keyStateTracker->updateKeyStates();
 
-    const bool isOtherOverlayActive = gameInstructionsOverlay.GetIsActive() || endGameOverlay.GetIsActive() ;
+    const bool isOtherOverlayActive = gridSelectionOverlay.GetIsActive() || gameInstructionsOverlay.GetIsActive() || endGameOverlay.GetIsActive();
     if (!isOtherOverlayActive)
     {
-        if (this->keyStateTracker->isKeyDown("TogglePause")) {
+        if (this->keyStateTracker->isKeyDown("TogglePause"))
+        {
             if (this->pauseOverlay.GetIsActive())
-            this->pauseOverlay.Close();
+                this->pauseOverlay.Close();
             else
-            this->pauseOverlay.Show();
+                this->pauseOverlay.Show();
         }
     }
 
@@ -188,6 +191,13 @@ void GameState::update(const float& dt)
         return;
     }
 
+    if (gridSelectionOverlay.GetIsActive()) {
+        gridSelectionOverlay.Update(*window);
+
+        // TODO(siqek): finish
+        return;
+    }
+
     this->snake.update(dt);
 
     if (this->snake.hasFilledGrid()) {
@@ -215,6 +225,12 @@ void GameState::render(sf::RenderTarget* target)
 {
     if (!target)
         target = this->window;
+
+    if (gridSelectionOverlay.GetIsActive())
+    {
+        gridSelectionOverlay.Render(*target);
+        return;
+    }
 
     for (const auto& freeTile : this->grid->getFreeTiles())
     {

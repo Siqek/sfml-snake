@@ -1,7 +1,7 @@
 #ifndef COLORS_HPP
 #define COLORS_HPP
 
-#include "stdafx.hpp"
+#include <cstdint>
 
 namespace Colors::Hex {
     static constexpr std::uint32_t Background          = 0x0F0E17FF;
@@ -32,6 +32,13 @@ namespace Colors::Hex {
 
     static constexpr std::uint32_t ButtonActiveBg      = 0x1E3B33FF;
     static constexpr std::uint32_t ButtonActiveOutline = 0xCCFFBDFF;
+
+
+    static constexpr std::uint32_t GridSelectionCardBackground  = 0x1A1A22FF;
+    static constexpr std::uint32_t GridSelectionCardOutline     = 0x4A7B68FF;
+
+    static constexpr std::uint32_t GridImitationColor           = 0x3C3547FF;
+
 }
 
 #endif // COLORS_HPP

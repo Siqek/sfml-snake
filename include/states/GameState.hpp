@@ -16,6 +16,7 @@ class Grid;
 #include "snake/SnakeRenderer.hpp"
 #include "snake/AppleCluster.hpp"
 
+#include "states/overlays/GridSelectionOverlay.hpp"
 #include "states/overlays/GameInstructionsOverlay.hpp"
 #include "states/overlays/PauseOverlay.hpp"
 #include "states/overlays/EndGameOverlay.hpp"
@@ -61,6 +62,7 @@ private:
     unsigned int score;
     sf::Text scoreText;
 
+    GridSelectionOverlay gridSelectionOverlay;
     GameInstructionsOverlay gameInstructionsOverlay;
     PauseOverlay pauseOverlay;
     EndGameOverlay endGameOverlay;
