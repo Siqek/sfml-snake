@@ -5,10 +5,21 @@
 
 #include "mgui/Button.hpp"
 
+struct EndGameOverlayTypes
+{
+    enum class EButton
+    {
+        Restart,
+        BackToMenu
+    };
+};
+
 class EndGameOverlay
-    : public ButtonOverlayBase<2>
+    : public ButtonOverlayBase<EndGameOverlayTypes::EButton, 2>
 {
 public:
+    using EButton = EndGameOverlayTypes::EButton;
+
     EndGameOverlay(sf::Vector2f widnowSize, const sf::Font& font);
     ~EndGameOverlay() = default;
 

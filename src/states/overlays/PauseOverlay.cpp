@@ -5,7 +5,7 @@
 
 PauseOverlay::PauseOverlay(const sf::Vector2f& windowSize, const sf::Font& font)
     : ButtonOverlayBase(windowSize, font,
-        {{ { "Continue", "Continue" }, { "Restart", "Restart" }, { "BackToMenu", "Back to Menu" } }})
+        {{ { EButton::Continue, "Continue" }, { EButton::Restart, "Restart" }, { EButton::BackToMenu, "Back to Menu" } }})
 {
     PauseText.setFont(font);
     PauseText.setString("Pause");

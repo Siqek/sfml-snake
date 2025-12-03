@@ -3,10 +3,22 @@
 
 #include "states/overlays/ButtonOverlayBase.hpp"
 
+struct PauseOverlayTypes
+{
+    enum class EButton
+    {
+        Continue,
+        Restart,
+        BackToMenu
+    };
+};
+
 class PauseOverlay
-    : public ButtonOverlayBase<3>
+    : public ButtonOverlayBase<PauseOverlayTypes::EButton, 3>
 {
 public:
+    using EButton = PauseOverlayTypes::EButton;
+
     PauseOverlay(const sf::Vector2f& windowSize, const sf::Font& font);
     ~PauseOverlay() = default;
 

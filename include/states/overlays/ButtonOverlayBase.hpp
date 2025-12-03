@@ -14,23 +14,24 @@
 
 #include "config/Colors.hpp"
 
-template<size_t N>
+template<typename E, size_t N>
 class ButtonOverlayBase
     : public Overlay
 {
+    static_assert(std::is_enum_v<E>, "Template parameter must be an enum type");
 public:
     struct ButtonInit {
-        std::string Id;
+        E Id;
         std::string Text;
 
-        ButtonInit(const char* id, const char* text)
+        ButtonInit(E id, const char* text)
             : Id(id), Text(text) {}
     };
 
     ButtonOverlayBase(const sf::Vector2f& windowSize, const sf::Font& font, const std::array<ButtonInit, N>& buttonInits);
     virtual ~ButtonOverlayBase() = default;
 
-    bool IsButtonReleased(const std::string& id) const;
+    bool IsButtonReleased(E id) const;
 
     virtual void OnWindowResize(const sf::Vector2f& windowSize) override;
 
@@ -41,15 +42,15 @@ private:
     void UpdateUIScaling(sf::Vector2f windowSize);
 
     struct OverlayButton {
-        std::string Id;
+        E Id;
         mgui::Button Button;
     };
 
     std::array<OverlayButton, N> Buttons;
 };
 
-template<size_t N>
-ButtonOverlayBase<N>::ButtonOverlayBase(const sf::Vector2f& windowSize, const sf::Font& font, const std::array<ButtonInit, N>& buttonInits)
+template<typename E, size_t N>
+ButtonOverlayBase<E, N>::ButtonOverlayBase(const sf::Vector2f& windowSize, const sf::Font& font, const std::array<ButtonInit, N>& buttonInits)
     : Overlay(windowSize, sf::Color(Colors::Hex::OverlayBackground))
 {
     for (size_t i = 0; i < N; ++i)
@@ -70,8 +71,8 @@ ButtonOverlayBase<N>::ButtonOverlayBase(const sf::Vector2f& windowSize, const sf
     UpdateUIScaling(windowSize);
 }
 
-template<size_t N>
-bool ButtonOverlayBase<N>::IsButtonReleased(const std::string& id) const
+template<typename E, size_t N>
+bool ButtonOverlayBase<E, N>::IsButtonReleased(E id) const
 {
     for (const auto& button : Buttons)
     {
@@ -82,22 +83,22 @@ bool ButtonOverlayBase<N>::IsButtonReleased(const std::string& id) const
     return false;
 }
 
-template<size_t N>
-void ButtonOverlayBase<N>::OnWindowResize(const sf::Vector2f& windowSize)
+template<typename E, size_t N>
+void ButtonOverlayBase<E, N>::OnWindowResize(const sf::Vector2f& windowSize)
 {
     Overlay::OnWindowResize(windowSize);
     UpdateUIScaling(windowSize);
 }
 
-template<size_t N>
-void ButtonOverlayBase<N>::Update(const sf::RenderWindow& window)
+template<typename E, size_t N>
+void ButtonOverlayBase<E, N>::Update(const sf::RenderWindow& window)
 {
     for (auto& button : Buttons)
         button.Button.update(window);
 }
 
-template<size_t N>
-void ButtonOverlayBase<N>::Render(sf::RenderTarget& target)
+template<typename E, size_t N>
+void ButtonOverlayBase<E, N>::Render(sf::RenderTarget& target)
 {
     if (!GetIsActive())
         return;
@@ -108,8 +109,8 @@ void ButtonOverlayBase<N>::Render(sf::RenderTarget& target)
         button.Button.render(target);
 }
 
-template<size_t N>
-void ButtonOverlayBase<N>::UpdateUIScaling(sf::Vector2f windowSize)
+template<typename E, size_t N>
+void ButtonOverlayBase<E, N>::UpdateUIScaling(sf::Vector2f windowSize)
 {
     const auto size = sf::Vector2f(windowSize.x / 3.f, windowSize.y / 16.f);
     const auto position = windowSize / 2.f;

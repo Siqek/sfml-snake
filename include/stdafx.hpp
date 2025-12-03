@@ -12,6 +12,7 @@
 #include <cctype>
 #include <cstdint>
 #include <optional>
+#include <type_traits>
 #include <utility>
 #include <cmath>
 #include <filesystem>

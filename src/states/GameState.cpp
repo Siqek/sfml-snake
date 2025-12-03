@@ -152,14 +152,18 @@ void GameState::update(const float& dt)
 {
     this->updateInput();
 
-    if (this->endGameOverlay.GetIsActive()) {
-        this->endGameOverlay.Update(*this->window);
+    if (endGameOverlay.GetIsActive()) {
+        endGameOverlay.Update(*window);
 
-        if (this->endGameOverlay.IsButtonReleased("BackToMenu"))
-            this->endState();
+        if (endGameOverlay.IsButtonReleased(EndGameOverlay::EButton::BackToMenu))
+        {
+            endState();
+        }
 
-        if (this->endGameOverlay.IsButtonReleased("Restart"))
-            this->restart();
+        if (endGameOverlay.IsButtonReleased(EndGameOverlay::EButton::Restart))
+        {
+            restart();
+        }
 
         return;
     }
@@ -176,17 +180,23 @@ void GameState::update(const float& dt)
         return;
     }
 
-    if (this->pauseOverlay.GetIsActive()) {
-        this->pauseOverlay.Update(*this->window);
+    if (pauseOverlay.GetIsActive()) {
+        pauseOverlay.Update(*window);
 
-        if (this->pauseOverlay.IsButtonReleased("Continue"))
-            this->pauseOverlay.Close();
+        if (pauseOverlay.IsButtonReleased(PauseOverlay::EButton::Continue))
+        {
+            pauseOverlay.Close();
+        }
 
-        if (this->pauseOverlay.IsButtonReleased("Restart"))
-            this->restart();
+        if (pauseOverlay.IsButtonReleased(PauseOverlay::EButton::Restart))
+        {
+            restart();
+        }
 
-        if (this->pauseOverlay.IsButtonReleased("BackToMenu"))
-            this->endState();
+        if (pauseOverlay.IsButtonReleased(PauseOverlay::EButton::BackToMenu))
+        {
+            endState();
+        }
 
         return;
     }

@@ -5,7 +5,7 @@
 
 EndGameOverlay::EndGameOverlay(sf::Vector2f windowSize, const sf::Font& font)
     : ButtonOverlayBase(windowSize, font,
-        {{ { "Restart", "Restart" }, { "BackToMenu", "Back to Menu" } }})
+        {{ { EButton::Restart, "Restart" }, { EButton::BackToMenu, "Back to Menu" } }})
 {
     Title.setFont(font);
     Title.setFillColor(sf::Color(Colors::Hex::TextMain));
