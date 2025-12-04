@@ -5,6 +5,8 @@
 
 #include "mgui/ArrowSelector.hpp"
 
+#include "mgui/Button.hpp"
+
 class GridSelectionOverlay
     : public Overlay
 {
@@ -44,7 +46,7 @@ private:
 
     sf::RectangleShape GridImitation;
 
-    // TODO(siqek): add 'play' button
+    mgui::Button PlayButton;
 };
 
 #endif // GRIDSELECTIONOVERLAY_HPP
