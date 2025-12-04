@@ -1,6 +1,8 @@
 #ifndef GRIDSELECTIONOVERLAY_HPP
 #define GRIDSELECTIONOVERLAY_HPP
 
+#include "snake/grid/Grid.hpp"
+
 #include "states/overlays/Overlay.hpp"
 
 #include "mgui/ArrowSelector.hpp"
@@ -13,6 +15,8 @@ class GridSelectionOverlay
 public:
     GridSelectionOverlay(const sf::Vector2f& windowSize, const sf::Font& font);
 
+    bool IsPlayButtonReleased() const;
+
     void OnWindowResize(const sf::Vector2f& windowSize) override;
 
     void Update(const sf::RenderWindow& window) override;
@@ -21,17 +25,11 @@ public:
 private:
     void UpdateUIScaling(sf::Vector2f windowSize);
 
-    enum class EGridType : size_t;
-    void UpdateGridImitation(GridSelectionOverlay::EGridType gridType);
+    void UpdateGridImitation(EGridType gridType);
 
     void AdjustHoleSizeToGridSize();
 
     sf::RectangleShape GridSelectionBackground;
-
-    enum class EGridType : size_t {
-        Rectangular,
-        Donut
-    };
 
     mgui::ArrowSelector<EGridType> GridSelector;
     static std::vector<mgui::ArrowSelector<EGridType>::Option> GridSelectorOptions;

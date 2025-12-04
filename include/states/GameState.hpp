@@ -8,7 +8,7 @@ namespace UIConfig {
 
 class KeyStateTracker;
 
-class Grid;
+class IGrid;
 
 #include "states/State.hpp"
 
@@ -46,7 +46,7 @@ private:
     std::unordered_map<std::string, int> keybinds;
     KeyStateTracker* keyStateTracker;
 
-    Grid* grid;
+    IGrid* grid;
 
     uint8_t gridSizeX;
     uint8_t gridSizeY;

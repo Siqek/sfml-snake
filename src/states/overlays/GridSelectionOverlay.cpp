@@ -5,9 +5,9 @@
 
 #include "config/Colors.hpp"
 
-std::vector<mgui::ArrowSelector<GridSelectionOverlay::EGridType>::Option> GridSelectionOverlay::GridSelectorOptions = {
+std::vector<mgui::ArrowSelector<EGridType>::Option> GridSelectionOverlay::GridSelectorOptions = {
     { "rectangular", "Rectangular Grid", EGridType::Rectangular },
-    { "donut", "Donut Grid", EGridType::Donut }
+    { "donut", "Donut Grid", EGridType::RectangularDonut }
 };
 
 std::vector<mgui::ArrowSelector<sf::Vector2i>::Option> GridSelectionOverlay::GridHoleSizeSelectorOptions = {
@@ -62,6 +62,11 @@ GridSelectionOverlay::GridSelectionOverlay(const sf::Vector2f& windowSize, const
     UpdateUIScaling(windowSize);
 }
 
+bool GridSelectionOverlay::IsPlayButtonReleased() const
+{
+    return PlayButton.isReleased();
+}
+
 void GridSelectionOverlay::OnWindowResize(const sf::Vector2f& windowSize)
 {
     Overlay::OnWindowResize(windowSize);
@@ -80,7 +85,7 @@ void GridSelectionOverlay::Update(const sf::RenderWindow& window)
     {
         UpdateGridImitation(GridSelector.getActiveValue());
 
-        if (GridSelector.getActiveValue() == EGridType::Donut)
+        if (GridSelector.getActiveValue() == EGridType::RectangularDonut)
         {
             AdjustHoleSizeToGridSize();
         }
@@ -88,7 +93,7 @@ void GridSelectionOverlay::Update(const sf::RenderWindow& window)
 
     if (GridSizeSelector.hasActiveOptionChanged())
     {
-        if (GridSelector.getActiveValue() == EGridType::Donut)
+        if (GridSelector.getActiveValue() == EGridType::RectangularDonut)
         {
             AdjustHoleSizeToGridSize();
         }
@@ -116,7 +121,7 @@ void GridSelectionOverlay::Render(sf::RenderTarget& target)
     GridSizeSelector.render(target);
     target.draw(GridSizeSelectorLabel);
 
-    if (GridSelector.getActiveValue() == EGridType::Donut)
+    if (GridSelector.getActiveValue() == EGridType::RectangularDonut)
     {
         GridHoleSizeSelector.render(target);
         target.draw(GridHoleSizeSelectorLabel);
@@ -220,7 +225,7 @@ void GridSelectionOverlay::UpdateGridImitation(EGridType gridType)
             GridImitation.setOutlineColor(sf::Color::Transparent);
             break;
 
-        case EGridType::Donut:
+        case EGridType::RectangularDonut:
             GridImitation.setOutlineColor(GridImitation.getFillColor());
             GridImitation.setFillColor(sf::Color::Transparent);
             break;

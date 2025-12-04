@@ -1,11 +1,11 @@
 #include "stdafx.hpp"
 #include "snake/Snake.hpp"
 
-#include "snake/Grid.hpp"
+#include "snake/grid/Grid.hpp"
 
 #include "config/Colors.hpp"
 
-Snake::Snake(float speedTilesPerSec, unsigned int length, Grid*& grid)
+Snake::Snake(float speedTilesPerSec, unsigned int length, IGrid*& grid)
     : speedTilesPerSec(speedTilesPerSec),
     direction(Direction::Right), prevDirection(Direction::Right), nextDirection(Direction::Right),
     grid(grid),
@@ -17,10 +17,10 @@ Snake::Snake(float speedTilesPerSec, unsigned int length, Grid*& grid)
     assert(length != 0);
     assert(grid != nullptr);
 
-    this->initHeadPosition(this->grid->getSize() / 2 - sf::Vector2i(1, 1));
+    this->initHeadPosition(this->grid->GetSize() / 2 - sf::Vector2i(1, 1));
 }
 
-bool Snake::hasFilledGrid() const { return body.size() == grid->getTotalTileCount(); }
+bool Snake::hasFilledGrid() const { return body.size() == grid->GetTotalTileCount(); }
 
 void Snake::initHeadPosition(const sf::Vector2i& position)
 {
@@ -60,7 +60,7 @@ void Snake::reset()
     isAlive = true;
 
     lengthToGrow = initialLengthToGrow;
-    this->initHeadPosition(this->grid->getSize() / 2 - sf::Vector2i(1, 1));
+    this->initHeadPosition(this->grid->GetSize() / 2 - sf::Vector2i(1, 1));
 }
 
 void Snake::move()
@@ -76,7 +76,7 @@ void Snake::move()
     }
 
     // Ensure the snake stays within grid boundaries
-    if (!this->grid->isWithinBoundaries(head))
+    if (!this->grid->IsWithinBoundaries(head))
         return this->die();
 
     // Ensure the snake doesn't collide with itself, except for the tail (since the snake can follow its own tail)
@@ -110,14 +110,14 @@ void Snake::move()
 
 void Snake::addHead(const sf::Vector2i& head)
 {
-    if (!this->grid->occupyTile(head))
+    if (!this->grid->OccupyTile(head))
         throw std::runtime_error("Tile is already taken.");
     this->body.push_front(head);
 }
 
 void Snake::removeTail()
 {
-    if (!this->grid->freeTile(this->body.back()))
+    if (!this->grid->FreeTile(this->body.back()))
         throw std::runtime_error("Tile is already freed.");
     this->body.pop_back();
 }

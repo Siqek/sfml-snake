@@ -3,7 +3,7 @@
 
 #include "settings/GameSettings.hpp"
 
-#include "snake/Grid.hpp"
+#include "snake/grid/RectangularGrid.hpp"
 
 #include "utils/KeyStateTracker.hpp"
 #include "utils/IniParser.hpp"
@@ -78,7 +78,7 @@ void GameState::updateUIScaling()
 
 GameState::GameState(StateData* stateData)
     : State(stateData),
-    grid(new Grid(sf::Vector2i(stateData->gameSettings->gridSize))),
+    grid(new RectangularGrid(sf::Vector2i(stateData->gameSettings->gridSize))),
     gridSizeX(stateData->gameSettings->gridSize.x), gridSizeY(stateData->gameSettings->gridSize.y),
     snake(stateData->gameSettings->snakeSpeed, 3u, this->grid),
     score(0u),
@@ -88,7 +88,7 @@ GameState::GameState(StateData* stateData)
     endGameOverlay(sf::Vector2f(this->window->getSize()), this->font)
 {
     this->appleCluster.setAppleLimit(this->stateData->gameSettings->maxAppleCount);
-    this->appleCluster.spawnAll(this->grid->getFreeTiles());
+    this->appleCluster.spawnAll(this->grid->GetFreeTiles());
 
     this->scoreText.setFont(this->font);
     this->scoreText.setString("0");
@@ -102,10 +102,7 @@ GameState::GameState(StateData* stateData)
 
     this->updateUIScaling();
 
-    gameInstructionsOverlay.Show();
-
-    // TODO(siqek): at the beginning, open the grid selection overlay instead of the game instructions.
-    // gridSelectionOverlay.Show();
+    gridSelectionOverlay.Show();
 }
 
 GameState::~GameState()
@@ -204,7 +201,12 @@ void GameState::update(const float& dt)
     if (gridSelectionOverlay.GetIsActive()) {
         gridSelectionOverlay.Update(*window);
 
-        // TODO(siqek): finish
+        if (gridSelectionOverlay.IsPlayButtonReleased())
+        {
+            gridSelectionOverlay.Close();
+            gameInstructionsOverlay.Show();
+        }
+
         return;
     }
 
@@ -224,7 +226,7 @@ void GameState::update(const float& dt)
 
     if (this->appleCluster.eatAppleAt(this->snake.getHeadPosition()))
     {
-        this->appleCluster.spawn(this->grid->getFreeTiles());
+        this->appleCluster.spawn(this->grid->GetFreeTiles());
         this->snake.grow(1u);
         this->score++;
         this->updateScoreText();
@@ -242,7 +244,7 @@ void GameState::render(sf::RenderTarget* target)
         return;
     }
 
-    for (const auto& freeTile : this->grid->getFreeTiles())
+    for (const auto& freeTile : this->grid->GetFreeTiles())
     {
         if (freeTile.x % 2 == freeTile.y % 2)
             this->tile.setFillColor(sf::Color(Colors::Hex::BoardCellPrimary));
@@ -278,14 +280,15 @@ void GameState::restart()
     this->updateScoreText();
 
     delete this->grid;
-    this->grid = new Grid(sf::Vector2i(this->stateData->gameSettings->gridSize));
+    this->grid = new RectangularGrid(sf::Vector2i(this->stateData->gameSettings->gridSize));
 
     this->snake.reset();
 
     this->appleCluster.reset();
-    this->appleCluster.spawnAll(this->grid->getFreeTiles());
+    this->appleCluster.spawnAll(this->grid->GetFreeTiles());
 
-    this->gameInstructionsOverlay.Show();
+    this->gridSelectionOverlay.Show();
+    this->gameInstructionsOverlay.Close();
     this->pauseOverlay.Close();
     this->endGameOverlay.Close();
 }
