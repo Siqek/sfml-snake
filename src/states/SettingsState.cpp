@@ -26,14 +26,9 @@ SettingsState::SettingsState(StateData* stateData)
     setElementColors(this->snakeSpeedSelector);
     setElementColors(this->maxAppleCountSelector);
 
-    if (this->gameSettings.gridSizeOptionId)
-        this->gridSizeSelector.setActiveOption(*this->gameSettings.gridSizeOptionId);
-
-    if (this->gameSettings.snakeSpeedOptionId)
-        this->snakeSpeedSelector.setActiveOption(*this->gameSettings.snakeSpeedOptionId);
-
-    if (this->gameSettings.maxAppleCountOptionId)
-        this->maxAppleCountSelector.setActiveOption(*this->gameSettings.maxAppleCountOptionId);
+    this->gridSizeSelector.setActiveOption(this->gameSettings.GridSize.Id);
+    this->snakeSpeedSelector.setActiveOption(this->gameSettings.SnakeSpeed.Id);
+    this->maxAppleCountSelector.setActiveOption(this->gameSettings.MaxAppleCount.Id);
 
     this->gridSizeLabel.setFont(this->font);
     this->gridSizeLabel.setString("Grid Size:");
@@ -91,20 +86,20 @@ void SettingsState::updateSelectors()
 
     if (this->gridSizeSelector.hasActiveOptionChanged()) {
         const auto& option = this->gridSizeSelector.getActiveOption();
-        this->gameSettings.gridSize = option.value;
-        this->gameSettings.gridSizeOptionId = option.id;
+        this->gameSettings.GridSize.Value = option.value;
+        this->gameSettings.GridSize.Id = option.id;
     }
 
     if (this->snakeSpeedSelector.hasActiveOptionChanged()) {
         const auto& option = this->snakeSpeedSelector.getActiveOption();
-        this->gameSettings.snakeSpeed = option.value;
-        this->gameSettings.snakeSpeedOptionId = option.id;
+        this->gameSettings.SnakeSpeed.Value = option.value;
+        this->gameSettings.SnakeSpeed.Id = option.id;
     }
 
     if (this->maxAppleCountSelector.hasActiveOptionChanged()) {
         const auto& option = this->maxAppleCountSelector.getActiveOption();
-        this->gameSettings.maxAppleCount = option.value;
-        this->gameSettings.maxAppleCountOptionId = option.id;
+        this->gameSettings.MaxAppleCount.Value = option.value;
+        this->gameSettings.MaxAppleCount.Id = option.id;
     }
 }
 
@@ -115,7 +110,7 @@ void SettingsState::updateButtons()
 
     if (this->saveSettingsButton.isReleased()) {
         *(this->stateData->gameSettings) = this->gameSettings;
-        this->gameSettings.saveToFile("config/game_settings.ini");
+        this->gameSettings.SaveToFile("config/game_settings.ini");
     }
 
     if (this->exitButton.isReleased())

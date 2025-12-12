@@ -6,54 +6,129 @@
 #include "config/GameSettingsOptions.hpp"
 
 GameSettings::GameSettings()
-    : gridSize(0, 0), snakeSpeed(0.f), maxAppleCount(0u) {}
+    : GridType(GetDefaultGridTypeSetting()),
+    GridSize(GetDefaultGridSizeSetting()),
+    GridHoleSize(GetDefaultGridHoleSizeSetting()),
+    SnakeSpeed(GetDefaultSnakeSpeedSetting()),
+    MaxAppleCount(GetDefaultMaxAppleCountSetting())
+{}
 
 GameSettings::GameSettings(const std::string& filename)
-    : gridSize(0, 0), snakeSpeed(0.f), maxAppleCount(0u)
+    : GameSettings()
 {
-    this->loadFromFile(filename);
+    LoadFromFile(filename);
 }
 
-void GameSettings::loadFromFile(const std::string& filename)
+void GameSettings::LoadFromFile(const std::string& filename)
 {
     IniParser iniParser(filename);
 
-    const auto applyOptionById = [&](const std::string& loadedOptionId, const auto& options, auto& settingValue, auto& settingOptionId) {
-        if (loadedOptionId.empty())
-            return;
-
+    const auto findValueById = [](const auto& options, const std::string& id)
+        -> const decltype(&options[0].value)
+    {
         for (const auto& option : options)
         {
-            if (option.id == loadedOptionId)
+            if (option.id == id)
             {
-                settingValue = option.value;
-                settingOptionId = option.id;
-                break;
+                return &option.value;
             }
+        }
+        return nullptr;
+    };
+
+    const auto loadSetting = [findValueById](auto& outSetting, const auto& options, const std::string& id, const auto& defaultSetting)
+    {
+        const auto* value = findValueById(options, id);
+
+        if (value)
+        {
+            outSetting.Value = *value;
+            outSetting.Id = id;
+        }
+        else
+        {
+            outSetting = defaultSetting;
         }
     };
 
-    std::string loadedGridSizeOptionId = iniParser.getString("GameSettings", "GridSizeOptionId");
-    applyOptionById(loadedGridSizeOptionId, GameSettingsOptions::GridSizeOptions, this->gridSize, this->gridSizeOptionId);
+    loadSetting(
+        GridType,
+        GameSettingsOptions::GridTypeOptions,
+        iniParser.getString("GameSettings", "GridTypeId"),
+        GetDefaultGridTypeSetting()
+    );
 
-    std::string loadedSnakeSpeedOptionId = iniParser.getString("GameSettings", "SnakeSpeedOptionId");
-    applyOptionById(loadedSnakeSpeedOptionId, GameSettingsOptions::SnakeSpeedOptions, this->snakeSpeed, this->snakeSpeedOptionId);
+    loadSetting(
+        GridSize,
+        GameSettingsOptions::GridSizeOptions,
+        iniParser.getString("GameSettings", "GridSizeId"),
+        GetDefaultGridSizeSetting()
+    );
 
-    std::string loadedMaxAppleCountOptionId = iniParser.getString("GameSettings", "MaxAppleCountOptionId");
-    applyOptionById(loadedMaxAppleCountOptionId, GameSettingsOptions::MaxAppleCountOptions, this->maxAppleCount, this->maxAppleCountOptionId);
+    loadSetting(
+        GridHoleSize,
+        GameSettingsOptions::GridHoleSizeOptions,
+        iniParser.getString("GameSettings", "GridHoleSizeId"),
+        GetDefaultGridHoleSizeSetting()
+    );
+
+    loadSetting(SnakeSpeed,
+        GameSettingsOptions::SnakeSpeedOptions,
+        iniParser.getString("GameSettings", "SnakeSpeedId"),
+        GetDefaultSnakeSpeedSetting()
+    );
+
+    loadSetting(
+        MaxAppleCount,
+        GameSettingsOptions::MaxAppleCountOptions,
+        iniParser.getString("GameSettings", "MaxAppleCountId"),
+        GetDefaultMaxAppleCountSetting()
+    );
 }
 
-void GameSettings::saveToFile(const std::string& filename)
+void GameSettings::SaveToFile(const std::string& filename)
 {
     std::ofstream file(filename);
 
     if (file.is_open())
     {
         file << "[GameSettings]\n";
-        file << "GridSizeOptionId=" << this->gridSizeOptionId.value_or("") << "\n";
-        file << "SnakeSpeedOptionId=" << this->snakeSpeedOptionId.value_or("") << "\n";
-        file << "MaxAppleCountOptionId=" << this->maxAppleCountOptionId.value_or("") << "\n";
+        file << "GridTypeId=" << GridType.Id << "\n";
+        file << "GridSizeId=" << GridSize.Id << "\n";
+        file << "GridHoleSizeId=" << GridHoleSize.Id << "\n";
+        file << "SnakeSpeedId=" << SnakeSpeed.Id << "\n";
+        file << "MaxAppleCountId=" << MaxAppleCount.Id << "\n";
     }
 
     file.close();
+}
+
+GameSettings::Setting<EGridType> GameSettings::GetDefaultGridTypeSetting()
+{
+    const auto& option = GameSettingsOptions::GridTypeOptions[GameSettingsOptions::DefaultGridTypeOptionIndex];
+    return Setting<EGridType>(option.id, option.value);
+}
+
+GameSettings::Setting<sf::Vector2i> GameSettings::GetDefaultGridSizeSetting()
+{
+    const auto& option = GameSettingsOptions::GridSizeOptions[GameSettingsOptions::DefaultGridSizeOptionIndex];
+    return Setting<sf::Vector2i>(option.id, option.value);
+}
+
+GameSettings::Setting<sf::Vector2i> GameSettings::GetDefaultGridHoleSizeSetting()
+{
+    const auto& option = GameSettingsOptions::GridHoleSizeOptions[GameSettingsOptions::DefaultGridHoleSizeOptionIndex];
+    return Setting<sf::Vector2i>(option.id, option.value);
+}
+
+GameSettings::Setting<float> GameSettings::GetDefaultSnakeSpeedSetting()
+{
+    const auto& option = GameSettingsOptions::SnakeSpeedOptions[GameSettingsOptions::DefaultSnakeSpeedOptionIndex];
+    return Setting<float>(option.id, option.value);
+}
+
+GameSettings::Setting<unsigned> GameSettings::GetDefaultMaxAppleCountSetting()
+{
+    const auto& option = GameSettingsOptions::MaxAppleCountOptions[GameSettingsOptions::DefaultMaxAppleCountOptionIndex];
+    return Setting<unsigned>(option.id, option.value);
 }

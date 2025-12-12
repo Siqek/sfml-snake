@@ -4,6 +4,7 @@
 #include "settings/GameSettings.hpp"
 
 #include "snake/grid/RectangularGrid.hpp"
+#include "snake/grid/RectangularDonutGrid.hpp"
 
 #include "utils/KeyStateTracker.hpp"
 #include "utils/IniParser.hpp"
@@ -36,6 +37,25 @@ void GameState::initKeyStateTracker()
     this->keyStateTracker = new KeyStateTracker(this->keybinds);
 }
 
+std::unique_ptr<IGrid> GameState::createGrid()
+{
+    const GameSettings* gameSettings = stateData->gameSettings;
+
+    switch (gameSettings->GridType.Value)
+    {
+        case EGridType::Rectangular:
+            return std::make_unique<RectangularGrid>(gameSettings->GridSize.Value);
+
+        case EGridType::RectangularDonut:
+            return std::make_unique<RectangularDonutGrid>((gameSettings->GridSize.Value - gameSettings->GridHoleSize.Value) / 2, gameSettings->GridHoleSize.Value);
+
+        default:
+            break;
+    }
+
+    return std::make_unique<RectangularGrid>(gameSettings->GridSize.Value);
+}
+
 void GameState::updateUIScaling()
 {
     // Recalculates the size and position of all UI elements based on the new window size
@@ -44,10 +64,12 @@ void GameState::updateUIScaling()
     // new window size
     const sf::Vector2f windowSize(window->getSize());
 
+    const sf::Vector2i gridSize = stateData->gameSettings->GridSize.Value;
+
     // tile size
     this->tileSize = std::min(
-        windowSize.x * 0.95f / static_cast<float>(this->gridSizeX),
-        windowSize.y * UIConfig::GridHeightRatio / static_cast<float>(this->gridSizeY)
+        windowSize.x * 0.95f / static_cast<float>(gridSize.x),
+        windowSize.y * UIConfig::GridHeightRatio / static_cast<float>(gridSize.y)
     );
     this->snakeRenderer.setTileSize(this->tileSize);
     this->appleCluster.setTileSize(this->tileSize);
@@ -56,8 +78,8 @@ void GameState::updateUIScaling()
     // score text
     this->scoreText.setCharacterSize(static_cast<unsigned int>(windowSize.y * UIConfig::ScoreHeightRatio * 0.25f));
     this->scoreText.setPosition(sf::Vector2f(
-        static_cast<float>(windowSize.x) / 2.f,
-        static_cast<float>(windowSize.y) * UIConfig::ScoreHeightRatio / 2.f
+        windowSize.x / 2.f,
+        windowSize.y * UIConfig::ScoreHeightRatio / 2.f
     ));
 
     // centerize score text
@@ -65,10 +87,10 @@ void GameState::updateUIScaling()
     this->scoreText.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
 
     // grid offsets
-    this->gridOffset.x = windowSize.x / 2.f - static_cast<float>(this->gridSizeX) / 2.f * this->tileSize;
+    this->gridOffset.x = windowSize.x / 2.f - static_cast<float>(gridSize.x) / 2.f * this->tileSize;
     this->gridOffset.y =
         windowSize.y * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f )
-        - static_cast<float>(this->gridSizeY) / 2.f * this->tileSize;
+        - static_cast<float>(gridSize.y) / 2.f * this->tileSize;
 
     gridSelectionOverlay.OnWindowResize(windowSize);
     gameInstructionsOverlay.OnWindowResize(windowSize);
@@ -78,16 +100,15 @@ void GameState::updateUIScaling()
 
 GameState::GameState(StateData* stateData)
     : State(stateData),
-    grid(new RectangularGrid(sf::Vector2i(stateData->gameSettings->gridSize))),
-    gridSizeX(stateData->gameSettings->gridSize.x), gridSizeY(stateData->gameSettings->gridSize.y),
-    snake(stateData->gameSettings->snakeSpeed, 3u, this->grid),
+    grid(new RectangularGrid(sf::Vector2i(stateData->gameSettings->GridSize.Value))),
+    snake(stateData->gameSettings->SnakeSpeed.Value, 3u, this->grid),
     score(0u),
     gridSelectionOverlay(sf::Vector2f(window->getSize()), font),
     gameInstructionsOverlay(sf::Vector2f(this->window->getSize()), this->font),
     pauseOverlay(sf::Vector2f(this->window->getSize()), this->font),
     endGameOverlay(sf::Vector2f(this->window->getSize()), this->font)
 {
-    this->appleCluster.setAppleLimit(this->stateData->gameSettings->maxAppleCount);
+    this->appleCluster.setAppleLimit(this->stateData->gameSettings->MaxAppleCount.Value);
     this->appleCluster.spawnAll(this->grid->GetFreeTiles());
 
     this->scoreText.setFont(this->font);
@@ -203,6 +224,8 @@ void GameState::update(const float& dt)
 
         if (gridSelectionOverlay.IsPlayButtonReleased())
         {
+            // TODO(siqek): update settings, create grid, save new settings into a file
+
             gridSelectionOverlay.Close();
             gameInstructionsOverlay.Show();
         }
@@ -280,7 +303,7 @@ void GameState::restart()
     this->updateScoreText();
 
     delete this->grid;
-    this->grid = new RectangularGrid(sf::Vector2i(this->stateData->gameSettings->gridSize));
+    this->grid = new RectangularGrid(sf::Vector2i(this->stateData->gameSettings->GridSize.Value));
 
     this->snake.reset();
 

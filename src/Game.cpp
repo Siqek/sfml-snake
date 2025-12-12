@@ -85,26 +85,6 @@ void Game::initFont()
     }
 }
 
-void Game::initGameSettings()
-{
-    const auto& gridSizeDefaultOption      = GameSettingsOptions::GridSizeOptions.at(GameSettingsOptions::DefaultGridSizeOptionIndex);
-    const auto& snakeSpeedDefaultOption    = GameSettingsOptions::SnakeSpeedOptions.at(GameSettingsOptions::DefaultSnakeSpeedOptionIndex);
-    const auto& maxAppleCountDefaultOption = GameSettingsOptions::MaxAppleCountOptions.at(GameSettingsOptions::DefaultMaxAppleCountOptionIndex);
-
-    // Set default grid size
-    this->gameSettings.gridSize              = gridSizeDefaultOption.value;
-    this->gameSettings.gridSizeOptionId      = gridSizeDefaultOption.id;
-    // Set default snake speed
-    this->gameSettings.snakeSpeed            = snakeSpeedDefaultOption.value;
-    this->gameSettings.snakeSpeedOptionId    = snakeSpeedDefaultOption.id;
-    // Set default max apple count
-    this->gameSettings.maxAppleCount         = maxAppleCountDefaultOption.value;
-    this->gameSettings.maxAppleCountOptionId = maxAppleCountDefaultOption.id;
-
-    // Load from file (overwrite default settings)
-    this->gameSettings.loadFromFile("config/game_settings.ini");
-}
-
 void Game::initStateData()
 {
     this->stateData.window = this->window;
@@ -127,12 +107,11 @@ void Game::updateFPS()
 }
 
 Game::Game()
-    : dt(0.f), states{}, supportedKeys{}
+    : dt(0.f), gameSettings("config/game_settings.ini"), states{}, supportedKeys{}
 {
     this->initWindow();
     this->initSupportedKeys();
     this->initFont();
-    this->initGameSettings();
     this->initStateData();
     this->initStates();
 

@@ -39,7 +39,6 @@ private:
     void initWindow();
     void initSupportedKeys();
     void initFont();
-    void initGameSettings();
     void initStateData();
     void initStates();
 

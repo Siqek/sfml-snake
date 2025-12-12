@@ -1,22 +1,38 @@
 #ifndef GAMESETTINGS_HPP
 #define GAMESETTINGS_HPP
 
+#include "snake/grid/Grid.hpp"
+
 class GameSettings
 {
 public:
-    sf::Vector2<uint8_t> gridSize;
-    float snakeSpeed;
-    unsigned maxAppleCount;
-
-    std::optional<std::string> gridSizeOptionId;
-    std::optional<std::string> snakeSpeedOptionId;
-    std::optional<std::string> maxAppleCountOptionId;
-
     GameSettings();
     GameSettings(const std::string& filename);
 
-    void loadFromFile(const std::string& filename);
-    void saveToFile(const std::string& filename);
+    void LoadFromFile(const std::string& filename);
+    void SaveToFile(const std::string& filename);
+
+    template<typename T>
+    struct Setting {
+        std::string Id;
+        T Value;
+
+        Setting(const std::string& id, const T& value)
+            : Id(id), Value(value) {}
+    };
+
+    Setting<EGridType> GridType;
+    Setting<sf::Vector2i> GridSize;
+    Setting<sf::Vector2i> GridHoleSize;
+    Setting<float> SnakeSpeed;
+    Setting<unsigned> MaxAppleCount;
+
+private:
+    static Setting<EGridType> GetDefaultGridTypeSetting();
+    static Setting<sf::Vector2i> GetDefaultGridSizeSetting();
+    static Setting<sf::Vector2i> GetDefaultGridHoleSizeSetting();
+    static Setting<float> GetDefaultSnakeSpeedSetting();
+    static Setting<unsigned> GetDefaultMaxAppleCountSetting();
 };
 
 #endif // GAMESETTINGS_HPP

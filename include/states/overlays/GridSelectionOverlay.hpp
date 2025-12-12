@@ -1,6 +1,8 @@
 #ifndef GRIDSELECTIONOVERLAY_HPP
 #define GRIDSELECTIONOVERLAY_HPP
 
+class GameSettings;
+
 #include "snake/grid/Grid.hpp"
 
 #include "states/overlays/Overlay.hpp"
@@ -17,6 +19,8 @@ public:
 
     bool IsPlayButtonReleased() const;
 
+    void UpdateGameSettings(GameSettings& outGameSettings);
+
     void OnWindowResize(const sf::Vector2f& windowSize) override;
 
     void Update(const sf::RenderWindow& window) override;
@@ -31,13 +35,9 @@ private:
 
     sf::RectangleShape GridSelectionBackground;
 
-    mgui::ArrowSelector<EGridType> GridSelector;
-    static std::vector<mgui::ArrowSelector<EGridType>::Option> GridSelectorOptions;
-
-    mgui::ArrowSelector<sf::Vector2<uint8_t>> GridSizeSelector;
-
+    mgui::ArrowSelector<EGridType> GridTypeSelector;
+    mgui::ArrowSelector<sf::Vector2i> GridSizeSelector;
     mgui::ArrowSelector<sf::Vector2i> GridHoleSizeSelector;
-    static std::vector<mgui::ArrowSelector<sf::Vector2i>::Option> GridHoleSizeSelectorOptions;
 
     sf::Text GridSizeSelectorLabel;
     sf::Text GridHoleSizeSelectorLabel;

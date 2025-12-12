@@ -1,28 +1,17 @@
 #include "stdafx.hpp"
 #include "states/overlays/GridSelectionOverlay.hpp"
 
+#include "settings/GameSettings.hpp"
+
 #include "config/GameSettingsOptions.hpp"
 
 #include "config/Colors.hpp"
 
-std::vector<mgui::ArrowSelector<EGridType>::Option> GridSelectionOverlay::GridSelectorOptions = {
-    { "rectangular", "Rectangular Grid", EGridType::Rectangular },
-    { "donut", "Donut Grid", EGridType::RectangularDonut }
-};
-
-std::vector<mgui::ArrowSelector<sf::Vector2i>::Option> GridSelectionOverlay::GridHoleSizeSelectorOptions = {
-    { "2x2", "2x2", { 2, 2 } },
-    { "4x4", "4x4", { 4, 4 } },
-    { "6x6", "6x6", { 6, 6 } },
-    { "8x8", "8x8", { 8, 8 } },
-    { "10x10", "10x10", { 10, 10 } }
-};
-
 GridSelectionOverlay::GridSelectionOverlay(const sf::Vector2f& windowSize, const sf::Font& font)
     : Overlay(windowSize, sf::Color::Transparent),
-    GridSelector(GridSelectorOptions, font),
-    GridSizeSelector(GameSettingsOptions::GridSizeOptions, font),
-    GridHoleSizeSelector(GridHoleSizeSelectorOptions, font),
+    GridTypeSelector(GameSettingsOptions::GridTypeOptions, font, GameSettingsOptions::DefaultGridTypeOptionIndex),
+    GridSizeSelector(GameSettingsOptions::GridSizeOptions, font, GameSettingsOptions::DefaultGridSizeOptionIndex),
+    GridHoleSizeSelector(GameSettingsOptions::GridHoleSizeOptions, font, GameSettingsOptions::DefaultGridHoleSizeOptionIndex),
     GridSizeSelectorLabel("Grid Size", font),
     GridHoleSizeSelectorLabel("Hole Size", font)
 {
@@ -50,7 +39,7 @@ GridSelectionOverlay::GridSelectionOverlay(const sf::Vector2f& windowSize, const
         elem.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
     };
 
-    styleElement(GridSelector);
+    styleElement(GridTypeSelector);
     styleElement(GridSizeSelector);
     styleElement(GridHoleSizeSelector);
 
@@ -67,6 +56,19 @@ bool GridSelectionOverlay::IsPlayButtonReleased() const
     return PlayButton.isReleased();
 }
 
+void GridSelectionOverlay::UpdateGameSettings(GameSettings& outGameSettings)
+{
+    auto applyOption = [](auto& setting, const auto& option)
+    {
+        setting.Id = option.id;
+        setting.Value = option.value;
+    };
+
+    applyOption(outGameSettings.GridType, GridTypeSelector.getActiveOption());
+    applyOption(outGameSettings.GridSize, GridSizeSelector.getActiveOption());
+    applyOption(outGameSettings.GridHoleSize, GridHoleSizeSelector.getActiveOption());
+}
+
 void GridSelectionOverlay::OnWindowResize(const sf::Vector2f& windowSize)
 {
     Overlay::OnWindowResize(windowSize);
@@ -75,17 +77,17 @@ void GridSelectionOverlay::OnWindowResize(const sf::Vector2f& windowSize)
 
 void GridSelectionOverlay::Update(const sf::RenderWindow& window)
 {
-    GridSelector.update(window);
+    GridTypeSelector.update(window);
     GridSizeSelector.update(window);
     GridHoleSizeSelector.update(window);
 
     PlayButton.update(window);
 
-    if (GridSelector.hasActiveOptionChanged())
+    if (GridTypeSelector.hasActiveOptionChanged())
     {
-        UpdateGridImitation(GridSelector.getActiveValue());
+        UpdateGridImitation(GridTypeSelector.getActiveValue());
 
-        if (GridSelector.getActiveValue() == EGridType::RectangularDonut)
+        if (GridTypeSelector.getActiveValue() == EGridType::RectangularDonut)
         {
             AdjustHoleSizeToGridSize();
         }
@@ -93,7 +95,7 @@ void GridSelectionOverlay::Update(const sf::RenderWindow& window)
 
     if (GridSizeSelector.hasActiveOptionChanged())
     {
-        if (GridSelector.getActiveValue() == EGridType::RectangularDonut)
+        if (GridTypeSelector.getActiveValue() == EGridType::RectangularDonut)
         {
             AdjustHoleSizeToGridSize();
         }
@@ -116,12 +118,12 @@ void GridSelectionOverlay::Render(sf::RenderTarget& target)
 
     target.draw(GridImitation);
 
-    GridSelector.render(target);
+    GridTypeSelector.render(target);
 
     GridSizeSelector.render(target);
     target.draw(GridSizeSelectorLabel);
 
-    if (GridSelector.getActiveValue() == EGridType::RectangularDonut)
+    if (GridTypeSelector.getActiveValue() == EGridType::RectangularDonut)
     {
         GridHoleSizeSelector.render(target);
         target.draw(GridHoleSizeSelectorLabel);
@@ -152,16 +154,16 @@ void GridSelectionOverlay::UpdateUIScaling(sf::Vector2f windowSize)
     GridImitation.setOrigin(gridImitationSize / 2.f);
     GridImitation.setOutlineThickness(gridImitationSideSize * -0.33f);
 
-    const sf::Vector2f selectorSize = sf::Vector2f(backgroundSize.x * 0.9f, backgroundSize.y * 0.064f);
-    const float selectorOutlineThickness = selectorSize.y / 16.f;
+    const sf::Vector2f mainSelectorSize = sf::Vector2f(backgroundSize.x * 0.9f, backgroundSize.y * 0.064f);
+    const float mainSelectorOutlineThickness = mainSelectorSize.y / 16.f;
 
-    GridSelector.setPosition(sf::Vector2f(backgroundPosition.x, backgroundPosition.y + backgroundSize.y / 2.f - selectorSize.y));
-    GridSelector.setSize(selectorSize);
-    GridSelector.setOrigin(selectorSize / 2.f);
-    GridSelector.setOutlineThickness(selectorOutlineThickness);
+    GridTypeSelector.setPosition(sf::Vector2f(backgroundPosition.x, backgroundPosition.y + backgroundSize.y / 2.f - mainSelectorSize.y));
+    GridTypeSelector.setSize(mainSelectorSize);
+    GridTypeSelector.setOrigin(mainSelectorSize / 2.f);
+    GridTypeSelector.setOutlineThickness(mainSelectorOutlineThickness);
 
-    const sf::Vector2f subselectorSize = selectorSize * 0.8f;
-    const float subselectorOutlineThickness = selectorOutlineThickness * 0.8f;
+    const sf::Vector2f subselectorSize = mainSelectorSize * 0.8f;
+    const float subselectorOutlineThickness = mainSelectorOutlineThickness * 0.8f;
 
     const unsigned subselectorLabelCharacterSize = static_cast<unsigned>(subselectorSize.y * 0.6f);
     const float subselectorLabelOutlineThickness = static_cast<float>(subselectorLabelCharacterSize / 32.f);
@@ -242,9 +244,9 @@ void GridSelectionOverlay::AdjustHoleSizeToGridSize()
 
     if (activeHoleSize.x >= activeGridSize.x || activeHoleSize.y >= activeGridSize.y)
     {
-        std::string holeSizeId = GridHoleSizeSelectorOptions.at(0).id;
+        std::string holeSizeId = GameSettingsOptions::GridHoleSizeOptions[0].id;
 
-        for (const auto& holeSizeOption : GridHoleSizeSelectorOptions)
+        for (const auto& holeSizeOption : GameSettingsOptions::GridHoleSizeOptions)
         {
             if (holeSizeOption.value.x >= activeGridSize.x || holeSizeOption.value.y >= activeGridSize.y)
             {

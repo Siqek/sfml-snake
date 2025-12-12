@@ -37,6 +37,8 @@ private:
     void initKeybinds();
     void initKeyStateTracker();
 
+    std::unique_ptr<IGrid> createGrid();
+
     void updateUIScaling();
 
     void updateScoreText();
@@ -46,10 +48,9 @@ private:
     std::unordered_map<std::string, int> keybinds;
     KeyStateTracker* keyStateTracker;
 
+    // std::unique_ptr<IGrid> grid;
     IGrid* grid;
 
-    uint8_t gridSizeX;
-    uint8_t gridSizeY;
     sf::Vector2f gridOffset;
     float tileSize;
     sf::RectangleShape tile;

@@ -23,7 +23,7 @@ private:
 
     void updateUIScaling();
 
-    mgui::ArrowSelector<sf::Vector2<uint8_t>> gridSizeSelector;
+    mgui::ArrowSelector<sf::Vector2i> gridSizeSelector;
     mgui::ArrowSelector<float> snakeSpeedSelector;
     mgui::ArrowSelector<unsigned> maxAppleCountSelector;
 
