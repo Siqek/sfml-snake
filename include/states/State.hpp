@@ -1,41 +1,58 @@
 #ifndef STATE_HPP
 #define STATE_HPP
 
-class State;
+class IState;
+class StateStackManager;
 class GameSettings;
 
-struct StateData {
-    sf::RenderWindow* window;
-    const std::unordered_map<std::string, int>* supportedKeys;
-    const sf::Font* font;
-    std::stack<State*>* states;
-    GameSettings* gameSettings;
+struct StateContext {
+    sf::RenderWindow* Window;
+    const std::unordered_map<std::string, int>& SupportedKeys;
+    const sf::Font& AppFont;
+    StateStackManager& StateStack;
+    GameSettings& CurrentGameSettings;
+
+    StateContext(
+        sf::RenderWindow* window,
+        const std::unordered_map<std::string, int>& supportedKeys,
+        const sf::Font& appFont,
+        StateStackManager& stateStack,
+        GameSettings& currentGameSettings
+    )
+        : Window(window),
+          SupportedKeys(supportedKeys),
+          AppFont(appFont),
+          StateStack(stateStack),
+          CurrentGameSettings(currentGameSettings)
+    {}
 };
 
-class State
+class IState
 {
 public:
-    State(StateData* stateData);
-    virtual ~State();
+    virtual ~IState() = default;
 
-    virtual void update(const float& dt) = 0;
+    bool WantsToBeDetached() const { return bWantsToBeDetached; }
 
-    virtual void render(sf::RenderTarget* target = nullptr) = 0;
+    virtual void Update(float dt) = 0;
 
-    virtual void onWindowResize() {};
+    virtual void Render(sf::RenderTarget& target) = 0;
 
-    bool getQuit() const { return quit; }
+    virtual void OnWindowResize() {}
+
+    virtual void OnAttach() {}
+
+    virtual void OnDetach() {}
 
 protected:
-    sf::RenderWindow* window;
-    const std::unordered_map<std::string, int>& supportedKeys;
-    const sf::Font& font;
-    StateData* stateData;
+    IState(StateContext& context);
 
-    void endState() { quit = true; }
+    void MarkToBeDetached();
+
+    StateContext& Context;
 
 private:
-    bool quit;
+    bool bWantsToBeDetached;
 };
 
 #endif

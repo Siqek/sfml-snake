@@ -40,7 +40,7 @@ void GameInstructionsOverlay::OnWindowResize(const sf::Vector2f& windowSize)
 
 void GameInstructionsOverlay::Render(sf::RenderTarget& target)
 {
-    if (!GetIsActive())
+    if (!IsActive())
         return;
 
     Overlay::Render(target);

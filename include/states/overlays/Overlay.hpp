@@ -12,7 +12,7 @@ public:
     void Close();
     void Show();
 
-    bool GetIsActive() const { return bIsActive; }
+    bool IsActive() const { return bIsActive; }
 
     virtual void OnWindowResize(const sf::Vector2f& windowSize);
 

@@ -1,16 +1,19 @@
 #include "stdafx.hpp"
 #include "states/SettingsState.hpp"
 
+#include "states/StateStackManager.hpp"
+#include "states/MainMenuState.hpp"
+
 #include "config/GameSettingsOptions.hpp"
 
 #include "config/Colors.hpp"
 
-SettingsState::SettingsState(StateData* stateData)
-    : State(stateData),
-    gridSizeSelector(GameSettingsOptions::GridSizeOptions, this->font, GameSettingsOptions::DefaultGridSizeOptionIndex),
-    snakeSpeedSelector(GameSettingsOptions::SnakeSpeedOptions, this->font, GameSettingsOptions::DefaultSnakeSpeedOptionIndex),
-    maxAppleCountSelector(GameSettingsOptions::MaxAppleCountOptions, this->font, GameSettingsOptions::DefaultMaxAppleCountOptionIndex),
-    gameSettings(*stateData->gameSettings)
+SettingsState::SettingsState(StateContext& context)
+    : IState(context),
+    GridSizeSelector(GameSettingsOptions::GridSizeOptions, Context.AppFont, GameSettingsOptions::DefaultGridSizeOptionIndex),
+    SnakeSpeedSelector(GameSettingsOptions::SnakeSpeedOptions, Context.AppFont, GameSettingsOptions::DefaultSnakeSpeedOptionIndex),
+    MaxAppleCountSelector(GameSettingsOptions::MaxAppleCountOptions, Context.AppFont, GameSettingsOptions::DefaultMaxAppleCountOptionIndex),
+    Settings(Context.CurrentGameSettings)
 {
     const auto setElementColors = [](auto& element){
         element.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
@@ -22,104 +25,103 @@ SettingsState::SettingsState(StateData* stateData)
         element.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
     };
 
-    setElementColors(this->gridSizeSelector);
-    setElementColors(this->snakeSpeedSelector);
-    setElementColors(this->maxAppleCountSelector);
+    setElementColors(GridSizeSelector);
+    setElementColors(SnakeSpeedSelector);
+    setElementColors(MaxAppleCountSelector);
 
-    this->gridSizeSelector.setActiveOption(this->gameSettings.GridSize.Id);
-    this->snakeSpeedSelector.setActiveOption(this->gameSettings.SnakeSpeed.Id);
-    this->maxAppleCountSelector.setActiveOption(this->gameSettings.MaxAppleCount.Id);
+    GridSizeSelector.setActiveOption(Settings.GridSize.Id);
+    SnakeSpeedSelector.setActiveOption(Settings.SnakeSpeed.Id);
+    MaxAppleCountSelector.setActiveOption(Settings.MaxAppleCount.Id);
 
-    this->gridSizeLabel.setFont(this->font);
-    this->gridSizeLabel.setString("Grid Size:");
+    GridSizeLabel.setFont(Context.AppFont);
+    GridSizeLabel.setString("Grid Size:");
 
-    this->snakeSpeedLabel.setFont(this->font);
-    this->snakeSpeedLabel.setString("Snake Speed:");
+    SnakeSpeedLabel.setFont(Context.AppFont);
+    SnakeSpeedLabel.setString("Snake Speed:");
 
-    this->maxAppleCountLabel.setFont(this->font);
-    this->maxAppleCountLabel.setString("Max Apple Count:");
+    MaxAppleCountLabel.setFont(Context.AppFont);
+    MaxAppleCountLabel.setString("Max Apple Count:");
 
-    this->saveSettingsButton.setFont(font);
-    this->saveSettingsButton.setText("Save");
-    setElementColors(this->saveSettingsButton);
+    SaveSettingsButton.setFont(Context.AppFont);
+    SaveSettingsButton.setText("Save");
+    setElementColors(SaveSettingsButton);
 
-    this->exitButton.setFont(this->font);
-    this->exitButton.setText("Exit");
-    setElementColors(this->exitButton);
+    SaveAndExitButton.setFont(Context.AppFont);
+    SaveAndExitButton.setText("Save & Exit");
+    setElementColors(SaveAndExitButton);
 
-    this->updateUIScaling();
+    UpdateUIScaling();
 }
 
-void SettingsState::onWindowResize()
+void SettingsState::Update(float /*dt*/)
 {
-    this->updateUIScaling();
+    UpdateSelectors();
+    UpdateButtons();
 }
 
-void SettingsState::update(const float& /*dt*/)
+void SettingsState::Render(sf::RenderTarget& target)
 {
-    this->updateSelectors();
-    this->updateButtons();
+    target.draw(GridSizeLabel);
+    target.draw(SnakeSpeedLabel);
+    target.draw(MaxAppleCountLabel);
+
+    GridSizeSelector.render(target);
+    SnakeSpeedSelector.render(target);
+    MaxAppleCountSelector.render(target);
+
+    SaveSettingsButton.render(target);
+    SaveAndExitButton.render(target);
 }
 
-void SettingsState::render(sf::RenderTarget* target)
+void SettingsState::OnWindowResize()
 {
-    if (target == nullptr)
-        target = this->window;
-
-    target->draw(this->gridSizeLabel);
-    target->draw(this->snakeSpeedLabel);
-    target->draw(this->maxAppleCountLabel);
-
-    this->gridSizeSelector.render(*target);
-    this->snakeSpeedSelector.render(*target);
-    this->maxAppleCountSelector.render(*target);
-
-    this->saveSettingsButton.render(*target);
-    this->exitButton.render(*target);
+    UpdateUIScaling();
 }
 
-void SettingsState::updateSelectors()
+void SettingsState::UpdateSelectors()
 {
-    this->gridSizeSelector.update(*this->window);
-    this->snakeSpeedSelector.update(*this->window);
-    this->maxAppleCountSelector.update(*this->window);
+    GridSizeSelector.update(*Context.Window);
+    SnakeSpeedSelector.update(*Context.Window);
+    MaxAppleCountSelector.update(*Context.Window);
 
-    if (this->gridSizeSelector.hasActiveOptionChanged()) {
-        const auto& option = this->gridSizeSelector.getActiveOption();
-        this->gameSettings.GridSize.Value = option.value;
-        this->gameSettings.GridSize.Id = option.id;
+    const auto updateSettingIfChanged = [](const auto& selector, auto& setting)
+    {
+        if (selector.hasActiveOptionChanged())
+        {
+            const auto& option = selector.getActiveOption();
+            setting.Value = option.value;
+            setting.Id = option.id;
+        }
+    };
+
+    updateSettingIfChanged(GridSizeSelector, Settings.GridSize);
+    updateSettingIfChanged(SnakeSpeedSelector, Settings.SnakeSpeed);
+    updateSettingIfChanged(MaxAppleCountSelector, Settings.MaxAppleCount);
+}
+
+void SettingsState::UpdateButtons()
+{
+    SaveSettingsButton.update(*Context.Window);
+    SaveAndExitButton.update(*Context.Window);
+
+    if (SaveSettingsButton.isReleased())
+    {
+        Context.CurrentGameSettings = Settings;
+        Context.CurrentGameSettings.SaveToFile("config/game_settings.ini");
     }
 
-    if (this->snakeSpeedSelector.hasActiveOptionChanged()) {
-        const auto& option = this->snakeSpeedSelector.getActiveOption();
-        this->gameSettings.SnakeSpeed.Value = option.value;
-        this->gameSettings.SnakeSpeed.Id = option.id;
-    }
-
-    if (this->maxAppleCountSelector.hasActiveOptionChanged()) {
-        const auto& option = this->maxAppleCountSelector.getActiveOption();
-        this->gameSettings.MaxAppleCount.Value = option.value;
-        this->gameSettings.MaxAppleCount.Id = option.id;
+    if (SaveAndExitButton.isReleased())
+    {
+        Context.CurrentGameSettings = Settings;
+        Context.CurrentGameSettings.SaveToFile("config/game_settings.ini");
+        Context.StateStack.QueueAttach(std::make_shared<MainMenuState>(Context));
+        MarkToBeDetached();
     }
 }
 
-void SettingsState::updateButtons()
+void SettingsState::UpdateUIScaling()
 {
-    this->saveSettingsButton.update(*this->window);
-    this->exitButton.update(*this->window);
-
-    if (this->saveSettingsButton.isReleased()) {
-        *(this->stateData->gameSettings) = this->gameSettings;
-        this->gameSettings.SaveToFile("config/game_settings.ini");
-    }
-
-    if (this->exitButton.isReleased())
-        this->endState();
-}
-
-void SettingsState::updateUIScaling()
-{
-    const auto windowSize = sf::Vector2f(this->window->getSize());
+    const auto windowSize = sf::Vector2f(Context.Window->getSize());
 
     const auto selectorSize = sf::Vector2f(windowSize.x / 3.5f, windowSize.y / 18.f);
     const auto firstSelectorPosition = sf::Vector2f(windowSize.x / 3.f * 2.f, windowSize.y / 2.f - 1.5f * selectorSize.y);
@@ -131,39 +133,39 @@ void SettingsState::updateUIScaling()
     const auto labelPositionOffset = selectorPositionOffset;
 
     // Update selectors
-    this->gridSizeSelector.setPosition(firstSelectorPosition);
-    this->gridSizeSelector.setSize(selectorSize);
-    this->gridSizeSelector.setOrigin(selectorSize / 2.f);
-    this->gridSizeSelector.setOutlineThickness(selectorOutlineThickness);
+    GridSizeSelector.setPosition(firstSelectorPosition);
+    GridSizeSelector.setSize(selectorSize);
+    GridSizeSelector.setOrigin(selectorSize / 2.f);
+    GridSizeSelector.setOutlineThickness(selectorOutlineThickness);
 
-    this->snakeSpeedSelector.setPosition(firstSelectorPosition + selectorPositionOffset);
-    this->snakeSpeedSelector.setSize(selectorSize);
-    this->snakeSpeedSelector.setOrigin(selectorSize / 2.f);
-    this->snakeSpeedSelector.setOutlineThickness(selectorOutlineThickness);
+    SnakeSpeedSelector.setPosition(firstSelectorPosition + selectorPositionOffset);
+    SnakeSpeedSelector.setSize(selectorSize);
+    SnakeSpeedSelector.setOrigin(selectorSize / 2.f);
+    SnakeSpeedSelector.setOutlineThickness(selectorOutlineThickness);
 
-    this->maxAppleCountSelector.setPosition(firstSelectorPosition + 2.f * selectorPositionOffset);
-    this->maxAppleCountSelector.setSize(selectorSize);
-    this->maxAppleCountSelector.setOrigin(selectorSize / 2.f);
-    this->maxAppleCountSelector.setOutlineThickness(selectorOutlineThickness);
+    MaxAppleCountSelector.setPosition(firstSelectorPosition + 2.f * selectorPositionOffset);
+    MaxAppleCountSelector.setSize(selectorSize);
+    MaxAppleCountSelector.setOrigin(selectorSize / 2.f);
+    MaxAppleCountSelector.setOutlineThickness(selectorOutlineThickness);
 
     // Update labels
-    this->gridSizeLabel.setCharacterSize(labelCharacterSize);
-    this->gridSizeLabel.setPosition(firstLabelPosition);
+    GridSizeLabel.setCharacterSize(labelCharacterSize);
+    GridSizeLabel.setPosition(firstLabelPosition);
 
-    this->snakeSpeedLabel.setCharacterSize(labelCharacterSize);
-    this->snakeSpeedLabel.setPosition(firstLabelPosition + labelPositionOffset);
+    SnakeSpeedLabel.setCharacterSize(labelCharacterSize);
+    SnakeSpeedLabel.setPosition(firstLabelPosition + labelPositionOffset);
 
-    this->maxAppleCountLabel.setCharacterSize(labelCharacterSize);
-    this->maxAppleCountLabel.setPosition(firstLabelPosition + 2.f * labelPositionOffset);
+    MaxAppleCountLabel.setCharacterSize(labelCharacterSize);
+    MaxAppleCountLabel.setPosition(firstLabelPosition + 2.f * labelPositionOffset);
 
     const auto updateLabelOrigin = [selectorSize](sf::Text& label) {
         auto lb = label.getLocalBounds();
         label.setOrigin(sf::Vector2f(selectorSize.x / 2.f, lb.height / 2.f + lb.top));
     };
 
-    updateLabelOrigin(this->gridSizeLabel);
-    updateLabelOrigin(this->snakeSpeedLabel);
-    updateLabelOrigin(this->maxAppleCountLabel);
+    updateLabelOrigin(GridSizeLabel);
+    updateLabelOrigin(SnakeSpeedLabel);
+    updateLabelOrigin(MaxAppleCountLabel);
 
     const auto buttonPositionY = windowSize.y / 8.f * 7.f;
     const auto buttonSize = sf::Vector2f(windowSize.x / 5.f, windowSize.y / 18.f);
@@ -171,16 +173,15 @@ void SettingsState::updateUIScaling()
     const auto buttonOutlineThickness = buttonSize.y / 20.f;
     const auto buttonMarginFromWindowBorder = windowSize.x / 8.f;
 
-    // Exit button
-    this->exitButton.setPosition(sf::Vector2f(buttonMarginFromWindowBorder, buttonPositionY));
-    this->exitButton.setSize(buttonSize);
-    this->exitButton.setCharacterSize(buttonCharacterSize);
-    this->exitButton.setOutlineThickness(buttonOutlineThickness);
-
     // Save button
-    this->saveSettingsButton.setPosition(
-        sf::Vector2f(windowSize.x - buttonSize.x - buttonMarginFromWindowBorder, buttonPositionY));
-    this->saveSettingsButton.setSize(buttonSize);
-    this->saveSettingsButton.setCharacterSize(buttonCharacterSize);
-    this->saveSettingsButton.setOutlineThickness(buttonOutlineThickness);
+    SaveSettingsButton.setPosition(sf::Vector2f(buttonMarginFromWindowBorder, buttonPositionY));
+    SaveSettingsButton.setSize(buttonSize);
+    SaveSettingsButton.setCharacterSize(buttonCharacterSize);
+    SaveSettingsButton.setOutlineThickness(buttonOutlineThickness);
+
+    // Exit button
+    SaveAndExitButton.setPosition(sf::Vector2f(windowSize.x - buttonSize.x - buttonMarginFromWindowBorder, buttonPositionY));
+    SaveAndExitButton.setSize(buttonSize);
+    SaveAndExitButton.setCharacterSize(buttonCharacterSize);
+    SaveAndExitButton.setOutlineThickness(buttonOutlineThickness);
 }

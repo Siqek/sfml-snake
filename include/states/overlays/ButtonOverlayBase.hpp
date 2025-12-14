@@ -100,7 +100,7 @@ void ButtonOverlayBase<E, N>::Update(const sf::RenderWindow& window)
 template<typename E, size_t N>
 void ButtonOverlayBase<E, N>::Render(sf::RenderTarget& target)
 {
-    if (!GetIsActive())
+    if (!IsActive())
         return;
 
     Overlay::Render(target);

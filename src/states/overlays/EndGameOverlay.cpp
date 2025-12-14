@@ -29,7 +29,7 @@ void EndGameOverlay::OnWindowResize(const sf::Vector2f& windowSize)
 
 void EndGameOverlay::Render(sf::RenderTarget& target)
 {
-    if (!GetIsActive())
+    if (!IsActive())
         return;
 
     ButtonOverlayBase::Render(target);

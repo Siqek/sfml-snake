@@ -85,19 +85,9 @@ void Game::initFont()
     }
 }
 
-void Game::initStateData()
-{
-    this->stateData.window = this->window;
-    this->stateData.supportedKeys = &this->supportedKeys;
-    this->stateData.font = &this->font;
-    this->stateData.states = &this->states;
-    this->stateData.gameSettings = &this->gameSettings;
-}
-
 void Game::initStates()
 {
-    this->states.push(new MainMenuState(&this->stateData));
-    this->states.top()->onWindowResize();
+    stateStack.Attach(std::make_shared<MainMenuState>(stateContext));
 }
 
 void Game::updateFPS()
@@ -107,12 +97,14 @@ void Game::updateFPS()
 }
 
 Game::Game()
-    : dt(0.f), gameSettings("config/game_settings.ini"), states{}, supportedKeys{}
+    : dt(0.f), gameSettings("config/game_settings.ini"), supportedKeys{}, stateContext(nullptr, supportedKeys, font, stateStack, gameSettings)
 {
     this->initWindow();
+
+    stateContext.Window = window;
+
     this->initSupportedKeys();
     this->initFont();
-    this->initStateData();
     this->initStates();
 
     this->fpsText.setFont(this->font);
@@ -124,12 +116,6 @@ Game::Game()
 Game::~Game()
 {
     delete window;
-
-    while (!this->states.empty())
-    {
-        delete this->states.top();
-        this->states.pop();
-    }
 }
 
 void Game::run()
@@ -156,7 +142,7 @@ void Game::updateSFMLEvent()
             sf::FloatRect visibleArea(0.f, 0.f, static_cast<float>(event.size.width), static_cast<float>(event.size.height));
             this->window->setView(sf::View(visibleArea));
 
-            this->states.top()->onWindowResize();
+            this->stateStack.OnWindowResize();
         }
     }
 }
@@ -167,41 +153,22 @@ void Game::update()
     this->updateSFMLEvent();
     this->updateFPS();
 
-    if (this->states.empty()) {
-        this->end();
+    if (stateStack.IsEmpty())
+    {
+        end();
         return;
     }
 
-    if (this->states.top() == nullptr) {
-        assert(false && "Critical error: nullptr on state stack!");
-        throw std::runtime_error("Critical error: nullptr found on state stack!");
-    }
+    stateStack.UpdateStates(dt);
 
-    this->states.top()->update(this->dt);
-
-    if (this->states.top()->getQuit()) {
-        delete this->states.top();
-        this->states.pop();
-        if (!this->states.empty())
-            this->states.top()->onWindowResize(); // Reapply UI scaling if window size changed in the previous state
-    }
+    stateStack.FlushPendingAttachments();
 }
 
 void Game::render()
 {
     this->window->clear(sf::Color(Colors::Hex::Background));
 
-    if (this->states.empty()) {
-        this->end();
-        return;
-    }
-
-    if (this->states.top() == nullptr) {
-        assert(false && "Critical error: nullptr on state stack!");
-        throw std::runtime_error("Critical error: nullptr found on state stack!");
-    }
-
-    this->states.top()->render();
+    stateStack.RenderStates(*window);
 
     this->window->draw(this->fpsText);
 

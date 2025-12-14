@@ -109,7 +109,7 @@ void GridSelectionOverlay::Update(const sf::RenderWindow& window)
 
 void GridSelectionOverlay::Render(sf::RenderTarget& target)
 {
-    if (!GetIsActive())
+    if (!IsActive())
     {
         return;
     }

@@ -5,24 +5,24 @@
 #include "mgui/Button.hpp"
 
 class MainMenuState
-    : public State
+    : public IState
 {
 public:
-    MainMenuState(StateData* stateData);
+    MainMenuState(StateContext& context);
 
-    void onWindowResize() override;
+    void Update(float dt) override;
 
-    void update(const float& dt) override;
+    void Render(sf::RenderTarget& target) override;
 
-    void render(sf::RenderTarget* target = nullptr) override;
+    void OnWindowResize() override;
 
 private:
-    mgui::Button startButton;
-    mgui::Button settingsButton;
-    mgui::Button exitButton;
+    void UpdateButtons();
+    void UpdateUIScaling();
 
-    void updateButtons();
-    void updateUIScaling();
+    mgui::Button PlayButton;
+    mgui::Button GoToSettingsButton;
+    mgui::Button ExitButton;
 };
 
 #endif // MAINMENUSTATE_HPP

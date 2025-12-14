@@ -1,22 +1,23 @@
 #include "stdafx.hpp"
 #include "states/MainMenuState.hpp"
 
+#include "states/StateStackManager.hpp"
 #include "states/GameState.hpp"
 #include "states/SettingsState.hpp"
 
 #include "config/Colors.hpp"
 
-MainMenuState::MainMenuState(StateData* stateData)
-    : State(stateData)
+MainMenuState::MainMenuState(StateContext& context)
+    : IState(context)
 {
-    this->startButton.setFont(this->font);
-    this->startButton.setText("Play");
+    PlayButton.setFont(Context.AppFont);
+    PlayButton.setText("Play");
 
-    this->settingsButton.setFont(this->font);
-    this->settingsButton.setText("Settings");
+    GoToSettingsButton.setFont(Context.AppFont);
+    GoToSettingsButton.setText("Settings");
 
-    this->exitButton.setFont(this->font);
-    this->exitButton.setText("Exit");
+    ExitButton.setFont(Context.AppFont);
+    ExitButton.setText("Exit");
 
     const auto setButtonColors = [](mgui::Button& button){
         button.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
@@ -28,70 +29,74 @@ MainMenuState::MainMenuState(StateData* stateData)
         button.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
     };
 
-    setButtonColors(this->startButton);
-    setButtonColors(this->settingsButton);
-    setButtonColors(this->exitButton);
+    setButtonColors(PlayButton);
+    setButtonColors(GoToSettingsButton);
+    setButtonColors(ExitButton);
+
+    UpdateUIScaling();
 }
 
-void MainMenuState::onWindowResize()
+void MainMenuState::Update(float /*dt*/)
 {
-    this->updateUIScaling();
+    UpdateButtons();
 }
 
-void MainMenuState::update(const float& /*dt*/)
+void MainMenuState::Render(sf::RenderTarget& target)
 {
-    this->updateButtons();
+    PlayButton.render(target);
+    GoToSettingsButton.render(target);
+    ExitButton.render(target);
 }
 
-void MainMenuState::render(sf::RenderTarget* target)
+void MainMenuState::OnWindowResize()
 {
-    if (target == nullptr)
-        target = this->window;
-
-    this->startButton.render(*target);
-    this->settingsButton.render(*target);
-    this->exitButton.render(*target);
+    UpdateUIScaling();
 }
 
-void MainMenuState::updateButtons()
+void MainMenuState::UpdateButtons()
 {
-    this->startButton.update(*this->window);
-    this->settingsButton.update(*this->window);
-    this->exitButton.update(*this->window);
+    PlayButton.update(*Context.Window);
+    GoToSettingsButton.update(*Context.Window);
+    ExitButton.update(*Context.Window);
 
-    if (this->startButton.isReleased()) {
-        this->stateData->states->push(new GameState(this->stateData));
+    if (PlayButton.isReleased())
+    {
+        Context.StateStack.QueueAttach(std::make_shared<GameState>(Context));
+        MarkToBeDetached();
     }
 
-    if (this->settingsButton.isReleased()) {
-        this->stateData->states->push(new SettingsState(this->stateData));
+    if (GoToSettingsButton.isReleased())
+    {
+        Context.StateStack.QueueAttach(std::make_shared<SettingsState>(Context));
+        MarkToBeDetached();
     }
 
-    if (this->exitButton.isReleased()) {
-        this->endState();
+    if (ExitButton.isReleased())
+    {
+        MarkToBeDetached();
     }
 }
 
-void MainMenuState::updateUIScaling()
+void MainMenuState::UpdateUIScaling()
 {
-    const auto windowSize = sf::Vector2f(this->window->getSize());
+    const auto windowSize = sf::Vector2f(Context.Window->getSize());
 
     const std::array<mgui::Button*, 3> buttons{
-        &this->startButton,
-        &this->settingsButton,
-        &this->exitButton
+        &PlayButton,
+        &GoToSettingsButton,
+        &ExitButton
     };
 
     const auto buttonSize = sf::Vector2f(windowSize.x / 3.5f, windowSize.y / 16.f);
     const auto buttonCharacterSize = static_cast<unsigned>(buttonSize.y / 2.f);
     const auto buttonOutlineThickness = buttonSize.y / 16.f;
 
-    const auto buttonPositionOffset = buttonSize.y * 1.6f;
-    const auto firstButtonPosition = sf::Vector2f(windowSize.x / 2.f, windowSize.y / 2.f - buttonPositionOffset);
+    const auto buttonYPositionOffset = buttonSize.y * 1.6f;
+    const auto firstButtonPosition = sf::Vector2f(windowSize.x / 2.f, windowSize.y / 2.f - buttonYPositionOffset);
 
     for (size_t i = 0; i < buttons.size(); ++i) {
-        auto* button = buttons[i];
-        button->setPosition(sf::Vector2f(firstButtonPosition.x, firstButtonPosition.y + buttonPositionOffset * static_cast<float>(i)));
+        mgui::Button* button = buttons[i];
+        button->setPosition(sf::Vector2f(firstButtonPosition.x, firstButtonPosition.y + buttonYPositionOffset * static_cast<float>(i)));
         button->setSize(buttonSize);
         button->setCharacterSize(buttonCharacterSize);
         button->setOrigin(buttonSize / 2.f);

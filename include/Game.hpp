@@ -3,6 +3,8 @@
 
 #include "states/State.hpp"
 
+#include "states/StateStackManager.hpp"
+
 #include "settings/GameSettings.hpp"
 
 #include "utils/FPSCounter.hpp"
@@ -30,16 +32,15 @@ private:
 
     GameSettings gameSettings;
 
-    StateData stateData;
-
-    std::stack<State*> states;
+    StateStackManager stateStack;
 
     std::unordered_map<std::string, int> supportedKeys;
+
+    StateContext stateContext;
 
     void initWindow();
     void initSupportedKeys();
     void initFont();
-    void initStateData();
     void initStates();
 
     void updateDeltaTime();

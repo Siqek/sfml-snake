@@ -23,6 +23,7 @@
 #include <memory>
 #include <random>
 #include <functional>
+#include <algorithm>
 
 // SFML headers
 #include <SFML/Graphics.hpp>

@@ -1,7 +1,11 @@
 #include "stdafx.hpp"
 #include "states/State.hpp"
 
-State::State(StateData* stateData)
-    : window(stateData->window), supportedKeys(*stateData->supportedKeys), font(*stateData->font), stateData(stateData), quit(false) {}
+IState::IState(StateContext& context)
+    : Context(context), bWantsToBeDetached(false)
+{}
 
-State::~State() {}
+void IState::MarkToBeDetached()
+{
+    bWantsToBeDetached = true;
+}

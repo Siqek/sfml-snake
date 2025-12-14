@@ -24,7 +24,7 @@ void PauseOverlay::OnWindowResize(const sf::Vector2f& windowSize)
 
 void PauseOverlay::Render(sf::RenderTarget& target)
 {
-    if (!GetIsActive())
+    if (!IsActive())
         return;
 
     ButtonOverlayBase::Render(target);

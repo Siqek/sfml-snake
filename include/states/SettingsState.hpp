@@ -8,33 +8,35 @@
 #include "settings/GameSettings.hpp"
 
 class SettingsState
-    : public State
+    : public IState
 {
 public:
-    SettingsState(StateData* stateData);
+    SettingsState(StateContext& context);
 
-    void onWindowResize() override;
+    void Update(float dt) override;
 
-    void update(const float& dt) override;
-    void render(sf::RenderTarget* target = nullptr) override;
+    void Render(sf::RenderTarget& target) override;
+
+    void OnWindowResize() override;
+
 private:
-    void updateSelectors();
-    void updateButtons();
+    void UpdateSelectors();
+    void UpdateButtons();
 
-    void updateUIScaling();
+    void UpdateUIScaling();
 
-    mgui::ArrowSelector<sf::Vector2i> gridSizeSelector;
-    mgui::ArrowSelector<float> snakeSpeedSelector;
-    mgui::ArrowSelector<unsigned> maxAppleCountSelector;
+    mgui::ArrowSelector<sf::Vector2i> GridSizeSelector;
+    mgui::ArrowSelector<float> SnakeSpeedSelector;
+    mgui::ArrowSelector<unsigned> MaxAppleCountSelector;
 
-    sf::Text gridSizeLabel;
-    sf::Text snakeSpeedLabel;
-    sf::Text maxAppleCountLabel;
+    sf::Text GridSizeLabel;
+    sf::Text SnakeSpeedLabel;
+    sf::Text MaxAppleCountLabel;
 
-    GameSettings gameSettings;
+    GameSettings Settings;
 
-    mgui::Button saveSettingsButton;
-    mgui::Button exitButton;
+    mgui::Button SaveSettingsButton;
+    mgui::Button SaveAndExitButton;
 };
 
 #endif // SETTINGSSTATE_HPP

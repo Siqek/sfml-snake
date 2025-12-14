@@ -22,51 +22,54 @@ class IGrid;
 #include "states/overlays/EndGameOverlay.hpp"
 
 class GameState
-    : public State
+    : public IState
 {
 public:
-    GameState(StateData* stateData);
+    GameState(StateContext& context);
     ~GameState();
 
-    void onWindowResize() override;
-    void updateInput();
-    void update(const float& dt) override;
-    void render(sf::RenderTarget* target = nullptr) override;
+    void Update(float dt) override;
+
+    void Render(sf::RenderTarget& target) override;
+
+    void OnWindowResize() override;
 
 private:
-    void initKeybinds();
-    void initKeyStateTracker();
+    void InitKeybinds();
+    void InitKeyStateTracker();
 
-    std::unique_ptr<IGrid> createGrid();
+    void UpdateInput();
 
-    void updateUIScaling();
+    void UpdateScoreText();
 
-    void updateScoreText();
+    void UpdateUIScaling();
 
-    void restart();
+    std::unique_ptr<IGrid> CreateGrid();
 
-    std::unordered_map<std::string, int> keybinds;
-    KeyStateTracker* keyStateTracker;
+    void Restart();
+
+    std::unordered_map<std::string, int> Keybinds;
+    KeyStateTracker* KeyTracker;
 
     // std::unique_ptr<IGrid> grid;
-    IGrid* grid;
+    IGrid* Grid;
 
-    sf::Vector2f gridOffset;
-    float tileSize;
-    sf::RectangleShape tile;
+    sf::Vector2f GridOffset;
+    float TileSize;
+    sf::RectangleShape Tile;
 
-    Snake snake;
-    SnakeRenderer snakeRenderer;
+    Snake PlayerSnake;
+    SnakeRenderer PlayerSnakeRenderer;
 
-    AppleCluster appleCluster;
+    AppleCluster Apples;
 
-    unsigned int score;
-    sf::Text scoreText;
+    unsigned int Score;
+    sf::Text ScoreText;
 
-    GridSelectionOverlay gridSelectionOverlay;
-    GameInstructionsOverlay gameInstructionsOverlay;
-    PauseOverlay pauseOverlay;
-    EndGameOverlay endGameOverlay;
+    GridSelectionOverlay GridSelectionMenu;
+    GameInstructionsOverlay InstructionsOverlay;
+    PauseOverlay PauseMenu;
+    EndGameOverlay EndGameMenu;
 };
 
 #endif

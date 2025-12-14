@@ -1,6 +1,9 @@
 #include "stdafx.hpp"
 #include "states/GameState.hpp"
 
+#include "states/StateStackManager.hpp"
+#include "states/MainMenuState.hpp"
+
 #include "settings/GameSettings.hpp"
 
 #include "snake/grid/RectangularGrid.hpp"
@@ -11,19 +14,198 @@
 
 #include "config/Colors.hpp"
 
-void GameState::initKeybinds()
+GameState::GameState(StateContext& context)
+    : IState(context),
+    Grid(new RectangularGrid(sf::Vector2i(Context.CurrentGameSettings.GridSize.Value))),
+    PlayerSnake(Context.CurrentGameSettings.SnakeSpeed.Value, 3u, Grid),
+    Score(0u),
+    GridSelectionMenu(sf::Vector2f(Context.Window->getSize()), Context.AppFont),
+    InstructionsOverlay(sf::Vector2f(Context.Window->getSize()), Context.AppFont),
+    PauseMenu(sf::Vector2f(Context.Window->getSize()), Context.AppFont),
+    EndGameMenu(sf::Vector2f(Context.Window->getSize()), Context.AppFont)
+{
+    Apples.setAppleLimit(Context.CurrentGameSettings.MaxAppleCount.Value);
+    Apples.spawnAll(Grid->GetFreeTiles());
+
+    ScoreText.setFont(Context.AppFont);
+    ScoreText.setString("0");
+    ScoreText.setFillColor(sf::Color(Colors::Hex::TextMain));
+    ScoreText.setOutlineThickness(2.f);
+    ScoreText.setOutlineColor(sf::Color(Colors::Hex::TextMainOutline));
+    UpdateScoreText();
+
+    InitKeybinds();
+    InitKeyStateTracker();
+
+    UpdateUIScaling();
+
+    GridSelectionMenu.Show();
+}
+
+GameState::~GameState()
+{
+    delete KeyTracker;
+    delete Grid;
+}
+
+void GameState::Update(float dt)
+{
+    UpdateInput();
+
+    if (EndGameMenu.IsActive())
+    {
+        EndGameMenu.Update(*Context.Window);
+
+        if (EndGameMenu.IsButtonReleased(EndGameOverlay::EButton::BackToMenu))
+        {
+            Context.StateStack.QueueAttach(std::make_shared<MainMenuState>(Context));
+            MarkToBeDetached();
+        }
+
+        if (EndGameMenu.IsButtonReleased(EndGameOverlay::EButton::Restart))
+        {
+            Restart();
+        }
+
+        return;
+    }
+
+    if (InstructionsOverlay.IsActive())
+    {
+        // Close the GameInstructionsOverlay if any key is pressed
+        for (int key = 0; key < sf::Keyboard::KeyCount; ++key)
+        {
+            if (sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(key)))
+            {
+                InstructionsOverlay.Close();
+                break;
+            }
+        }
+        return;
+    }
+
+    if (PauseMenu.IsActive())
+    {
+        PauseMenu.Update(*Context.Window);
+
+        if (PauseMenu.IsButtonReleased(PauseOverlay::EButton::Continue))
+        {
+            PauseMenu.Close();
+        }
+
+        if (PauseMenu.IsButtonReleased(PauseOverlay::EButton::Restart))
+        {
+            Restart();
+        }
+
+        if (PauseMenu.IsButtonReleased(PauseOverlay::EButton::BackToMenu))
+        {
+            Context.StateStack.QueueAttach(std::make_shared<MainMenuState>(Context));
+            MarkToBeDetached();
+        }
+
+        return;
+    }
+
+    if (GridSelectionMenu.IsActive())
+    {
+        GridSelectionMenu.Update(*Context.Window);
+
+        if (GridSelectionMenu.IsPlayButtonReleased())
+        {
+            // TODO(siqek): update settings, create grid, save new settings into a file
+
+            GridSelectionMenu.Close();
+            InstructionsOverlay.Show();
+        }
+
+        return;
+    }
+
+    PlayerSnake.update(dt);
+
+    if (PlayerSnake.hasFilledGrid())
+    {
+        EndGameMenu.SetTitle("Snake is full. So is your glory!");
+        EndGameMenu.Show();
+        return;
+    }
+
+    if (!PlayerSnake.getIsAlive())
+    {
+        EndGameMenu.SetTitle("Game Over");
+        EndGameMenu.Show();
+        return;
+    }
+
+    if (Apples.eatAppleAt(PlayerSnake.getHeadPosition()))
+    {
+        Apples.spawn(Grid->GetFreeTiles());
+        PlayerSnake.grow(1u);
+        Score++;
+        UpdateScoreText();
+    }
+}
+
+void GameState::Render(sf::RenderTarget& target)
+{
+    if (GridSelectionMenu.IsActive())
+    {
+        GridSelectionMenu.Render(target);
+        return;
+    }
+
+    for (const auto& freeTile : Grid->GetFreeTiles())
+    {
+
+        Tile.setFillColor(sf::Color(freeTile.x % 2 == freeTile.y % 2 ? Colors::Hex::BoardCellPrimary : Colors::Hex::BoardCellSecondary));
+
+        Tile.setPosition(GridOffset + sf::Vector2f(freeTile) * TileSize);
+        target.draw(Tile);
+    }
+
+    PlayerSnakeRenderer.render(target, PlayerSnake, GridOffset);
+
+    if (!PlayerSnake.hasFilledGrid())
+    {
+        Apples.render(target, GridOffset.x, GridOffset.y);
+    }
+
+    target.draw(ScoreText);
+
+    InstructionsOverlay.Render(target);
+    PauseMenu.Render(target);
+    EndGameMenu.Render(target);
+}
+
+void GameState::OnWindowResize()
+{
+    UpdateUIScaling();
+
+    const sf::Vector2f windowSize(Context.Window->getSize());
+
+    GridSelectionMenu.OnWindowResize(windowSize);
+    InstructionsOverlay.OnWindowResize(windowSize);
+    PauseMenu.OnWindowResize(windowSize);
+    EndGameMenu.OnWindowResize(windowSize);
+}
+
+void GameState::InitKeybinds()
 {
     IniParser iniParser("config/gamestate_keybinds.ini");
     const auto& keybindSnakeSection = iniParser.getSection("Snake");
     const auto& keybindsGeneralSection = iniParser.getSection("General");
 
-    this->keybinds.reserve(keybindSnakeSection.size() + keybindsGeneralSection.size());
+    Keybinds.reserve(keybindSnakeSection.size() + keybindsGeneralSection.size());
 
-    const auto bindSection = [this](const auto& keybindSection) {
-        for (const auto& [bind, key] : keybindSection) {
-            auto it = this->supportedKeys.find(key);
-            if (it != this->supportedKeys.end()) {
-                this->keybinds[bind] = it->second;
+    const auto bindSection = [this](const auto& keybindSection)
+    {
+        for (const auto& [bind, key] : keybindSection)
+        {
+            auto it = this->Context.SupportedKeys.find(key);
+            if (it != this->Context.SupportedKeys.end())
+            {
+                this->Keybinds[bind] = it->second;
             }
         }
     };
@@ -32,286 +214,122 @@ void GameState::initKeybinds()
     bindSection(keybindsGeneralSection);
 }
 
-void GameState::initKeyStateTracker()
+void GameState::InitKeyStateTracker()
 {
-    this->keyStateTracker = new KeyStateTracker(this->keybinds);
+    KeyTracker = new KeyStateTracker(Keybinds);
 }
 
-std::unique_ptr<IGrid> GameState::createGrid()
+void GameState::UpdateInput()
 {
-    const GameSettings* gameSettings = stateData->gameSettings;
+    if (!Context.Window->hasFocus())
+    {
+        return;
+    }
 
-    switch (gameSettings->GridType.Value)
+    KeyTracker->updateKeyStates();
+
+    const bool isOtherOverlayActive = GridSelectionMenu.IsActive() || InstructionsOverlay.IsActive() || EndGameMenu.IsActive();
+    if (!isOtherOverlayActive)
+    {
+        if (KeyTracker->isKeyDown("TogglePause"))
+        {
+            if (PauseMenu.IsActive())
+            {
+                PauseMenu.Close();
+            }
+            else
+            {
+                PauseMenu.Show();
+            }
+        }
+    }
+
+    if (KeyTracker->isKeyDown("MoveUp") || KeyTracker->isKeyDown("AltMoveUp"))
+    {
+        PlayerSnake.setDirection(Direction::Up);
+    }
+    else if (KeyTracker->isKeyDown("MoveDown") || KeyTracker->isKeyDown("AltMoveDown"))
+    {
+        PlayerSnake.setDirection(Direction::Down);
+    }
+    else if (KeyTracker->isKeyDown("MoveRight") || KeyTracker->isKeyDown("AltMoveRight"))
+    {
+        PlayerSnake.setDirection(Direction::Right);
+    }
+    else if (KeyTracker->isKeyDown("MoveLeft") || KeyTracker->isKeyDown("AltMoveLeft"))
+    {
+        PlayerSnake.setDirection(Direction::Left);
+    }
+}
+
+void GameState::UpdateScoreText()
+{
+    ScoreText.setString(std::to_string(Score));
+    const auto lb = ScoreText.getLocalBounds();
+    ScoreText.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
+}
+
+void GameState::UpdateUIScaling()
+{
+    const sf::Vector2f windowSize(Context.Window->getSize());
+
+    const sf::Vector2i gridSize = Context.CurrentGameSettings.GridSize.Value;
+
+    TileSize = std::min(
+        windowSize.x * 0.95f / gridSize.x,
+        windowSize.y * UIConfig::GridHeightRatio / gridSize.y
+    );
+    PlayerSnakeRenderer.setTileSize(TileSize);
+    Apples.setTileSize(TileSize);
+    Tile.setSize(sf::Vector2f(TileSize, TileSize));
+
+    ScoreText.setCharacterSize(static_cast<unsigned>(windowSize.y * UIConfig::ScoreHeightRatio * 0.25f));
+    ScoreText.setPosition(sf::Vector2f(
+        windowSize.x / 2.f,
+        windowSize.y * UIConfig::ScoreHeightRatio / 2.f
+    ));
+
+    auto lb = ScoreText.getLocalBounds();
+    ScoreText.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
+
+    GridOffset.x = windowSize.x / 2.f - gridSize.x / 2.f * TileSize;
+    GridOffset.y = windowSize.y * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f) - gridSize.y / 2.f * TileSize;
+}
+
+std::unique_ptr<IGrid> GameState::CreateGrid()
+{
+    const GameSettings& gameSettings = Context.CurrentGameSettings;
+
+    switch (gameSettings.GridType.Value)
     {
         case EGridType::Rectangular:
-            return std::make_unique<RectangularGrid>(gameSettings->GridSize.Value);
+            return std::make_unique<RectangularGrid>(gameSettings.GridSize.Value);
 
         case EGridType::RectangularDonut:
-            return std::make_unique<RectangularDonutGrid>((gameSettings->GridSize.Value - gameSettings->GridHoleSize.Value) / 2, gameSettings->GridHoleSize.Value);
+            return std::make_unique<RectangularDonutGrid>((gameSettings.GridSize.Value - gameSettings.GridHoleSize.Value) / 2, gameSettings.GridHoleSize.Value);
 
         default:
             break;
     }
 
-    return std::make_unique<RectangularGrid>(gameSettings->GridSize.Value);
+    return std::make_unique<RectangularGrid>(gameSettings.GridSize.Value);
 }
 
-void GameState::updateUIScaling()
+void GameState::Restart()
 {
-    // Recalculates the size and position of all UI elements based on the new window size
-    // such as: tile size, text size/position, and grid offsets
+    Score = 0u;
+    UpdateScoreText();
 
-    // new window size
-    const sf::Vector2f windowSize(window->getSize());
+    delete Grid;
+    Grid = new RectangularGrid(sf::Vector2i(Context.CurrentGameSettings.GridSize.Value));
 
-    const sf::Vector2i gridSize = stateData->gameSettings->GridSize.Value;
+    PlayerSnake.reset();
 
-    // tile size
-    this->tileSize = std::min(
-        windowSize.x * 0.95f / static_cast<float>(gridSize.x),
-        windowSize.y * UIConfig::GridHeightRatio / static_cast<float>(gridSize.y)
-    );
-    this->snakeRenderer.setTileSize(this->tileSize);
-    this->appleCluster.setTileSize(this->tileSize);
-    this->tile.setSize(sf::Vector2f(this->tileSize, this->tileSize));
+    Apples.reset();
+    Apples.spawnAll(Grid->GetFreeTiles());
 
-    // score text
-    this->scoreText.setCharacterSize(static_cast<unsigned int>(windowSize.y * UIConfig::ScoreHeightRatio * 0.25f));
-    this->scoreText.setPosition(sf::Vector2f(
-        windowSize.x / 2.f,
-        windowSize.y * UIConfig::ScoreHeightRatio / 2.f
-    ));
-
-    // centerize score text
-    auto lb = this->scoreText.getLocalBounds();
-    this->scoreText.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
-
-    // grid offsets
-    this->gridOffset.x = windowSize.x / 2.f - static_cast<float>(gridSize.x) / 2.f * this->tileSize;
-    this->gridOffset.y =
-        windowSize.y * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f )
-        - static_cast<float>(gridSize.y) / 2.f * this->tileSize;
-
-    gridSelectionOverlay.OnWindowResize(windowSize);
-    gameInstructionsOverlay.OnWindowResize(windowSize);
-    pauseOverlay.OnWindowResize(windowSize);
-    endGameOverlay.OnWindowResize(windowSize);
-}
-
-GameState::GameState(StateData* stateData)
-    : State(stateData),
-    grid(new RectangularGrid(sf::Vector2i(stateData->gameSettings->GridSize.Value))),
-    snake(stateData->gameSettings->SnakeSpeed.Value, 3u, this->grid),
-    score(0u),
-    gridSelectionOverlay(sf::Vector2f(window->getSize()), font),
-    gameInstructionsOverlay(sf::Vector2f(this->window->getSize()), this->font),
-    pauseOverlay(sf::Vector2f(this->window->getSize()), this->font),
-    endGameOverlay(sf::Vector2f(this->window->getSize()), this->font)
-{
-    this->appleCluster.setAppleLimit(this->stateData->gameSettings->MaxAppleCount.Value);
-    this->appleCluster.spawnAll(this->grid->GetFreeTiles());
-
-    this->scoreText.setFont(this->font);
-    this->scoreText.setString("0");
-    this->scoreText.setFillColor(sf::Color(Colors::Hex::TextMain));
-    this->scoreText.setOutlineThickness(2.f);
-    this->scoreText.setOutlineColor(sf::Color(Colors::Hex::TextMainOutline));
-    this->updateScoreText();
-
-    this->initKeybinds();
-    this->initKeyStateTracker();
-
-    this->updateUIScaling();
-
-    gridSelectionOverlay.Show();
-}
-
-GameState::~GameState()
-{
-    delete this->keyStateTracker;
-    delete this->grid;
-}
-
-void GameState::onWindowResize()
-{
-    this->updateUIScaling();
-}
-
-void GameState::updateInput()
-{
-    if (!this->window->hasFocus())
-        return;
-
-    this->keyStateTracker->updateKeyStates();
-
-    const bool isOtherOverlayActive = gridSelectionOverlay.GetIsActive() || gameInstructionsOverlay.GetIsActive() || endGameOverlay.GetIsActive();
-    if (!isOtherOverlayActive)
-    {
-        if (this->keyStateTracker->isKeyDown("TogglePause"))
-        {
-            if (this->pauseOverlay.GetIsActive())
-                this->pauseOverlay.Close();
-            else
-                this->pauseOverlay.Show();
-        }
-    }
-
-    if (this->keyStateTracker->isKeyDown("MoveUp") || this->keyStateTracker->isKeyDown("AltMoveUp"))
-        this->snake.setDirection(Direction::Up);
-    else if (this->keyStateTracker->isKeyDown("MoveDown") || this->keyStateTracker->isKeyDown("AltMoveDown"))
-        this->snake.setDirection(Direction::Down);
-    else if (this->keyStateTracker->isKeyDown("MoveRight") || this->keyStateTracker->isKeyDown("AltMoveRight"))
-        this->snake.setDirection(Direction::Right);
-    else if (this->keyStateTracker->isKeyDown("MoveLeft") || this->keyStateTracker->isKeyDown("AltMoveLeft"))
-        this->snake.setDirection(Direction::Left);
-}
-
-void GameState::update(const float& dt)
-{
-    this->updateInput();
-
-    if (endGameOverlay.GetIsActive()) {
-        endGameOverlay.Update(*window);
-
-        if (endGameOverlay.IsButtonReleased(EndGameOverlay::EButton::BackToMenu))
-        {
-            endState();
-        }
-
-        if (endGameOverlay.IsButtonReleased(EndGameOverlay::EButton::Restart))
-        {
-            restart();
-        }
-
-        return;
-    }
-
-    if (this->gameInstructionsOverlay.GetIsActive()) {
-        // Close the GameInstructionsOverlay if any key is pressed
-        for (int key = 0; key < sf::Keyboard::KeyCount; ++key)
-        {
-            if (sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(key))) {
-                this->gameInstructionsOverlay.Close();
-                break;
-            }
-        }
-        return;
-    }
-
-    if (pauseOverlay.GetIsActive()) {
-        pauseOverlay.Update(*window);
-
-        if (pauseOverlay.IsButtonReleased(PauseOverlay::EButton::Continue))
-        {
-            pauseOverlay.Close();
-        }
-
-        if (pauseOverlay.IsButtonReleased(PauseOverlay::EButton::Restart))
-        {
-            restart();
-        }
-
-        if (pauseOverlay.IsButtonReleased(PauseOverlay::EButton::BackToMenu))
-        {
-            endState();
-        }
-
-        return;
-    }
-
-    if (gridSelectionOverlay.GetIsActive()) {
-        gridSelectionOverlay.Update(*window);
-
-        if (gridSelectionOverlay.IsPlayButtonReleased())
-        {
-            // TODO(siqek): update settings, create grid, save new settings into a file
-
-            gridSelectionOverlay.Close();
-            gameInstructionsOverlay.Show();
-        }
-
-        return;
-    }
-
-    this->snake.update(dt);
-
-    if (this->snake.hasFilledGrid()) {
-        this->endGameOverlay.SetTitle("Snake is full. So is your glory!");
-        this->endGameOverlay.Show();
-        return;
-    }
-
-    if (!this->snake.getIsAlive()) {
-        this->endGameOverlay.SetTitle("Game Over");
-        this->endGameOverlay.Show();
-        return;
-    }
-
-    if (this->appleCluster.eatAppleAt(this->snake.getHeadPosition()))
-    {
-        this->appleCluster.spawn(this->grid->GetFreeTiles());
-        this->snake.grow(1u);
-        this->score++;
-        this->updateScoreText();
-    }
-}
-
-void GameState::render(sf::RenderTarget* target)
-{
-    if (!target)
-        target = this->window;
-
-    if (gridSelectionOverlay.GetIsActive())
-    {
-        gridSelectionOverlay.Render(*target);
-        return;
-    }
-
-    for (const auto& freeTile : this->grid->GetFreeTiles())
-    {
-        if (freeTile.x % 2 == freeTile.y % 2)
-            this->tile.setFillColor(sf::Color(Colors::Hex::BoardCellPrimary));
-        else
-            this->tile.setFillColor(sf::Color(Colors::Hex::BoardCellSecondary));
-
-        this->tile.setPosition(this->gridOffset + sf::Vector2f(freeTile) * this->tileSize);
-        target->draw(this->tile);
-    }
-
-    this->snakeRenderer.render(*target, this->snake, this->gridOffset);
-
-    if (!this->snake.hasFilledGrid())
-        this->appleCluster.render(*target, this->gridOffset.x, this->gridOffset.y);
-
-    target->draw(this->scoreText);
-
-    this->gameInstructionsOverlay.Render(*target);
-    this->pauseOverlay.Render(*target);
-    this->endGameOverlay.Render(*target);
-}
-
-void GameState::updateScoreText()
-{
-    this->scoreText.setString(std::to_string(this->score));
-    const auto lb = this->scoreText.getLocalBounds();
-    this->scoreText.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
-}
-
-void GameState::restart()
-{
-    this->score = 0;
-    this->updateScoreText();
-
-    delete this->grid;
-    this->grid = new RectangularGrid(sf::Vector2i(this->stateData->gameSettings->GridSize.Value));
-
-    this->snake.reset();
-
-    this->appleCluster.reset();
-    this->appleCluster.spawnAll(this->grid->GetFreeTiles());
-
-    this->gridSelectionOverlay.Show();
-    this->gameInstructionsOverlay.Close();
-    this->pauseOverlay.Close();
-    this->endGameOverlay.Close();
+    GridSelectionMenu.Show();
+    InstructionsOverlay.Close();
+    PauseMenu.Close();
+    EndGameMenu.Close();
 }
