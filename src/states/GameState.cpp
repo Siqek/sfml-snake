@@ -16,10 +16,9 @@
 
 GameState::GameState(StateContext& context)
     : IState(context),
-    Grid(new RectangularGrid(sf::Vector2i(Context.CurrentGameSettings.GridSize.Value))),
+    Grid(new RectangularGrid(Context.CurrentGameSettings.GridSize.Value)),
     PlayerSnake(Context.CurrentGameSettings.SnakeSpeed.Value, 3u, Grid),
     Score(0u),
-    GridSelectionMenu(sf::Vector2f(Context.Window->getSize()), Context.AppFont),
     InstructionsOverlay(sf::Vector2f(Context.Window->getSize()), Context.AppFont),
     PauseMenu(sf::Vector2f(Context.Window->getSize()), Context.AppFont),
     EndGameMenu(sf::Vector2f(Context.Window->getSize()), Context.AppFont)
@@ -39,7 +38,7 @@ GameState::GameState(StateContext& context)
 
     UpdateUIScaling();
 
-    GridSelectionMenu.Show();
+    InstructionsOverlay.Show();
 }
 
 GameState::~GameState()
@@ -107,21 +106,6 @@ void GameState::Update(float dt)
         return;
     }
 
-    if (GridSelectionMenu.IsActive())
-    {
-        GridSelectionMenu.Update(*Context.Window);
-
-        if (GridSelectionMenu.IsPlayButtonReleased())
-        {
-            // TODO(siqek): update settings, create grid, save new settings into a file
-
-            GridSelectionMenu.Close();
-            InstructionsOverlay.Show();
-        }
-
-        return;
-    }
-
     PlayerSnake.update(dt);
 
     if (PlayerSnake.hasFilledGrid())
@@ -149,12 +133,6 @@ void GameState::Update(float dt)
 
 void GameState::Render(sf::RenderTarget& target)
 {
-    if (GridSelectionMenu.IsActive())
-    {
-        GridSelectionMenu.Render(target);
-        return;
-    }
-
     for (const auto& freeTile : Grid->GetFreeTiles())
     {
 
@@ -184,7 +162,6 @@ void GameState::OnWindowResize()
 
     const sf::Vector2f windowSize(Context.Window->getSize());
 
-    GridSelectionMenu.OnWindowResize(windowSize);
     InstructionsOverlay.OnWindowResize(windowSize);
     PauseMenu.OnWindowResize(windowSize);
     EndGameMenu.OnWindowResize(windowSize);
@@ -228,7 +205,7 @@ void GameState::UpdateInput()
 
     KeyTracker->updateKeyStates();
 
-    const bool isOtherOverlayActive = GridSelectionMenu.IsActive() || InstructionsOverlay.IsActive() || EndGameMenu.IsActive();
+    const bool isOtherOverlayActive = InstructionsOverlay.IsActive() || EndGameMenu.IsActive();
     if (!isOtherOverlayActive)
     {
         if (KeyTracker->isKeyDown("TogglePause"))
@@ -321,15 +298,14 @@ void GameState::Restart()
     UpdateScoreText();
 
     delete Grid;
-    Grid = new RectangularGrid(sf::Vector2i(Context.CurrentGameSettings.GridSize.Value));
+    Grid = new RectangularGrid(Context.CurrentGameSettings.GridSize.Value);
 
     PlayerSnake.reset();
 
     Apples.reset();
     Apples.spawnAll(Grid->GetFreeTiles());
 
-    GridSelectionMenu.Show();
-    InstructionsOverlay.Close();
+    InstructionsOverlay.Show();
     PauseMenu.Close();
     EndGameMenu.Close();
 }

@@ -16,7 +16,6 @@ class IGrid;
 #include "snake/SnakeRenderer.hpp"
 #include "snake/AppleCluster.hpp"
 
-#include "states/overlays/GridSelectionOverlay.hpp"
 #include "states/overlays/GameInstructionsOverlay.hpp"
 #include "states/overlays/PauseOverlay.hpp"
 #include "states/overlays/EndGameOverlay.hpp"
@@ -66,7 +65,6 @@ private:
     unsigned int Score;
     sf::Text ScoreText;
 
-    GridSelectionOverlay GridSelectionMenu;
     GameInstructionsOverlay InstructionsOverlay;
     PauseOverlay PauseMenu;
     EndGameOverlay EndGameMenu;

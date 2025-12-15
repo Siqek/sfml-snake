@@ -2,7 +2,7 @@
 #include "states/MainMenuState.hpp"
 
 #include "states/StateStackManager.hpp"
-#include "states/GameState.hpp"
+#include "states/GridSelectionState.hpp"
 #include "states/SettingsState.hpp"
 
 #include "config/Colors.hpp"
@@ -61,7 +61,7 @@ void MainMenuState::UpdateButtons()
 
     if (PlayButton.isReleased())
     {
-        Context.StateStack.QueueAttach(std::make_shared<GameState>(Context));
+        Context.StateStack.QueueAttach(std::make_shared<GridSelectionState>(Context));
         MarkToBeDetached();
     }
 

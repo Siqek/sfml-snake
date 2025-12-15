@@ -1,33 +1,30 @@
-#ifndef GRIDSELECTIONOVERLAY_HPP
-#define GRIDSELECTIONOVERLAY_HPP
+#ifndef GRIDSELECTIONSTATE_HPP
+#define GRIDSELECTIONSTATE_HPP
 
-class GameSettings;
+#include "states/State.hpp"
 
 #include "snake/grid/Grid.hpp"
-
-#include "states/overlays/Overlay.hpp"
 
 #include "mgui/ArrowSelector.hpp"
 
 #include "mgui/Button.hpp"
 
-class GridSelectionOverlay
-    : public Overlay
+class GridSelectionState
+    : public IState
 {
 public:
-    GridSelectionOverlay(const sf::Vector2f& windowSize, const sf::Font& font);
+    GridSelectionState(StateContext& context);
 
-    bool IsPlayButtonReleased() const;
+    void Update(float dt) override;
 
-    void UpdateGameSettings(GameSettings& outGameSettings);
-
-    void OnWindowResize(const sf::Vector2f& windowSize) override;
-
-    void Update(const sf::RenderWindow& window) override;
     void Render(sf::RenderTarget& target) override;
 
+    void OnWindowResize() override;
+
 private:
-    void UpdateUIScaling(sf::Vector2f windowSize);
+    void UpdateGameSettings();
+
+    void UpdateUIScaling();
 
     void UpdateGridImitation(EGridType gridType);
 
@@ -47,4 +44,4 @@ private:
     mgui::Button PlayButton;
 };
 
-#endif // GRIDSELECTIONOVERLAY_HPP
+#endif // GRIDSELECTIONSTATE_HPP

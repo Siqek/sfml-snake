@@ -1,5 +1,8 @@
 #include "stdafx.hpp"
-#include "states/overlays/GridSelectionOverlay.hpp"
+#include "states/GridSelectionState.hpp"
+
+#include "states/StateStackManager.hpp"
+#include "states/GameState.hpp"
 
 #include "settings/GameSettings.hpp"
 
@@ -7,13 +10,13 @@
 
 #include "config/Colors.hpp"
 
-GridSelectionOverlay::GridSelectionOverlay(const sf::Vector2f& windowSize, const sf::Font& font)
-    : Overlay(windowSize, sf::Color::Transparent),
-    GridTypeSelector(GameSettingsOptions::GridTypeOptions, font, GameSettingsOptions::DefaultGridTypeOptionIndex),
-    GridSizeSelector(GameSettingsOptions::GridSizeOptions, font, GameSettingsOptions::DefaultGridSizeOptionIndex),
-    GridHoleSizeSelector(GameSettingsOptions::GridHoleSizeOptions, font, GameSettingsOptions::DefaultGridHoleSizeOptionIndex),
-    GridSizeSelectorLabel("Grid Size", font),
-    GridHoleSizeSelectorLabel("Hole Size", font)
+GridSelectionState::GridSelectionState(StateContext& context)
+    : IState(context),
+    GridTypeSelector(GameSettingsOptions::GridTypeOptions, Context.AppFont, GameSettingsOptions::DefaultGridTypeOptionIndex),
+    GridSizeSelector(GameSettingsOptions::GridSizeOptions, Context.AppFont, GameSettingsOptions::DefaultGridSizeOptionIndex),
+    GridHoleSizeSelector(GameSettingsOptions::GridHoleSizeOptions, Context.AppFont, GameSettingsOptions::DefaultGridHoleSizeOptionIndex),
+    GridSizeSelectorLabel("Grid Size", Context.AppFont),
+    GridHoleSizeSelectorLabel("Hole Size", Context.AppFont)
 {
     GridSelectionBackground.setFillColor(sf::Color(Colors::Hex::GridSelectionCardBackground));
     GridSelectionBackground.setOutlineColor(sf::Color(Colors::Hex::GridSelectionCardOutline));
@@ -43,45 +46,21 @@ GridSelectionOverlay::GridSelectionOverlay(const sf::Vector2f& windowSize, const
     styleElement(GridSizeSelector);
     styleElement(GridHoleSizeSelector);
 
-    PlayButton.setFont(font);
+    PlayButton.setFont(Context.AppFont);
     PlayButton.setText("Play");
 
     styleElement(PlayButton);
 
-    UpdateUIScaling(windowSize);
+    UpdateUIScaling();
 }
 
-bool GridSelectionOverlay::IsPlayButtonReleased() const
+void GridSelectionState::Update(float /*dt*/)
 {
-    return PlayButton.isReleased();
-}
+    GridTypeSelector.update(*Context.Window);
+    GridSizeSelector.update(*Context.Window);
+    GridHoleSizeSelector.update(*Context.Window);
 
-void GridSelectionOverlay::UpdateGameSettings(GameSettings& outGameSettings)
-{
-    auto applyOption = [](auto& setting, const auto& option)
-    {
-        setting.Id = option.id;
-        setting.Value = option.value;
-    };
-
-    applyOption(outGameSettings.GridType, GridTypeSelector.getActiveOption());
-    applyOption(outGameSettings.GridSize, GridSizeSelector.getActiveOption());
-    applyOption(outGameSettings.GridHoleSize, GridHoleSizeSelector.getActiveOption());
-}
-
-void GridSelectionOverlay::OnWindowResize(const sf::Vector2f& windowSize)
-{
-    Overlay::OnWindowResize(windowSize);
-    UpdateUIScaling(windowSize);
-}
-
-void GridSelectionOverlay::Update(const sf::RenderWindow& window)
-{
-    GridTypeSelector.update(window);
-    GridSizeSelector.update(window);
-    GridHoleSizeSelector.update(window);
-
-    PlayButton.update(window);
+    PlayButton.update(*Context.Window);
 
     if (GridTypeSelector.hasActiveOptionChanged())
     {
@@ -105,15 +84,17 @@ void GridSelectionOverlay::Update(const sf::RenderWindow& window)
     {
         AdjustHoleSizeToGridSize();
     }
+
+    if (PlayButton.isReleased())
+    {
+        UpdateGameSettings();
+        Context.StateStack.QueueAttach(std::make_shared<GameState>(Context));
+        MarkToBeDetached();
+    }
 }
 
-void GridSelectionOverlay::Render(sf::RenderTarget& target)
+void GridSelectionState::Render(sf::RenderTarget &target)
 {
-    if (!IsActive())
-    {
-        return;
-    }
-
     target.draw(GridSelectionBackground);
 
     target.draw(GridImitation);
@@ -132,8 +113,28 @@ void GridSelectionOverlay::Render(sf::RenderTarget& target)
     PlayButton.render(target);
 }
 
-void GridSelectionOverlay::UpdateUIScaling(sf::Vector2f windowSize)
+void GridSelectionState::OnWindowResize()
 {
+    UpdateUIScaling();
+}
+
+void GridSelectionState::UpdateGameSettings()
+{
+    auto applyOption = [](auto& setting, const auto& option)
+    {
+        setting.Id = option.id;
+        setting.Value = option.value;
+    };
+
+    applyOption(Context.CurrentGameSettings.GridType, GridTypeSelector.getActiveOption());
+    applyOption(Context.CurrentGameSettings.GridSize, GridSizeSelector.getActiveOption());
+    applyOption(Context.CurrentGameSettings.GridHoleSize, GridHoleSizeSelector.getActiveOption());
+}
+
+void GridSelectionState::UpdateUIScaling()
+{
+    const sf::Vector2f windowSize(Context.Window->getSize());
+
     const sf::Vector2f backgroundSize = sf::Vector2f(windowSize.x * 0.3f, windowSize.y * 0.75f);
     const float backgroundYTopMargin = windowSize.y * 0.05f;
     const sf::Vector2f backgroundPosition = sf::Vector2f(windowSize.x / 2.f, windowSize.y / 2.f - (windowSize.y - backgroundSize.y) / 2.f + backgroundYTopMargin);
@@ -218,7 +219,7 @@ void GridSelectionOverlay::UpdateUIScaling(sf::Vector2f windowSize)
     PlayButton.setOutlineThickness(playButtonOutlineThickness);
 }
 
-void GridSelectionOverlay::UpdateGridImitation(EGridType gridType)
+void GridSelectionState::UpdateGridImitation(EGridType gridType)
 {
     switch (gridType)
     {
@@ -237,7 +238,7 @@ void GridSelectionOverlay::UpdateGridImitation(EGridType gridType)
     }
 }
 
-void GridSelectionOverlay::AdjustHoleSizeToGridSize()
+void GridSelectionState::AdjustHoleSizeToGridSize()
 {
     const sf::Vector2i activeHoleSize = GridHoleSizeSelector.getActiveValue();
     const sf::Vector2i activeGridSize = sf::Vector2i(GridSizeSelector.getActiveValue());
