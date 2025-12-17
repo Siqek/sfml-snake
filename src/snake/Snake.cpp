@@ -5,7 +5,7 @@
 
 #include "config/Colors.hpp"
 
-Snake::Snake(float speedTilesPerSec, unsigned int length, IGrid*& grid)
+Snake::Snake(float speedTilesPerSec, unsigned int length, std::shared_ptr<IGrid> grid)
     : speedTilesPerSec(speedTilesPerSec),
     direction(Direction::Right), prevDirection(Direction::Right), nextDirection(Direction::Right),
     grid(grid),
@@ -17,7 +17,7 @@ Snake::Snake(float speedTilesPerSec, unsigned int length, IGrid*& grid)
     assert(length != 0);
     assert(grid != nullptr);
 
-    this->initHeadPosition(this->grid->GetSize() / 2 - sf::Vector2i(1, 1));
+    this->initHeadPosition(this->grid->GetSnakeHeadSpawnPosition());
 }
 
 bool Snake::hasFilledGrid() const { return body.size() == grid->GetTotalTileCount(); }
@@ -60,7 +60,7 @@ void Snake::reset()
     isAlive = true;
 
     lengthToGrow = initialLengthToGrow;
-    this->initHeadPosition(this->grid->GetSize() / 2 - sf::Vector2i(1, 1));
+    this->initHeadPosition(this->grid->GetSnakeHeadSpawnPosition());
 }
 
 void Snake::move()

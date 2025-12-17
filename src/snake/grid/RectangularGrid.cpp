@@ -29,6 +29,14 @@ bool RectangularGrid::IsOccupied(const sf::Vector2i& position) const
     return Occupied[position.x][position.y];
 }
 
+sf::Vector2i RectangularGrid::GetSnakeHeadSpawnPosition() const
+{
+    const int x = std::max(Size.x / 2 - 1, 0);
+    const int y = std::max(Size.y / 2 - 1, 0);
+
+    return sf::Vector2i{x, y};
+}
+
 size_t RectangularGrid::GetTotalTileCount() const
 {
     return static_cast<size_t>(Size.x * Size.y);

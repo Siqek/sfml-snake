@@ -16,7 +16,7 @@
 
 GameState::GameState(StateContext& context)
     : IState(context),
-    Grid(new RectangularGrid(Context.CurrentGameSettings.GridSize.Value)),
+    Grid(CreateGrid()),
     PlayerSnake(Context.CurrentGameSettings.SnakeSpeed.Value, 3u, Grid),
     Score(0u),
     InstructionsOverlay(sf::Vector2f(Context.Window->getSize()), Context.AppFont),
@@ -44,7 +44,6 @@ GameState::GameState(StateContext& context)
 GameState::~GameState()
 {
     delete KeyTracker;
-    delete Grid;
 }
 
 void GameState::Update(float dt)
@@ -273,23 +272,23 @@ void GameState::UpdateUIScaling()
     GridOffset.y = windowSize.y * (UIConfig::ScoreHeightRatio + UIConfig::GridHeightRatio / 2.f) - gridSize.y / 2.f * TileSize;
 }
 
-std::unique_ptr<IGrid> GameState::CreateGrid()
+std::shared_ptr<IGrid> GameState::CreateGrid()
 {
     const GameSettings& gameSettings = Context.CurrentGameSettings;
 
     switch (gameSettings.GridType.Value)
     {
         case EGridType::Rectangular:
-            return std::make_unique<RectangularGrid>(gameSettings.GridSize.Value);
+            return std::make_shared<RectangularGrid>(gameSettings.GridSize.Value);
 
         case EGridType::RectangularDonut:
-            return std::make_unique<RectangularDonutGrid>((gameSettings.GridSize.Value - gameSettings.GridHoleSize.Value) / 2, gameSettings.GridHoleSize.Value);
+            return std::make_shared<RectangularDonutGrid>((gameSettings.GridSize.Value - gameSettings.GridHoleSize.Value) / 2, gameSettings.GridHoleSize.Value);
 
         default:
             break;
     }
 
-    return std::make_unique<RectangularGrid>(gameSettings.GridSize.Value);
+    return std::make_shared<RectangularGrid>(gameSettings.GridSize.Value);
 }
 
 void GameState::Restart()
@@ -297,8 +296,7 @@ void GameState::Restart()
     Score = 0u;
     UpdateScoreText();
 
-    delete Grid;
-    Grid = new RectangularGrid(Context.CurrentGameSettings.GridSize.Value);
+    Grid = CreateGrid();
 
     PlayerSnake.reset();
 

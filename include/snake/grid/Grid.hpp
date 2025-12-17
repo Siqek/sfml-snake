@@ -19,8 +19,7 @@ public:
 
     virtual bool IsOccupied(const sf::Vector2i& position) const = 0;
 
-    // TODO(siqek): remove GetSize method and write a new one that returns the initial position of the snake's head
-    virtual const sf::Vector2i& GetSize() const = 0;
+    virtual sf::Vector2i GetSnakeHeadSpawnPosition() const = 0;
 
     virtual const std::vector<sf::Vector2i>& GetFreeTiles() const = 0;
 

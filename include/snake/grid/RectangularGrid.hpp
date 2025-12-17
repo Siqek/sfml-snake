@@ -14,7 +14,9 @@ public:
 
     bool IsOccupied(const sf::Vector2i& position) const override;
 
-    const sf::Vector2i& GetSize() const override { return Size; }
+    const sf::Vector2i& GetSize() const { return Size; }
+
+    virtual sf::Vector2i GetSnakeHeadSpawnPosition() const override;
 
     const std::vector<sf::Vector2i>& GetFreeTiles() const override { return FreeTiles; }
 

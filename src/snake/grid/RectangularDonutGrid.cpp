@@ -15,6 +15,14 @@ bool RectangularDonutGrid::IsWithinBoundaries(const sf::Vector2i& position) cons
     return RectangularGrid::IsWithinBoundaries(position) && !IsWithinHole(position);
 }
 
+sf::Vector2i RectangularDonutGrid::GetSnakeHeadSpawnPosition() const
+{
+    const int x = std::max(GetSize().x / 2 - 1, 0);
+    const int y = RingSize.y / 2;
+
+    return sf::Vector2i{x, y};
+}
+
 size_t RectangularDonutGrid::GetTotalTileCount() const
 {
     return RectangularGrid::GetTotalTileCount() - static_cast<size_t>(HoleSize.x * HoleSize.y);

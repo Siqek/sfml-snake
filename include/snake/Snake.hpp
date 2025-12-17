@@ -14,7 +14,7 @@ enum class Direction
 class Snake
 {
 public:
-    Snake(float speed, unsigned int length, IGrid*& grid);
+    Snake(float speed, unsigned int length, std::shared_ptr<IGrid> grid);
     ~Snake() = default;
 
     sf::Vector2i getHeadPosition() const { return body.front(); }
@@ -53,7 +53,7 @@ private:
     Direction prevDirection;
     Direction nextDirection;
 
-    IGrid*& grid;
+    std::shared_ptr<IGrid> grid;
 
     unsigned int lengthToGrow;
     unsigned int initialLengthToGrow;

@@ -12,6 +12,8 @@ public:
 
     bool IsWithinBoundaries(const sf::Vector2i& position) const override;
 
+    sf::Vector2i GetSnakeHeadSpawnPosition() const override;
+
     size_t GetTotalTileCount() const override;
 
 private:

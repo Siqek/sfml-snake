@@ -43,15 +43,14 @@ private:
 
     void UpdateUIScaling();
 
-    std::unique_ptr<IGrid> CreateGrid();
+    std::shared_ptr<IGrid> CreateGrid();
 
     void Restart();
 
     std::unordered_map<std::string, int> Keybinds;
     KeyStateTracker* KeyTracker;
 
-    // std::unique_ptr<IGrid> grid;
-    IGrid* Grid;
+    std::shared_ptr<IGrid> Grid;
 
     sf::Vector2f GridOffset;
     float TileSize;
