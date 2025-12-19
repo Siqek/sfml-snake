@@ -1,7 +1,7 @@
 #ifndef APPLECLUSTER_HPP
 #define APPLECLUSTER_HPP
 
-#include "snake/Apple.hpp"
+#include "game/Apple.hpp"
 
 class AppleCluster
 {

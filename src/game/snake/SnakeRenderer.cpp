@@ -1,5 +1,7 @@
 #include "stdafx.hpp"
-#include "snake/SnakeRenderer.hpp"
+#include "game/snake/SnakeRenderer.hpp"
+
+#include "game/snake/Snake.hpp"
 
 #include "config/Colors.hpp"
 
@@ -24,9 +26,9 @@ void SnakeRenderer::setTileSize(float size)
     this->bodyBorderCorner.setOrigin(this->bodySegment.getSize() / 2.f);
 }
 
-void SnakeRenderer::render(sf::RenderTarget& target, const Snake& snake, const sf::Vector2f& offset)
+void SnakeRenderer::render(sf::RenderTarget& target, const ISnake& snake, const sf::Vector2f& offset)
 {
-    const auto& snakeBody = snake.getBody();
+    const auto& snakeBody = snake.GetBody();
     for (size_t i = 0; i < snakeBody.size(); ++i)
     {
         const sf::Vector2f position = offset + sf::Vector2f(snakeBody[i]) * this->tileSize;

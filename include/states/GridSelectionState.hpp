@@ -3,7 +3,7 @@
 
 #include "states/State.hpp"
 
-#include "snake/grid/Grid.hpp"
+#include "game/grid/Grid.hpp"
 
 #include "mgui/ArrowSelector.hpp"
 

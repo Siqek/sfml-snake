@@ -1,5 +1,5 @@
 #include "stdafx.hpp"
-#include "snake/grid/RectangularDonutGrid.hpp"
+#include "game/grid/RectangularDonutGrid.hpp"
 
 RectangularDonutGrid::RectangularDonutGrid(const sf::Vector2i& ringSize, const sf::Vector2i& holeSize)
     : RectangularGrid(sf::Vector2i(ringSize * 2 + holeSize), RectangularGrid::EInitMode::Partial), RingSize(ringSize), HoleSize(holeSize)

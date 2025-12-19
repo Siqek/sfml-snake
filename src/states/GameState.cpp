@@ -6,8 +6,12 @@
 
 #include "settings/GameSettings.hpp"
 
-#include "snake/grid/RectangularGrid.hpp"
-#include "snake/grid/RectangularDonutGrid.hpp"
+#include "game/grid/Grid.hpp"
+#include "game/grid/RectangularGrid.hpp"
+#include "game/grid/RectangularDonutGrid.hpp"
+
+#include "game/snake/Snake.hpp"
+#include "game/snake/BasicSnake.hpp"
 
 #include "utils/KeyStateTracker.hpp"
 #include "utils/IniParser.hpp"
@@ -17,7 +21,7 @@
 GameState::GameState(StateContext& context)
     : IState(context),
     Grid(CreateGrid()),
-    PlayerSnake(Context.CurrentGameSettings.SnakeSpeed.Value, 3u, Grid),
+    PlayerSnake(CreateSnake()),
     Score(0u),
     InstructionsOverlay(sf::Vector2f(Context.Window->getSize()), Context.AppFont),
     PauseMenu(sf::Vector2f(Context.Window->getSize()), Context.AppFont),
@@ -105,26 +109,26 @@ void GameState::Update(float dt)
         return;
     }
 
-    PlayerSnake.update(dt);
+    PlayerSnake->Update(dt);
 
-    if (PlayerSnake.hasFilledGrid())
+    if (PlayerSnake->HasFilledGrid())
     {
         EndGameMenu.SetTitle("Snake is full. So is your glory!");
         EndGameMenu.Show();
         return;
     }
 
-    if (!PlayerSnake.getIsAlive())
+    if (!PlayerSnake->IsAlive())
     {
         EndGameMenu.SetTitle("Game Over");
         EndGameMenu.Show();
         return;
     }
 
-    if (Apples.eatAppleAt(PlayerSnake.getHeadPosition()))
+    if (Apples.eatAppleAt(PlayerSnake->GetHeadPosition()))
     {
         Apples.spawn(Grid->GetFreeTiles());
-        PlayerSnake.grow(1u);
+        PlayerSnake->Grow(1u);
         Score++;
         UpdateScoreText();
     }
@@ -141,9 +145,9 @@ void GameState::Render(sf::RenderTarget& target)
         target.draw(Tile);
     }
 
-    PlayerSnakeRenderer.render(target, PlayerSnake, GridOffset);
+    PlayerSnakeRenderer.render(target, *PlayerSnake, GridOffset);
 
-    if (!PlayerSnake.hasFilledGrid())
+    if (!PlayerSnake->HasFilledGrid())
     {
         Apples.render(target, GridOffset.x, GridOffset.y);
     }
@@ -222,19 +226,19 @@ void GameState::UpdateInput()
 
     if (KeyTracker->isKeyDown("MoveUp") || KeyTracker->isKeyDown("AltMoveUp"))
     {
-        PlayerSnake.setDirection(Direction::Up);
+        PlayerSnake->ChangeDirection(EMoveDirection::Up);
     }
     else if (KeyTracker->isKeyDown("MoveDown") || KeyTracker->isKeyDown("AltMoveDown"))
     {
-        PlayerSnake.setDirection(Direction::Down);
+        PlayerSnake->ChangeDirection(EMoveDirection::Down);
     }
     else if (KeyTracker->isKeyDown("MoveRight") || KeyTracker->isKeyDown("AltMoveRight"))
     {
-        PlayerSnake.setDirection(Direction::Right);
+        PlayerSnake->ChangeDirection(EMoveDirection::Right);
     }
     else if (KeyTracker->isKeyDown("MoveLeft") || KeyTracker->isKeyDown("AltMoveLeft"))
     {
-        PlayerSnake.setDirection(Direction::Left);
+        PlayerSnake->ChangeDirection(EMoveDirection::Left);
     }
 }
 
@@ -291,6 +295,11 @@ std::shared_ptr<IGrid> GameState::CreateGrid()
     return std::make_shared<RectangularGrid>(gameSettings.GridSize.Value);
 }
 
+std::unique_ptr<ISnake> GameState::CreateSnake()
+{
+    return std::make_unique<BasicSnake>(Context.CurrentGameSettings.SnakeSpeed.Value, 3u, Grid);
+}
+
 void GameState::Restart()
 {
     Score = 0u;
@@ -298,7 +307,7 @@ void GameState::Restart()
 
     Grid = CreateGrid();
 
-    PlayerSnake.reset();
+    PlayerSnake = CreateSnake();
 
     Apples.reset();
     Apples.spawnAll(Grid->GetFreeTiles());

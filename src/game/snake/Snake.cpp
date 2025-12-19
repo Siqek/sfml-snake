@@ -1,0 +1,85 @@
+#include "stdafx.hpp"
+#include "game/snake/Snake.hpp"
+
+ISnake::ISnake(float speedTilesPerSec, unsigned length, std::shared_ptr<IGrid> grid)
+    : Grid(grid),
+      CurrentDirection(EMoveDirection::Right),
+      PrevDirection(EMoveDirection::Right),
+      NextDirection(EMoveDirection::Right),
+      SpeedTilesPerSec(speedTilesPerSec),
+      PendingGrowth(std::max(1u, length) - 1u),
+      TilesTraveled(0.f),
+      bIsAlive(true)
+{
+    assert(speedTilesPerSec > 0.f);
+    assert(length != 0);
+    assert(grid != nullptr);
+}
+
+void ISnake::ChangeDirection(EMoveDirection direction)
+{
+    const bool isDirectionUnchanged = PrevDirection == CurrentDirection;
+
+    const EMoveDirection referenceDirection = isDirectionUnchanged ? PrevDirection : CurrentDirection;
+    const bool isTryingToSetOppositeDirection = direction == OppositeDirectionTo(referenceDirection);
+
+    if (isTryingToSetOppositeDirection)
+    {
+        return;
+    }
+
+    if (isDirectionUnchanged)
+    {
+        CurrentDirection = direction;
+    }
+
+    NextDirection = direction;
+}
+
+void ISnake::Grow(unsigned lengthToGrow)
+{
+    PendingGrowth += lengthToGrow;
+}
+
+void ISnake::Update(float dt)
+{
+    if (HasFilledGrid() || !IsAlive())
+    {
+        return;
+    }
+
+    TilesTraveled += SpeedTilesPerSec * dt;
+
+    while (TilesTraveled > 1.f)
+    {
+        Move();
+        TilesTraveled -= 1.f;
+    }
+}
+
+bool ISnake::ConsumePendingGrowth()
+{
+    if (PendingGrowth > 0)
+    {
+        PendingGrowth--;
+        return true;
+    }
+    return false;
+}
+
+void ISnake::Die()
+{
+    bIsAlive = false;
+}
+
+EMoveDirection ISnake::OppositeDirectionTo(EMoveDirection direction)
+{
+    switch (direction)
+    {
+        case EMoveDirection::Right: return EMoveDirection::Left;
+        case EMoveDirection::Left:  return EMoveDirection::Right;
+        case EMoveDirection::Down:  return EMoveDirection::Up;
+        case EMoveDirection::Up:    return EMoveDirection::Down;
+    }
+    return direction;
+}

@@ -1,5 +1,5 @@
 #include "stdafx.hpp"
-#include "snake/Apple.hpp"
+#include "game/Apple.hpp"
 
 Apple::Apple()
     : position{}, tileSize(0.f), isSpawned(false)

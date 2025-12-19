@@ -9,12 +9,12 @@ namespace UIConfig {
 class KeyStateTracker;
 
 class IGrid;
+class ISnake;
 
 #include "states/State.hpp"
 
-#include "snake/Snake.hpp"
-#include "snake/SnakeRenderer.hpp"
-#include "snake/AppleCluster.hpp"
+#include "game/snake/SnakeRenderer.hpp"
+#include "game/AppleCluster.hpp"
 
 #include "states/overlays/GameInstructionsOverlay.hpp"
 #include "states/overlays/PauseOverlay.hpp"
@@ -45,6 +45,8 @@ private:
 
     std::shared_ptr<IGrid> CreateGrid();
 
+    std::unique_ptr<ISnake> CreateSnake();
+
     void Restart();
 
     std::unordered_map<std::string, int> Keybinds;
@@ -56,7 +58,7 @@ private:
     float TileSize;
     sf::RectangleShape Tile;
 
-    Snake PlayerSnake;
+    std::unique_ptr<ISnake> PlayerSnake;
     SnakeRenderer PlayerSnakeRenderer;
 
     AppleCluster Apples;

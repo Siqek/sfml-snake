@@ -1,7 +1,7 @@
 #ifndef RECTANGULARGRID_HPP
 #define RECTANGULARGRID_HPP
 
-#include "snake/grid/Grid.hpp"
+#include "game/grid/Grid.hpp"
 
 class RectangularGrid
     : public IGrid

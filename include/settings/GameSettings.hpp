@@ -1,7 +1,7 @@
 #ifndef GAMESETTINGS_HPP
 #define GAMESETTINGS_HPP
 
-#include "snake/grid/Grid.hpp"
+#include "game/grid/Grid.hpp"
 
 class GameSettings
 {

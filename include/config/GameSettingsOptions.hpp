@@ -4,7 +4,7 @@
 #include <vector>
 #include <SFML/System/Vector2.hpp>
 
-#include "snake/grid/Grid.hpp"
+#include "game/grid/Grid.hpp"
 
 #include "mgui/ArrowSelector.hpp"
 

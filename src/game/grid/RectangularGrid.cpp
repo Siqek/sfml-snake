@@ -1,5 +1,5 @@
 #include "stdafx.hpp"
-#include "snake/grid/RectangularGrid.hpp"
+#include "game/grid/RectangularGrid.hpp"
 
 RectangularGrid::RectangularGrid(const sf::Vector2i& size)
     : RectangularGrid(size, EInitMode::Full) {}

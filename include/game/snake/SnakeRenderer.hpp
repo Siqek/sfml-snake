@@ -1,7 +1,7 @@
 #ifndef SNAKERENDERER_HPP
 #define SNAKERENDERER_HPP
 
-#include "snake/Snake.hpp"
+class ISnake;
 
 class SnakeRenderer
 {
@@ -10,7 +10,7 @@ public:
 
     void setTileSize(float size);
 
-    void render(sf::RenderTarget& target, const Snake& snake, const sf::Vector2f& offset);
+    void render(sf::RenderTarget& target, const ISnake& snake, const sf::Vector2f& offset);
 
 private:
     enum class BorderSide {

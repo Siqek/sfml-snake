@@ -1,5 +1,5 @@
 #include "stdafx.hpp"
-#include "snake/AppleCluster.hpp"
+#include "game/AppleCluster.hpp"
 
 AppleCluster::AppleCluster()
     : appleLimit(0u), tileSize(0.f), apples{}
