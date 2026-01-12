@@ -6,7 +6,7 @@
 #include "config/Colors.hpp"
 
 BasicSnake::BasicSnake(float speedTilesPerSec, unsigned length, std::shared_ptr<IGrid> grid)
-    : ISnake(speedTilesPerSec, length, grid),
+    : SnakeBase(speedTilesPerSec, length, grid),
       Body{}
 {
     InitHeadPosition();

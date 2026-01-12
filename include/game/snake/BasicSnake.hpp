@@ -6,7 +6,7 @@ class IGrid;
 #include "game/snake/Snake.hpp"
 
 class BasicSnake
-    : public ISnake
+    : public SnakeBase
 {
 public:
     BasicSnake(float speedTilesPerSec, unsigned length, std::shared_ptr<IGrid> grid);

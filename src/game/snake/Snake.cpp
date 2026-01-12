@@ -1,7 +1,7 @@
 #include "stdafx.hpp"
 #include "game/snake/Snake.hpp"
 
-ISnake::ISnake(float speedTilesPerSec, unsigned length, std::shared_ptr<IGrid> grid)
+SnakeBase::SnakeBase(float speedTilesPerSec, unsigned length, std::shared_ptr<IGrid> grid)
     : Grid(grid),
       CurrentDirection(EMoveDirection::Right),
       PrevDirection(EMoveDirection::Right),
@@ -16,7 +16,7 @@ ISnake::ISnake(float speedTilesPerSec, unsigned length, std::shared_ptr<IGrid> g
     assert(grid != nullptr);
 }
 
-void ISnake::ChangeDirection(EMoveDirection direction)
+void SnakeBase::ChangeDirection(EMoveDirection direction)
 {
     const bool isDirectionUnchanged = PrevDirection == CurrentDirection;
 
@@ -36,12 +36,12 @@ void ISnake::ChangeDirection(EMoveDirection direction)
     NextDirection = direction;
 }
 
-void ISnake::Grow(unsigned lengthToGrow)
+void SnakeBase::Grow(unsigned lengthToGrow)
 {
     PendingGrowth += lengthToGrow;
 }
 
-void ISnake::Update(float dt)
+void SnakeBase::Update(float dt)
 {
     if (HasFilledGrid() || !IsAlive())
     {
@@ -57,7 +57,7 @@ void ISnake::Update(float dt)
     }
 }
 
-bool ISnake::ConsumePendingGrowth()
+bool SnakeBase::ConsumePendingGrowth()
 {
     if (PendingGrowth > 0)
     {
@@ -67,12 +67,12 @@ bool ISnake::ConsumePendingGrowth()
     return false;
 }
 
-void ISnake::Die()
+void SnakeBase::Die()
 {
     bIsAlive = false;
 }
 
-EMoveDirection ISnake::OppositeDirectionTo(EMoveDirection direction)
+EMoveDirection SnakeBase::OppositeDirectionTo(EMoveDirection direction)
 {
     switch (direction)
     {
