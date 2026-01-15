@@ -122,6 +122,7 @@ void Game::run()
 {
     while (this->window->isOpen())
     {
+        // TODO(siqek): Run update method on a separate thread independently
         this->update();
         this->render();
     }
@@ -136,6 +137,10 @@ void Game::updateSFMLEvent()
 {
     sf::Event event;
     while (this->window->pollEvent(event)) {
+
+        // TODO(siqek): Use continue to skip to the next iteration instead of using else if for better readability
+        // TODO(siqek): Handle other events (mouse and keyboard) as well
+
         if (event.type == sf::Event::Closed) {
             this->end();
         } else if (event.type == sf::Event::Resized) {

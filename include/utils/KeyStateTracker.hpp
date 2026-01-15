@@ -1,6 +1,8 @@
 #ifndef KEYSTATETRACKER_HPP
 #define KEYSTATETRACKER_HPP
 
+// TODO(siqek): Get rid of this class - it was badly designed; sf::Event is a better choice to deal with key events
+
 struct KeyState {
     bool current; // false = IDLE; true = PRESSED
     bool previous;

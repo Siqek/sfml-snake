@@ -243,6 +243,9 @@ void GridSelectionState::AdjustHoleSizeToGridSize()
     const sf::Vector2i activeHoleSize = GridHoleSizeSelector.getActiveValue();
     const sf::Vector2i activeGridSize = sf::Vector2i(GridSizeSelector.getActiveValue());
 
+    // TODO(Siqek): Use descriptive bools in ifs instead of inline calculations for readability
+    // TODO(Siqek): Enforce minimum grid ring size of 2 units; current logic allows a value of 1
+
     if (activeHoleSize.x >= activeGridSize.x || activeHoleSize.y >= activeGridSize.y)
     {
         std::string holeSizeId = GameSettingsOptions::GridHoleSizeOptions[0].id;
