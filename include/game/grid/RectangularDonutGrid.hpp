@@ -16,13 +16,13 @@ public:
 
     size_t GetTotalTileCount() const override;
 
+    static constexpr int MinRingSize = 2;
+
 private:
     bool IsWithinHole(const sf::Vector2i& position) const;
 
     sf::Vector2i RingSize;
     sf::Vector2i HoleSize;
-
-    static constexpr int MinRingSize = std::ceil(MinGridSize / 2);
 };
 
 #endif // RECTANGULARDONUTGRID_HPP

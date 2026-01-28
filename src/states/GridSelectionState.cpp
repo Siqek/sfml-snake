@@ -4,6 +4,8 @@
 #include "states/StateStackManager.hpp"
 #include "states/GameState.hpp"
 
+#include "game/grid/RectangularDonutGrid.hpp"
+
 #include "settings/GameSettings.hpp"
 
 #include "config/GameSettingsOptions.hpp"
@@ -242,23 +244,32 @@ void GridSelectionState::AdjustHoleSizeToGridSize()
 {
     const sf::Vector2i activeHoleSize = GridHoleSizeSelector.getActiveValue();
     const sf::Vector2i activeGridSize = sf::Vector2i(GridSizeSelector.getActiveValue());
+    const sf::Vector2i activeRingSize = (activeGridSize - activeHoleSize) / 2;
 
-    // TODO(Siqek): Use descriptive bools in ifs instead of inline calculations for readability
-    // TODO(Siqek): Enforce minimum grid ring size of 2 units; current logic allows a value of 1
+    const bool isRingBigEnough =
+        activeRingSize.x >= RectangularDonutGrid::MinRingSize &&
+        activeRingSize.y >= RectangularDonutGrid::MinRingSize;
 
-    if (activeHoleSize.x >= activeGridSize.x || activeHoleSize.y >= activeGridSize.y)
+    if (isRingBigEnough)
     {
-        std::string holeSizeId = GameSettingsOptions::GridHoleSizeOptions[0].id;
-
-        for (const auto& holeSizeOption : GameSettingsOptions::GridHoleSizeOptions)
-        {
-            if (holeSizeOption.value.x >= activeGridSize.x || holeSizeOption.value.y >= activeGridSize.y)
-            {
-                break;
-            }
-            holeSizeId = holeSizeOption.id;
-        }
-
-        GridHoleSizeSelector.setActiveOption(holeSizeId);
+        return;
     }
+
+    // Finds and sets option with biggest possible value for active grid size.
+    std::string holeSizeId = GameSettingsOptions::GridHoleSizeOptions.front().id;
+    for (const auto& holeSizeOption : GameSettingsOptions::GridHoleSizeOptions)
+    {
+        const sf::Vector2i ringSize = (activeGridSize - holeSizeOption.value) / 2;
+
+        const bool isRingTooSmall =
+            ringSize.x < RectangularDonutGrid::MinRingSize ||
+            ringSize.y < RectangularDonutGrid::MinRingSize;
+
+        if (isRingTooSmall)
+        {
+            break;
+        }
+        holeSizeId = holeSizeOption.id;
+    }
+    GridHoleSizeSelector.setActiveOption(holeSizeId);
 }
