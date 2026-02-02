@@ -22,6 +22,16 @@ public:
 
     void OnWindowResize();
 
+    void OnKeyPressed(sf::Event::KeyEvent& key);
+
+    void OnKeyReleased(sf::Event::KeyEvent& key);
+
+    void OnMouseButtonPressed(sf::Event::MouseButtonEvent& mouseButton);
+
+    void OnMouseButtonReleased(sf::Event::MouseButtonEvent& mouseButton);
+
+    void OnMouseMoved(sf::Event::MouseMoveEvent& mouseMove);
+
 private:
     std::vector<std::shared_ptr<IState>> StateStack;
 

@@ -40,6 +40,16 @@ public:
 
     virtual void OnWindowResize() {}
 
+    virtual void OnKeyPressed(sf::Event::KeyEvent& /*key*/) {}
+
+    virtual void OnKeyReleased(sf::Event::KeyEvent& /*key*/) {}
+
+    virtual void OnMouseButtonPressed(sf::Event::MouseButtonEvent& /*mouseButton*/) {}
+
+    virtual void OnMouseButtonReleased(sf::Event::MouseButtonEvent& /*mouseButton*/) {}
+
+    virtual void OnMouseMoved(sf::Event::MouseMoveEvent& /*mouseMove*/) {}
+
     virtual void OnAttach() {}
 
     virtual void OnDetach() {}

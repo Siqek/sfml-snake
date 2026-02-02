@@ -136,18 +136,45 @@ void Game::updateDeltaTime()
 void Game::updateSFMLEvent()
 {
     sf::Event event;
-    while (this->window->pollEvent(event)) {
+    while (window->pollEvent(event))
+    {
+        switch (event.type)
+        {
+            case sf::Event::Closed:
+                end();
+                break;
 
-        // TODO(siqek): Use continue to skip to the next iteration instead of using else if for better readability
-        // TODO(siqek): Handle other events (mouse and keyboard) as well
+            case sf::Event::Resized:
+            {
+                sf::FloatRect visibleArea({ 0.f, 0.f }, sf::Vector2f(event.size.width, event.size.height));
+                window->setView(sf::View(visibleArea));
 
-        if (event.type == sf::Event::Closed) {
-            this->end();
-        } else if (event.type == sf::Event::Resized) {
-            sf::FloatRect visibleArea(0.f, 0.f, static_cast<float>(event.size.width), static_cast<float>(event.size.height));
-            this->window->setView(sf::View(visibleArea));
+                stateStack.OnWindowResize();
+                break;
+            }
 
-            this->stateStack.OnWindowResize();
+            case sf::Event::KeyPressed:
+                stateStack.OnKeyPressed(event.key);
+                break;
+
+            case sf::Event::KeyReleased:
+                stateStack.OnKeyReleased(event.key);
+                break;
+
+            case sf::Event::MouseButtonPressed:
+                stateStack.OnMouseButtonPressed(event.mouseButton);
+                break;
+
+            case sf::Event::MouseButtonReleased:
+                stateStack.OnMouseButtonReleased(event.mouseButton);
+                break;
+
+            case sf::Event::MouseMoved:
+                stateStack.OnMouseMoved(event.mouseMove);
+                break;
+
+            default:
+                break;
         }
     }
 }

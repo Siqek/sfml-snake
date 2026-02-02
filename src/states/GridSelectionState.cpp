@@ -243,7 +243,7 @@ void GridSelectionState::UpdateGridImitation(EGridType gridType)
 void GridSelectionState::AdjustHoleSizeToGridSize()
 {
     const sf::Vector2i activeHoleSize = GridHoleSizeSelector.getActiveValue();
-    const sf::Vector2i activeGridSize = sf::Vector2i(GridSizeSelector.getActiveValue());
+    const sf::Vector2i activeGridSize = GridSizeSelector.getActiveValue();
     const sf::Vector2i activeRingSize = (activeGridSize - activeHoleSize) / 2;
 
     const bool isRingBigEnough =

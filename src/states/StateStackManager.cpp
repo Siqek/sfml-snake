@@ -85,3 +85,43 @@ void StateStackManager::OnWindowResize()
         state->OnWindowResize();
     }
 }
+
+void StateStackManager::OnKeyPressed(sf::Event::KeyEvent& key)
+{
+    for (auto& state : StateStack)
+    {
+        state->OnKeyPressed(key);
+    }
+}
+
+void StateStackManager::OnKeyReleased(sf::Event::KeyEvent& key)
+{
+    for (auto& state : StateStack)
+    {
+        state->OnKeyReleased(key);
+    }
+}
+
+void StateStackManager::OnMouseButtonPressed(sf::Event::MouseButtonEvent& mouseButton)
+{
+    for (auto& state : StateStack)
+    {
+        state->OnMouseButtonPressed(mouseButton);
+    }
+}
+
+void StateStackManager::OnMouseButtonReleased(sf::Event::MouseButtonEvent& mouseButton)
+{
+    for (auto& state : StateStack)
+    {
+        state->OnMouseButtonReleased(mouseButton);
+    }
+}
+
+void StateStackManager::OnMouseMoved(sf::Event::MouseMoveEvent& mouseMove)
+{
+    for (auto& state : StateStack)
+    {
+        state->OnMouseMoved(mouseMove);
+    }
+}
