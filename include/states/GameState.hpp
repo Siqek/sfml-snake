@@ -6,8 +6,6 @@ namespace UIConfig {
     static constexpr float GridHeightRatio = 0.75f;
 }
 
-class KeyStateTracker;
-
 class IGrid;
 class ISnake;
 
@@ -33,11 +31,12 @@ public:
 
     void OnWindowResize() override;
 
+    void OnKeyPressed(sf::Event::KeyEvent& key) override;
+
+    void OnKeyReleased(sf::Event::KeyEvent& key) override;
+
 private:
     void InitKeybinds();
-    void InitKeyStateTracker();
-
-    void UpdateInput();
 
     void UpdateScoreText();
 
@@ -49,8 +48,46 @@ private:
 
     void Restart();
 
+    struct KeyDownState {
+        using Mask = uint16_t;
+
+        KeyDownState(Mask flags)
+            : Flags(flags) {}
+
+        enum class EFlag : Mask {
+            MoveUp       = 1 << 0,
+            MoveDown     = 1 << 1,
+            MoveRight    = 1 << 2,
+            MoveLeft     = 1 << 3,
+            AltMoveUp    = 1 << 4,
+            AltMoveDown  = 1 << 5,
+            AltMoveRight = 1 << 6,
+            AltMoveLeft  = 1 << 7,
+            TogglePause  = 1 << 8
+        };
+
+        inline bool IsDown(EFlag flag) const
+        {
+            return Flags & static_cast<Mask>(flag);
+        }
+
+        inline void SetDown(EFlag flag)
+        {
+            Flags |= static_cast<Mask>(flag);
+        }
+
+        inline void UnsetDown(EFlag flag)
+        {
+            Flags &= ~static_cast<Mask>(flag);
+        }
+
+    private:
+        Mask Flags;
+    };
+
     std::unordered_map<std::string, int> Keybinds;
-    KeyStateTracker* KeyTracker;
+
+    KeyDownState KeyState;
 
     std::shared_ptr<IGrid> Grid;
 

@@ -13,13 +13,13 @@
 #include "game/snake/Snake.hpp"
 #include "game/snake/BasicSnake.hpp"
 
-#include "utils/KeyStateTracker.hpp"
 #include "utils/IniParser.hpp"
 
 #include "config/Colors.hpp"
 
 GameState::GameState(StateContext& context)
     : IState(context),
+    KeyState(0u),
     Grid(CreateGrid()),
     PlayerSnake(CreateSnake()),
     Score(0u),
@@ -38,22 +38,16 @@ GameState::GameState(StateContext& context)
     UpdateScoreText();
 
     InitKeybinds();
-    InitKeyStateTracker();
 
     UpdateUIScaling();
 
     InstructionsOverlay.Show();
 }
 
-GameState::~GameState()
-{
-    delete KeyTracker;
-}
+GameState::~GameState() = default;
 
 void GameState::Update(float dt)
 {
-    UpdateInput();
-
     if (EndGameMenu.IsActive())
     {
         EndGameMenu.Update(*Context.Window);
@@ -74,15 +68,6 @@ void GameState::Update(float dt)
 
     if (InstructionsOverlay.IsActive())
     {
-        // Close the GameInstructionsOverlay if any key is pressed
-        for (int key = 0; key < sf::Keyboard::KeyCount; ++key)
-        {
-            if (sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(key)))
-            {
-                InstructionsOverlay.Close();
-                break;
-            }
-        }
         return;
     }
 
@@ -170,6 +155,89 @@ void GameState::OnWindowResize()
     EndGameMenu.OnWindowResize(windowSize);
 }
 
+void GameState::OnKeyPressed(sf::Event::KeyEvent& key)
+{
+    if (!Context.Window->hasFocus())
+    {
+        return;
+    }
+
+    if (!InstructionsOverlay.IsActive() && !EndGameMenu.IsActive())
+    {
+        if (Keybinds.at("TogglePause") == key.code)
+        {
+            if (PauseMenu.IsActive())
+            {
+                PauseMenu.Close();
+            }
+            else
+            {
+                PauseMenu.Show();
+            }
+        }
+    }
+
+    // Closes the InstructionOverlay when any button is pressed
+    if (InstructionsOverlay.IsActive())
+    {
+        InstructionsOverlay.Close();
+    }
+
+    struct MovementBinding
+    {
+        const char* ActionName;
+        KeyDownState::EFlag Flag;
+        EMoveDirection Direction;
+    };
+
+    static constexpr MovementBinding actionNameToMovementBinding[] {
+        { "MoveUp",       KeyDownState::EFlag::MoveUp,       EMoveDirection::Up },
+        { "MoveDown",     KeyDownState::EFlag::MoveDown,     EMoveDirection::Down },
+        { "MoveRight",    KeyDownState::EFlag::MoveRight,    EMoveDirection::Right },
+        { "MoveLeft",     KeyDownState::EFlag::MoveLeft,     EMoveDirection::Left },
+        { "AltMoveUp",    KeyDownState::EFlag::AltMoveUp,    EMoveDirection::Up },
+        { "AltMoveDown",  KeyDownState::EFlag::AltMoveDown,  EMoveDirection::Down },
+        { "AltMoveRight", KeyDownState::EFlag::AltMoveRight, EMoveDirection::Right },
+        { "AltMoveLeft",  KeyDownState::EFlag::AltMoveLeft,  EMoveDirection::Left }
+    };
+
+    for (const auto& binding : actionNameToMovementBinding)
+    {
+        if (Keybinds.at(binding.ActionName) == key.code &&
+            !KeyState.IsDown(binding.Flag))
+        {
+            KeyState.SetDown(binding.Flag);
+            PlayerSnake->ChangeDirection(binding.Direction);
+            break;
+        }
+    }
+}
+
+void GameState::OnKeyReleased(sf::Event::KeyEvent& key)
+{
+    static constexpr std::pair<const char*, KeyDownState::EFlag> actionNameToFlag[] {
+        { "MoveUp",       KeyDownState::EFlag::MoveUp },
+        { "MoveDown",     KeyDownState::EFlag::MoveDown },
+        { "MoveRight",    KeyDownState::EFlag::MoveRight },
+        { "MoveLeft",     KeyDownState::EFlag::MoveLeft },
+        { "AltMoveUp",    KeyDownState::EFlag::AltMoveUp },
+        { "AltMoveDown",  KeyDownState::EFlag::AltMoveDown },
+        { "AltMoveRight", KeyDownState::EFlag::AltMoveRight },
+        { "AltMoveLeft",  KeyDownState::EFlag::AltMoveLeft },
+        { "TogglePause",  KeyDownState::EFlag::TogglePause }
+    };
+
+    for (const auto& [actionName, flag] : actionNameToFlag)
+    {
+        if (Keybinds.at(actionName) == key.code)
+        {
+            KeyState.UnsetDown(flag);
+            break;
+        }
+    }
+}
+
+
 void GameState::InitKeybinds()
 {
     IniParser iniParser("config/gamestate_keybinds.ini");
@@ -192,54 +260,6 @@ void GameState::InitKeybinds()
 
     bindSection(keybindSnakeSection);
     bindSection(keybindsGeneralSection);
-}
-
-void GameState::InitKeyStateTracker()
-{
-    KeyTracker = new KeyStateTracker(Keybinds);
-}
-
-void GameState::UpdateInput()
-{
-    if (!Context.Window->hasFocus())
-    {
-        return;
-    }
-
-    KeyTracker->updateKeyStates();
-
-    const bool isOtherOverlayActive = InstructionsOverlay.IsActive() || EndGameMenu.IsActive();
-    if (!isOtherOverlayActive)
-    {
-        if (KeyTracker->isKeyDown("TogglePause"))
-        {
-            if (PauseMenu.IsActive())
-            {
-                PauseMenu.Close();
-            }
-            else
-            {
-                PauseMenu.Show();
-            }
-        }
-    }
-
-    if (KeyTracker->isKeyDown("MoveUp") || KeyTracker->isKeyDown("AltMoveUp"))
-    {
-        PlayerSnake->ChangeDirection(EMoveDirection::Up);
-    }
-    else if (KeyTracker->isKeyDown("MoveDown") || KeyTracker->isKeyDown("AltMoveDown"))
-    {
-        PlayerSnake->ChangeDirection(EMoveDirection::Down);
-    }
-    else if (KeyTracker->isKeyDown("MoveRight") || KeyTracker->isKeyDown("AltMoveRight"))
-    {
-        PlayerSnake->ChangeDirection(EMoveDirection::Right);
-    }
-    else if (KeyTracker->isKeyDown("MoveLeft") || KeyTracker->isKeyDown("AltMoveLeft"))
-    {
-        PlayerSnake->ChangeDirection(EMoveDirection::Left);
-    }
 }
 
 void GameState::UpdateScoreText()
