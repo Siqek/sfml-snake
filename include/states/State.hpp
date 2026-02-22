@@ -7,20 +7,17 @@ class GameSettings;
 
 struct StateContext {
     sf::RenderWindow* Window;
-    const std::unordered_map<std::string, int>& SupportedKeys;
     const sf::Font& AppFont;
     StateStackManager& StateStack;
     GameSettings& CurrentGameSettings;
 
     StateContext(
         sf::RenderWindow* window,
-        const std::unordered_map<std::string, int>& supportedKeys,
         const sf::Font& appFont,
         StateStackManager& stateStack,
         GameSettings& currentGameSettings
     )
         : Window(window),
-          SupportedKeys(supportedKeys),
           AppFont(appFont),
           StateStack(stateStack),
           CurrentGameSettings(currentGameSettings)

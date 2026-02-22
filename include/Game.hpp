@@ -34,14 +34,9 @@ private:
 
     StateStackManager stateStack;
 
-    // TODO(siqek): Use sf::Keyboard::Key enum directly instead of duplicating the structure in a file.
-    // Avoid unnecessary overhead and reduce the risk of errors.
-    std::unordered_map<std::string, int> supportedKeys;
-
     StateContext stateContext;
 
     void initWindow();
-    void initSupportedKeys();
     void initFont();
     void initStates();
 

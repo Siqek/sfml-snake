@@ -48,44 +48,45 @@ private:
 
     void Restart();
 
+    enum class EAction : uint16_t
+    {
+        MoveUp       = 1 << 0,
+        MoveDown     = 1 << 1,
+        MoveRight    = 1 << 2,
+        MoveLeft     = 1 << 3,
+        AltMoveUp    = 1 << 4,
+        AltMoveDown  = 1 << 5,
+        AltMoveRight = 1 << 6,
+        AltMoveLeft  = 1 << 7,
+        TogglePause  = 1 << 8
+    };
+
     struct KeyDownState {
         using Mask = uint16_t;
 
         KeyDownState(Mask flags)
             : Flags(flags) {}
 
-        enum class EFlag : Mask {
-            MoveUp       = 1 << 0,
-            MoveDown     = 1 << 1,
-            MoveRight    = 1 << 2,
-            MoveLeft     = 1 << 3,
-            AltMoveUp    = 1 << 4,
-            AltMoveDown  = 1 << 5,
-            AltMoveRight = 1 << 6,
-            AltMoveLeft  = 1 << 7,
-            TogglePause  = 1 << 8
-        };
-
-        inline bool IsDown(EFlag flag) const
+        inline bool IsDown(EAction action) const
         {
-            return Flags & static_cast<Mask>(flag);
+            return Flags & static_cast<Mask>(action);
         }
 
-        inline void SetDown(EFlag flag)
+        inline void SetDown(EAction action)
         {
-            Flags |= static_cast<Mask>(flag);
+            Flags |= static_cast<Mask>(action);
         }
 
-        inline void UnsetDown(EFlag flag)
+        inline void UnsetDown(EAction action)
         {
-            Flags &= ~static_cast<Mask>(flag);
+            Flags &= ~static_cast<Mask>(action);
         }
 
     private:
         Mask Flags;
     };
 
-    std::unordered_map<std::string, int> Keybinds;
+    std::unordered_map<EAction, sf::Keyboard::Key> Keybinds;
 
     KeyDownState KeyState;
 

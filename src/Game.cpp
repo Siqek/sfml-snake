@@ -60,23 +60,6 @@ void Game::initWindow()
 #endif // _WIN32
 }
 
-void Game::initSupportedKeys()
-{
-    IniParser iniParser("config/supported_keys.ini");
-    const auto& keys = iniParser.getSection("Keys");
-
-    this->supportedKeys.reserve(keys.size());
-
-    for (const auto& [key, value] : keys) {
-        try {
-            int val = std::stoi(value);
-            this->supportedKeys[key] = val;
-        } catch (const std::exception& e) {
-            std::cerr << "Error::Game::initSupportedKeys::" << e.what() << '\n';
-        }
-    }
-}
-
 void Game::initFont()
 {
     if (!this->font.loadFromFile("resources/fonts/Inter/static/Inter_28pt-Regular.ttf"))
@@ -97,13 +80,12 @@ void Game::updateFPS()
 }
 
 Game::Game()
-    : dt(0.f), gameSettings("config/game_settings.ini"), supportedKeys{}, stateContext(nullptr, supportedKeys, font, stateStack, gameSettings)
+    : dt(0.f), gameSettings("config/game_settings.ini"), stateContext(nullptr, font, stateStack, gameSettings)
 {
     this->initWindow();
 
     stateContext.Window = window;
 
-    this->initSupportedKeys();
     this->initFont();
     this->initStates();
 

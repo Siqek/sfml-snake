@@ -14,6 +14,7 @@
 #include "game/snake/BasicSnake.hpp"
 
 #include "utils/IniParser.hpp"
+#include "utils/KeyMapping.hpp"
 
 #include "config/Colors.hpp"
 
@@ -164,7 +165,7 @@ void GameState::OnKeyPressed(sf::Event::KeyEvent& key)
 
     if (!InstructionsOverlay.IsActive() && !EndGameMenu.IsActive())
     {
-        if (Keybinds.at("TogglePause") == key.code)
+        if (Keybinds.at(EAction::TogglePause) == key.code)
         {
             if (PauseMenu.IsActive())
             {
@@ -183,31 +184,24 @@ void GameState::OnKeyPressed(sf::Event::KeyEvent& key)
         InstructionsOverlay.Close();
     }
 
-    struct MovementBinding
-    {
-        const char* ActionName;
-        KeyDownState::EFlag Flag;
-        EMoveDirection Direction;
+    static constexpr std::pair<EAction, EMoveDirection> actionToDirection[] {
+        { EAction::MoveUp,       EMoveDirection::Up },
+        { EAction::MoveDown,     EMoveDirection::Down },
+        { EAction::MoveRight,    EMoveDirection::Right },
+        { EAction::MoveLeft,     EMoveDirection::Left },
+        { EAction::AltMoveUp,    EMoveDirection::Up },
+        { EAction::AltMoveDown,  EMoveDirection::Down },
+        { EAction::AltMoveRight, EMoveDirection::Right },
+        { EAction::AltMoveLeft,  EMoveDirection::Left }
     };
 
-    static constexpr MovementBinding actionNameToMovementBinding[] {
-        { "MoveUp",       KeyDownState::EFlag::MoveUp,       EMoveDirection::Up },
-        { "MoveDown",     KeyDownState::EFlag::MoveDown,     EMoveDirection::Down },
-        { "MoveRight",    KeyDownState::EFlag::MoveRight,    EMoveDirection::Right },
-        { "MoveLeft",     KeyDownState::EFlag::MoveLeft,     EMoveDirection::Left },
-        { "AltMoveUp",    KeyDownState::EFlag::AltMoveUp,    EMoveDirection::Up },
-        { "AltMoveDown",  KeyDownState::EFlag::AltMoveDown,  EMoveDirection::Down },
-        { "AltMoveRight", KeyDownState::EFlag::AltMoveRight, EMoveDirection::Right },
-        { "AltMoveLeft",  KeyDownState::EFlag::AltMoveLeft,  EMoveDirection::Left }
-    };
-
-    for (const auto& binding : actionNameToMovementBinding)
+    for (const auto& [action, direction] : actionToDirection)
     {
-        if (Keybinds.at(binding.ActionName) == key.code &&
-            !KeyState.IsDown(binding.Flag))
+        if (Keybinds.at(action) == key.code &&
+            !KeyState.IsDown(action))
         {
-            KeyState.SetDown(binding.Flag);
-            PlayerSnake->ChangeDirection(binding.Direction);
+            KeyState.SetDown(action);
+            PlayerSnake->ChangeDirection(direction);
             break;
         }
     }
@@ -215,23 +209,23 @@ void GameState::OnKeyPressed(sf::Event::KeyEvent& key)
 
 void GameState::OnKeyReleased(sf::Event::KeyEvent& key)
 {
-    static constexpr std::pair<const char*, KeyDownState::EFlag> actionNameToFlag[] {
-        { "MoveUp",       KeyDownState::EFlag::MoveUp },
-        { "MoveDown",     KeyDownState::EFlag::MoveDown },
-        { "MoveRight",    KeyDownState::EFlag::MoveRight },
-        { "MoveLeft",     KeyDownState::EFlag::MoveLeft },
-        { "AltMoveUp",    KeyDownState::EFlag::AltMoveUp },
-        { "AltMoveDown",  KeyDownState::EFlag::AltMoveDown },
-        { "AltMoveRight", KeyDownState::EFlag::AltMoveRight },
-        { "AltMoveLeft",  KeyDownState::EFlag::AltMoveLeft },
-        { "TogglePause",  KeyDownState::EFlag::TogglePause }
+    static constexpr EAction actions[] {
+        EAction::MoveUp,
+        EAction::MoveDown,
+        EAction::MoveRight,
+        EAction::MoveLeft,
+        EAction::AltMoveUp,
+        EAction::AltMoveDown,
+        EAction::AltMoveRight,
+        EAction::AltMoveLeft,
+        EAction::TogglePause
     };
 
-    for (const auto& [actionName, flag] : actionNameToFlag)
+    for (const EAction action : actions)
     {
-        if (Keybinds.at(actionName) == key.code)
+        if (Keybinds.at(action) == key.code)
         {
-            KeyState.UnsetDown(flag);
+            KeyState.UnsetDown(action);
             break;
         }
     }
@@ -241,25 +235,20 @@ void GameState::OnKeyReleased(sf::Event::KeyEvent& key)
 void GameState::InitKeybinds()
 {
     IniParser iniParser("config/gamestate_keybinds.ini");
-    const auto& keybindSnakeSection = iniParser.getSection("Snake");
-    const auto& keybindsGeneralSection = iniParser.getSection("General");
 
-    Keybinds.reserve(keybindSnakeSection.size() + keybindsGeneralSection.size());
+    Keybinds.reserve(9);
 
-    const auto bindSection = [this](const auto& keybindSection)
-    {
-        for (const auto& [bind, key] : keybindSection)
-        {
-            auto it = this->Context.SupportedKeys.find(key);
-            if (it != this->Context.SupportedKeys.end())
-            {
-                this->Keybinds[bind] = it->second;
-            }
-        }
-    };
+    Keybinds[EAction::MoveUp]    = KeyMapping::ToKey(iniParser.getString("Snake", "MoveUp",    "W"));
+    Keybinds[EAction::MoveDown]  = KeyMapping::ToKey(iniParser.getString("Snake", "MoveDown",  "S"));
+    Keybinds[EAction::MoveRight] = KeyMapping::ToKey(iniParser.getString("Snake", "MoveRight", "D"));
+    Keybinds[EAction::MoveLeft]  = KeyMapping::ToKey(iniParser.getString("Snake", "MoveLeft",  "A"));
 
-    bindSection(keybindSnakeSection);
-    bindSection(keybindsGeneralSection);
+    Keybinds[EAction::AltMoveUp]    = KeyMapping::ToKey(iniParser.getString("Snake", "AltMoveUp",    "Up"));
+    Keybinds[EAction::AltMoveDown]  = KeyMapping::ToKey(iniParser.getString("Snake", "AltMoveDown",  "Down"));
+    Keybinds[EAction::AltMoveRight] = KeyMapping::ToKey(iniParser.getString("Snake", "AltMoveRight", "Right"));
+    Keybinds[EAction::AltMoveLeft]  = KeyMapping::ToKey(iniParser.getString("Snake", "AltMoveLeft",  "Left"));
+
+    Keybinds[EAction::TogglePause] = KeyMapping::ToKey(iniParser.getString("General", "TogglePause", "Escape"));
 }
 
 void GameState::UpdateScoreText()
