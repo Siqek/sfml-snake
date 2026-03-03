@@ -25,6 +25,11 @@
 #include <functional>
 #include <algorithm>
 
+#include <thread>
+#include <atomic>
+#include <mutex>
+#include <condition_variable>
+
 // SFML headers
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>

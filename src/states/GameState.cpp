@@ -156,7 +156,7 @@ void GameState::OnWindowResize()
     EndGameMenu.OnWindowResize(windowSize);
 }
 
-void GameState::OnKeyPressed(sf::Event::KeyEvent& key)
+void GameState::OnKeyPressed(const sf::Event::KeyEvent& key)
 {
     if (!Context.Window->hasFocus())
     {
@@ -207,7 +207,7 @@ void GameState::OnKeyPressed(sf::Event::KeyEvent& key)
     }
 }
 
-void GameState::OnKeyReleased(sf::Event::KeyEvent& key)
+void GameState::OnKeyReleased(const sf::Event::KeyEvent& key)
 {
     static constexpr EAction actions[] {
         EAction::MoveUp,

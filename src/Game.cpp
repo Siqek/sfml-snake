@@ -3,11 +3,11 @@
 
 #include "states/MainMenuState.hpp"
 
-#include "utils/IniParser.hpp"
-
 #include "config/GameSettingsOptions.hpp"
 
 #include "config/Colors.hpp"
+
+#include "utils/IniParser.hpp"
 
 #ifdef __linux__
     #include <X11/Xlib.h>
@@ -18,141 +18,252 @@
     #include <windows.h>
 #endif // _WIN32
 
-void Game::initWindow()
+Game::Game()
+    : bIsRunning(false),
+      Snapshots(), ReadSnapshot(&Snapshots[0]), WriteSnapshot(&Snapshots[1]), BuiltSnapshot(&Snapshots[2]), bIsNewSnapshotAvailable(false),
+      DeltaTime(0.f), Settings("config/game_settings.ini"), Context(nullptr, AppFont, StateStack, Settings)
 {
-    const sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
+    InitWindow();
 
+    Context.Window = Window;
+
+    InitFont();
+    InitStates();
+
+    FpsLabel.setFont(AppFont);
+    FpsLabel.setPosition(sf::Vector2f(5.f, 5.f));
+    FpsLabel.setCharacterSize(16u);
+    FpsLabel.setFillColor(sf::Color::Green);
+}
+
+Game::~Game()
+{
+    delete Window;
+}
+
+void Game::Run()
+{
+    bIsRunning = true;
+
+    while (bIsRunning)
+    {
+        Update();
+        Render();
+    }
+
+    // TODO(siqek): finish multithreading
+
+    // RenderThread = std::thread(&Game::RenderLoop, this);
+
+    // UpdateLoop();
+}
+
+void Game::End()
+{
+    bIsRunning = false;
+
+    if (RenderThread.joinable())
+    {
+        RenderThread.join();
+    }
+
+    Window->close();
+}
+
+void Game::InitWindow()
+{
     IniParser iniParser;
     iniParser.loadFromFile("config/video.ini");
 
-    sf::ContextSettings gfxSetting = sf::ContextSettings();
-    gfxSetting.antialiasingLevel = iniParser.getInt("Graphics", "iAntiAliasing", 4);
+    sf::ContextSettings ctxSettings{};
+    ctxSettings.antialiasingLevel = iniParser.getInt("Graphics", "iAntiAliasing", 4);
 
     unsigned int width = iniParser.getInt("Graphics", "iResolutionWidth");
     unsigned int height = iniParser.getInt("Graphics", "iResolutionHeight");
 
+    const sf::VideoMode desktopMode = sf::VideoMode::getDesktopMode();
+
     if (width == 0) width = desktopMode.width;
     if (height == 0) height = desktopMode.height;
 
-    bool fullscreen = iniParser.getBool("Graphics", "bFullscreen", true);
+    const bool fullscreen = iniParser.getBool("Graphics", "bFullscreen", true);
+    const decltype(sf::Style::Default) windowStyle = fullscreen ? sf::Style::Fullscreen : sf::Style::Default;
 
-    this->window = new sf::RenderWindow(
-        sf::VideoMode({ width, height }),
-        "SFML project",
-        fullscreen ? sf::Style::Fullscreen : sf::Style::Default,
-        gfxSetting
-    );
-    this->window->setFramerateLimit(iniParser.getInt("Graphics", "iFramerateLimit", 60));
-    this->window->setVerticalSyncEnabled(iniParser.getBool("Graphics", "bVSync", true));
+    static constexpr const char* Title = "SFML project";
 
-#if defined(__linux__) || defined(_WIN32)
-    this->setMinimumWindowSize(sf::Vector2i(320, 240));
-#endif // __linux__ || _WIN32
+    Window = new sf::RenderWindow(sf::VideoMode({ width, height }), Title, windowStyle, ctxSettings);
+
+    Window->setFramerateLimit(iniParser.getInt("Graphics", "iFramerateLimit", 60));
+    Window->setVerticalSyncEnabled(iniParser.getBool("Graphics", "bVSync", true));
+
+    SetMinimumWindowSize(sf::Vector2i(320, 240));
 
 #ifdef _WIN32
-    if (desktopMode.width == this->window->getSize().x
-        && desktopMode.height == this->window->getSize().y
+    if (desktopMode.width == Window->getSize().x
+        && desktopMode.height == Window->getSize().y
         && !fullscreen)
     {
-        HWND hwnd = this->window->getSystemHandle();
+        HWND hwnd = Window->getSystemHandle();
         ShowWindow(hwnd, SW_MAXIMIZE);
     }
 #endif // _WIN32
 }
 
-void Game::initFont()
+void Game::InitFont()
 {
-    if (!this->font.loadFromFile("resources/fonts/Inter/static/Inter_28pt-Regular.ttf"))
+    static constexpr const char* AppFontFileName = "resources/fonts/Inter/static/Inter_28pt-Regular.ttf";
+    if (!AppFont.loadFromFile(AppFontFileName))
     {
-        std::cerr << "Error::Game::initFont::Failed to load font 'resources/fonts/Inter/static/Inter_28pt-Regular.ttf'\n";
+        throw std::runtime_error(std::string("Failed to load font (") + AppFontFileName + ")");
     }
 }
 
-void Game::initStates()
+void Game::InitStates()
 {
-    stateStack.Attach(std::make_shared<MainMenuState>(stateContext));
+    StateStack.Attach(std::make_shared<MainMenuState>(Context));
 }
 
-void Game::updateFPS()
+void Game::Update()
 {
-    this->fpsCounter.update(this->dt);
-    this->fpsText.setString(std::to_string(this->fpsCounter.getFPS()) + " fps");
-}
+    // TODO(siqek):
+    UpdateDeltaTime(); // do i need delta time as a member?
+    // Window->pollEvent should be called only on main thread so:
+    // create temp queue (add events to it from main thread)
+    // read the queue from simulation thread
+    UpdateSFMLEvent();
+    UpdateFPS(); // dont update fps based on simulation
 
-Game::Game()
-    : dt(0.f), gameSettings("config/game_settings.ini"), stateContext(nullptr, font, stateStack, gameSettings)
-{
-    this->initWindow();
-
-    stateContext.Window = window;
-
-    this->initFont();
-    this->initStates();
-
-    this->fpsText.setFont(this->font);
-    this->fpsText.setPosition(sf::Vector2f(5.f, 5.f));
-    this->fpsText.setCharacterSize(16u);
-    this->fpsText.setFillColor(sf::Color::Green);
-}
-
-Game::~Game()
-{
-    delete window;
-}
-
-void Game::run()
-{
-    while (this->window->isOpen())
+    if (StateStack.IsEmpty())
     {
-        // TODO(siqek): Run update method on a separate thread independently
-        this->update();
-        this->render();
+        End();
+        return;
+    }
+
+    StateStack.UpdateStates(DeltaTime);
+
+    StateStack.FlushPendingAttachments();
+}
+
+void Game::Render()
+{
+    Window->clear(sf::Color(Colors::Hex::Background));
+
+    StateStack.RenderStates(*Window);
+
+    Window->draw(FpsLabel);
+
+    Window->display();
+}
+
+void Game::UpdateLoop()
+{
+    // before multithreading, there are few conditions to achieve:
+
+    // TODO(siqek):
+    // disallow touching the window in simulation
+
+    // TODO(siqek):
+    // update GUI elements (buttons, etc.) based on events
+    // don't pass *Window in update methods
+    while (bIsRunning)
+    {
+        Update();
+
+        WriteSnapshot->Clear();
+        BuildSnapshot(*WriteSnapshot);
+
+        {
+            std::lock_guard<std::mutex> lock(SnapshotMutex);
+
+            std::swap(WriteSnapshot, BuiltSnapshot);
+
+            bIsNewSnapshotAvailable = true;
+        }
+        CV.notify_one();
     }
 }
 
-void Game::updateDeltaTime()
+void Game::RenderLoop()
 {
-    this->dt = this->dtClock.restart().asSeconds();
+    while (bIsRunning)
+    {
+        {
+            std::unique_lock<std::mutex> lock(SnapshotMutex);
+
+            if (!bIsNewSnapshotAvailable)
+            {
+                CV.wait(lock, [this]{ return bIsNewSnapshotAvailable; });
+            }
+
+            std::swap(ReadSnapshot, BuiltSnapshot);
+
+            bIsNewSnapshotAvailable = false;
+        }
+
+        // TODO(siqek):
+        // draw everything on sf::RenderTexture and then draw on window?
+        // ReadSnapshot->Render(render_target);
+
+        // Window->draw(render_target);
+    }
 }
 
-void Game::updateSFMLEvent()
+void Game::BuildSnapshot(RenderSnapshot &snapshot)
+{
+    // TODO(siqek): finish it
+
+    (void)snapshot; // ignore *unused args*
+}
+
+void Game::UpdateFPS()
+{
+    FpsCounter.update(DeltaTime);
+    FpsLabel.setString(std::to_string(FpsCounter.getFPS()) + " fps");
+}
+
+void Game::UpdateDeltaTime()
+{
+    DeltaTime = DeltaTimeClock.restart().asSeconds();
+}
+
+void Game::UpdateSFMLEvent()
 {
     sf::Event event;
-    while (window->pollEvent(event))
+    while (Window->pollEvent(event))
     {
         switch (event.type)
         {
             case sf::Event::Closed:
-                end();
+                End();
                 break;
 
             case sf::Event::Resized:
             {
                 sf::FloatRect visibleArea({ 0.f, 0.f }, sf::Vector2f(event.size.width, event.size.height));
-                window->setView(sf::View(visibleArea));
+                Window->setView(sf::View(visibleArea));
 
-                stateStack.OnWindowResize();
+                StateStack.OnWindowResize();
                 break;
             }
 
             case sf::Event::KeyPressed:
-                stateStack.OnKeyPressed(event.key);
+                StateStack.OnKeyPressed(event.key);
                 break;
 
             case sf::Event::KeyReleased:
-                stateStack.OnKeyReleased(event.key);
+                StateStack.OnKeyReleased(event.key);
                 break;
 
             case sf::Event::MouseButtonPressed:
-                stateStack.OnMouseButtonPressed(event.mouseButton);
+                StateStack.OnMouseButtonPressed(event.mouseButton);
                 break;
 
             case sf::Event::MouseButtonReleased:
-                stateStack.OnMouseButtonReleased(event.mouseButton);
+                StateStack.OnMouseButtonReleased(event.mouseButton);
                 break;
 
             case sf::Event::MouseMoved:
-                stateStack.OnMouseMoved(event.mouseMove);
+                StateStack.OnMouseMoved(event.mouseMove);
                 break;
 
             default:
@@ -161,44 +272,20 @@ void Game::updateSFMLEvent()
     }
 }
 
-void Game::update()
+void Game::SetMinimumWindowSize(sf::Vector2i minimumSize)
 {
-    this->updateDeltaTime();
-    this->updateSFMLEvent();
-    this->updateFPS();
-
-    if (stateStack.IsEmpty())
-    {
-        end();
-        return;
-    }
-
-    stateStack.UpdateStates(dt);
-
-    stateStack.FlushPendingAttachments();
+#if __linux__
+    SetMinimumWindowSize_Linux(minimumSize);
+#endif // __linux__
+#if _WIN32
+    SetMinimumWindowSize_Windows(minimumSize);
+#endif // _WIN32
 }
 
-void Game::render()
+void Game::SetMinimumWindowSize_Linux([[maybe_unused]] sf::Vector2i minimumSize)
 {
-    this->window->clear(sf::Color(Colors::Hex::Background));
-
-    stateStack.RenderStates(*window);
-
-    this->window->draw(this->fpsText);
-
-    this->window->display();
-}
-
-void Game::end()
-{
-    this->window->close();
-}
-
 #ifdef __linux__
-
-void Game::setMinimumWindowSize(sf::Vector2i minimumSize)
-{
-    ::Window x11Window = this->window->getSystemHandle();
+    ::Window x11Window = Window->getSystemHandle();
 
     Display* display = XOpenDisplay(nullptr);
     if (!display) {
@@ -222,18 +309,19 @@ void Game::setMinimumWindowSize(sf::Vector2i minimumSize)
 
     XFree(hints);
     XCloseDisplay(display);
+#endif // __linux__
 }
 
-#endif // __linux__
-
-#ifdef _WIN32
-
-void Game::setMinimumWindowSize(sf::Vector2i minimumSize)
+void Game::SetMinimumWindowSize_Windows([[maybe_unused]] sf::Vector2i minimumSize)
 {
-    Game::MIN_WINDOW_WIDTH = minimumSize.x;
-    Game::MIN_WINDOW_HEIGHT = minimumSize.y;
+#ifdef _WIN32
+    static int MinWindowWidth = 0;
+    static int MinWindowHeight = 0;
 
-    ::HWND hwnd = this->window->getSystemHandle();
+    MinWindowWidth = minimumSize.x;
+    MinWindowHeight = minimumSize.y;
+
+    ::HWND hwnd = Window->getSystemHandle();
 
     static WNDPROC oldProc = reinterpret_cast<WNDPROC>(
         GetWindowLongPtr(hwnd, GWLP_WNDPROC)
@@ -242,13 +330,12 @@ void Game::setMinimumWindowSize(sf::Vector2i minimumSize)
     auto windowProc = [](HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) -> LRESULT {
         if (uMsg == WM_GETMINMAXINFO) {
             MINMAXINFO* mmi = reinterpret_cast<MINMAXINFO*>(lParam);
-            mmi->ptMinTrackSize.x = Game::MIN_WINDOW_WIDTH;
-            mmi->ptMinTrackSize.y = Game::MIN_WINDOW_HEIGHT;
+            mmi->ptMinTrackSize.x = MinWindowWidth;
+            mmi->ptMinTrackSize.y = MinWindowHeight;
         }
         return CallWindowProc(oldProc, hwnd, uMsg, wParam, lParam);
     };
 
     SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(+windowProc));
+#endif // _WIN32
 }
-
-#endif

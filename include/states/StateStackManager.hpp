@@ -3,6 +3,8 @@
 
 class IState;
 
+class RenderSnapshot;
+
 class StateStackManager
 {
 public:
@@ -20,17 +22,19 @@ public:
 
     void RenderStates(sf::RenderTarget& target);
 
+    void BuildSnapshot(RenderSnapshot& snapshot);
+
     void OnWindowResize();
 
-    void OnKeyPressed(sf::Event::KeyEvent& key);
+    void OnKeyPressed(const sf::Event::KeyEvent& key);
 
-    void OnKeyReleased(sf::Event::KeyEvent& key);
+    void OnKeyReleased(const sf::Event::KeyEvent& key);
 
-    void OnMouseButtonPressed(sf::Event::MouseButtonEvent& mouseButton);
+    void OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton);
 
-    void OnMouseButtonReleased(sf::Event::MouseButtonEvent& mouseButton);
+    void OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton);
 
-    void OnMouseMoved(sf::Event::MouseMoveEvent& mouseMove);
+    void OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove);
 
 private:
     std::vector<std::shared_ptr<IState>> StateStack;

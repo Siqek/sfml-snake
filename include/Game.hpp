@@ -7,6 +7,8 @@
 
 #include "settings/GameSettings.hpp"
 
+#include "render/RenderSnapshot.hpp"
+
 #include "utils/FPSCounter.hpp"
 
 class Game
@@ -15,44 +17,62 @@ public:
     Game();
     ~Game();
 
-    void run();
-    void update();
-    void render();
-    void end();
+    void Run();
+    void End();
 
 private:
-    sf::RenderWindow* window;
-    sf::Clock dtClock;
-    float dt;
+    void InitWindow();
+    void InitFont();
+    void InitStates();
 
-    FPSCounter fpsCounter;
-    sf::Text fpsText;
+    void Update();
+    void Render();
 
-    sf::Font font;
+    void UpdateLoop();
+    void RenderLoop();
 
-    GameSettings gameSettings;
+    void BuildSnapshot(RenderSnapshot& snapshot);
 
-    StateStackManager stateStack;
+    void UpdateDeltaTime();
+    void UpdateSFMLEvent();
+    void UpdateFPS();
 
-    StateContext stateContext;
+    void SetMinimumWindowSize(sf::Vector2i minimumSize);
 
-    void initWindow();
-    void initFont();
-    void initStates();
+    void SetMinimumWindowSize_Linux(sf::Vector2i minimumSize);
+    void SetMinimumWindowSize_Windows(sf::Vector2i minimumSize);
 
-    void updateDeltaTime();
-    void updateSFMLEvent();
-    void updateFPS();
+    std::atomic<bool> bIsRunning;
 
-#ifdef _WIN32
-    inline static int MIN_WINDOW_WIDTH = 0;
-    inline static int MIN_WINDOW_HEIGHT = 0;
-#endif // _WIN32
+    std::thread RenderThread;
 
-#if defined(__linux__) || defined(_WIN32)
-    void setMinimumWindowSize(sf::Vector2i minimumSize);
-#endif // __linux__ || _WIN32
+    RenderSnapshot Snapshots[3];
 
+    RenderSnapshot* ReadSnapshot;
+    RenderSnapshot* WriteSnapshot;
+    RenderSnapshot* BuiltSnapshot;
+
+    bool bIsNewSnapshotAvailable;
+
+    std::mutex SnapshotMutex;
+    std::condition_variable CV;
+
+    sf::RenderWindow* Window;
+    std::deque<sf::Event> EventQueue;
+
+    sf::Clock DeltaTimeClock;
+    float DeltaTime;
+
+    FPSCounter FpsCounter;
+    sf::Text FpsLabel;
+
+    sf::Font AppFont; // is it thread-safe?
+
+    GameSettings Settings;
+
+    StateStackManager StateStack;
+
+    StateContext Context;
 };
 
 #endif

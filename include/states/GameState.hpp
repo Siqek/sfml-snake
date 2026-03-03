@@ -31,9 +31,9 @@ public:
 
     void OnWindowResize() override;
 
-    void OnKeyPressed(sf::Event::KeyEvent& key) override;
+    void OnKeyPressed(const sf::Event::KeyEvent& key) override;
 
-    void OnKeyReleased(sf::Event::KeyEvent& key) override;
+    void OnKeyReleased(const sf::Event::KeyEvent& key) override;
 
 private:
     void InitKeybinds();

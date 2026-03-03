@@ -37,15 +37,15 @@ public:
 
     virtual void OnWindowResize() {}
 
-    virtual void OnKeyPressed(sf::Event::KeyEvent& /*key*/) {}
+    virtual void OnKeyPressed([[maybe_unused]] const sf::Event::KeyEvent& key) {}
 
-    virtual void OnKeyReleased(sf::Event::KeyEvent& /*key*/) {}
+    virtual void OnKeyReleased([[maybe_unused]] const sf::Event::KeyEvent& key) {}
 
-    virtual void OnMouseButtonPressed(sf::Event::MouseButtonEvent& /*mouseButton*/) {}
+    virtual void OnMouseButtonPressed([[maybe_unused]] const sf::Event::MouseButtonEvent& mouseButton) {}
 
-    virtual void OnMouseButtonReleased(sf::Event::MouseButtonEvent& /*mouseButton*/) {}
+    virtual void OnMouseButtonReleased([[maybe_unused]] const sf::Event::MouseButtonEvent& mouseButton) {}
 
-    virtual void OnMouseMoved(sf::Event::MouseMoveEvent& /*mouseMove*/) {}
+    virtual void OnMouseMoved([[maybe_unused]] const sf::Event::MouseMoveEvent& mouseMove) {}
 
     virtual void OnAttach() {}
 

@@ -86,7 +86,7 @@ void StateStackManager::OnWindowResize()
     }
 }
 
-void StateStackManager::OnKeyPressed(sf::Event::KeyEvent& key)
+void StateStackManager::OnKeyPressed(const sf::Event::KeyEvent& key)
 {
     for (auto& state : StateStack)
     {
@@ -94,7 +94,7 @@ void StateStackManager::OnKeyPressed(sf::Event::KeyEvent& key)
     }
 }
 
-void StateStackManager::OnKeyReleased(sf::Event::KeyEvent& key)
+void StateStackManager::OnKeyReleased(const sf::Event::KeyEvent& key)
 {
     for (auto& state : StateStack)
     {
@@ -102,7 +102,7 @@ void StateStackManager::OnKeyReleased(sf::Event::KeyEvent& key)
     }
 }
 
-void StateStackManager::OnMouseButtonPressed(sf::Event::MouseButtonEvent& mouseButton)
+void StateStackManager::OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton)
 {
     for (auto& state : StateStack)
     {
@@ -110,7 +110,7 @@ void StateStackManager::OnMouseButtonPressed(sf::Event::MouseButtonEvent& mouseB
     }
 }
 
-void StateStackManager::OnMouseButtonReleased(sf::Event::MouseButtonEvent& mouseButton)
+void StateStackManager::OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton)
 {
     for (auto& state : StateStack)
     {
@@ -118,7 +118,7 @@ void StateStackManager::OnMouseButtonReleased(sf::Event::MouseButtonEvent& mouse
     }
 }
 
-void StateStackManager::OnMouseMoved(sf::Event::MouseMoveEvent& mouseMove)
+void StateStackManager::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
 {
     for (auto& state : StateStack)
     {
