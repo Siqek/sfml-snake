@@ -16,22 +16,22 @@ SettingsState::SettingsState(StateContext& context)
     Settings(Context.CurrentGameSettings)
 {
     const auto setElementColors = [](auto& element){
-        element.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
-        element.setFillColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverBg));
-        element.setFillColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveBg));
+        element.SetFillColor(mgui::ButtonTypes::EState::Idle,    sf::Color(Colors::Hex::ButtonIdleBg));
+        element.SetFillColor(mgui::ButtonTypes::EState::Hovered, sf::Color(Colors::Hex::ButtonHoverBg));
+        element.SetFillColor(mgui::ButtonTypes::EState::Pressed, sf::Color(Colors::Hex::ButtonActiveBg));
 
-        element.setAccentColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleOutline));
-        element.setAccentColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverOutline));
-        element.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
+        element.SetAccentColor(mgui::ButtonTypes::EState::Idle,    sf::Color(Colors::Hex::ButtonIdleOutline));
+        element.SetAccentColor(mgui::ButtonTypes::EState::Hovered, sf::Color(Colors::Hex::ButtonHoverOutline));
+        element.SetAccentColor(mgui::ButtonTypes::EState::Pressed, sf::Color(Colors::Hex::ButtonActiveOutline));
     };
 
     setElementColors(GridSizeSelector);
     setElementColors(SnakeSpeedSelector);
     setElementColors(MaxAppleCountSelector);
 
-    GridSizeSelector.setActiveOption(Settings.GridSize.Id);
-    SnakeSpeedSelector.setActiveOption(Settings.SnakeSpeed.Id);
-    MaxAppleCountSelector.setActiveOption(Settings.MaxAppleCount.Id);
+    GridSizeSelector.SetActiveOption(Settings.GridSize.Id);
+    SnakeSpeedSelector.SetActiveOption(Settings.SnakeSpeed.Id);
+    MaxAppleCountSelector.SetActiveOption(Settings.MaxAppleCount.Id);
 
     GridSizeLabel.setFont(Context.AppFont);
     GridSizeLabel.setString("Grid Size:");
@@ -42,12 +42,12 @@ SettingsState::SettingsState(StateContext& context)
     MaxAppleCountLabel.setFont(Context.AppFont);
     MaxAppleCountLabel.setString("Max Apple Count:");
 
-    SaveSettingsButton.setFont(Context.AppFont);
-    SaveSettingsButton.setText("Save");
+    SaveSettingsButton.SetFont(Context.AppFont);
+    SaveSettingsButton.SetText("Save");
     setElementColors(SaveSettingsButton);
 
-    SaveAndExitButton.setFont(Context.AppFont);
-    SaveAndExitButton.setText("Save & Exit");
+    SaveAndExitButton.SetFont(Context.AppFont);
+    SaveAndExitButton.SetText("Save & Exit");
     setElementColors(SaveAndExitButton);
 
     UpdateUIScaling();
@@ -65,32 +65,32 @@ void SettingsState::Render(sf::RenderTarget& target)
     target.draw(SnakeSpeedLabel);
     target.draw(MaxAppleCountLabel);
 
-    GridSizeSelector.render(target);
-    SnakeSpeedSelector.render(target);
-    MaxAppleCountSelector.render(target);
+    GridSizeSelector.Render(target);
+    SnakeSpeedSelector.Render(target);
+    MaxAppleCountSelector.Render(target);
 
-    SaveSettingsButton.render(target);
-    SaveAndExitButton.render(target);
+    SaveSettingsButton.Render(target);
+    SaveAndExitButton.Render(target);
 }
 
-void SettingsState::OnWindowResize()
+void SettingsState::OnWindowResize(const sf::Event::SizeEvent& size)
 {
     UpdateUIScaling();
 }
 
 void SettingsState::UpdateSelectors()
 {
-    GridSizeSelector.update(*Context.Window);
-    SnakeSpeedSelector.update(*Context.Window);
-    MaxAppleCountSelector.update(*Context.Window);
+    GridSizeSelector.Update(*Context.Window);
+    SnakeSpeedSelector.Update(*Context.Window);
+    MaxAppleCountSelector.Update(*Context.Window);
 
     const auto updateSettingIfChanged = [](const auto& selector, auto& setting)
     {
-        if (selector.hasActiveOptionChanged())
+        if (selector.HasActiveOptionChanged())
         {
-            const auto& option = selector.getActiveOption();
-            setting.Value = option.value;
-            setting.Id = option.id;
+            const auto& option = selector.GetActiveOption();
+            setting.Value = option.Value;
+            setting.Id = option.Id;
         }
     };
 
@@ -101,16 +101,16 @@ void SettingsState::UpdateSelectors()
 
 void SettingsState::UpdateButtons()
 {
-    SaveSettingsButton.update(*Context.Window);
-    SaveAndExitButton.update(*Context.Window);
+    SaveSettingsButton.Update(*Context.Window);
+    SaveAndExitButton.Update(*Context.Window);
 
-    if (SaveSettingsButton.isReleased())
+    if (SaveSettingsButton.IsReleased())
     {
         Context.CurrentGameSettings = Settings;
         Context.CurrentGameSettings.SaveToFile("config/game_settings.ini");
     }
 
-    if (SaveAndExitButton.isReleased())
+    if (SaveAndExitButton.IsReleased())
     {
         Context.CurrentGameSettings = Settings;
         Context.CurrentGameSettings.SaveToFile("config/game_settings.ini");
@@ -133,20 +133,20 @@ void SettingsState::UpdateUIScaling()
     const auto labelPositionOffset = selectorPositionOffset;
 
     // Update selectors
-    GridSizeSelector.setPosition(firstSelectorPosition);
-    GridSizeSelector.setSize(selectorSize);
-    GridSizeSelector.setOrigin(selectorSize / 2.f);
-    GridSizeSelector.setOutlineThickness(selectorOutlineThickness);
+    GridSizeSelector.SetPosition(firstSelectorPosition);
+    GridSizeSelector.SetSize(selectorSize);
+    GridSizeSelector.SetOrigin(selectorSize / 2.f);
+    GridSizeSelector.SetOutlineThickness(selectorOutlineThickness);
 
-    SnakeSpeedSelector.setPosition(firstSelectorPosition + selectorPositionOffset);
-    SnakeSpeedSelector.setSize(selectorSize);
-    SnakeSpeedSelector.setOrigin(selectorSize / 2.f);
-    SnakeSpeedSelector.setOutlineThickness(selectorOutlineThickness);
+    SnakeSpeedSelector.SetPosition(firstSelectorPosition + selectorPositionOffset);
+    SnakeSpeedSelector.SetSize(selectorSize);
+    SnakeSpeedSelector.SetOrigin(selectorSize / 2.f);
+    SnakeSpeedSelector.SetOutlineThickness(selectorOutlineThickness);
 
-    MaxAppleCountSelector.setPosition(firstSelectorPosition + 2.f * selectorPositionOffset);
-    MaxAppleCountSelector.setSize(selectorSize);
-    MaxAppleCountSelector.setOrigin(selectorSize / 2.f);
-    MaxAppleCountSelector.setOutlineThickness(selectorOutlineThickness);
+    MaxAppleCountSelector.SetPosition(firstSelectorPosition + 2.f * selectorPositionOffset);
+    MaxAppleCountSelector.SetSize(selectorSize);
+    MaxAppleCountSelector.SetOrigin(selectorSize / 2.f);
+    MaxAppleCountSelector.SetOutlineThickness(selectorOutlineThickness);
 
     // Update labels
     GridSizeLabel.setCharacterSize(labelCharacterSize);
@@ -174,14 +174,14 @@ void SettingsState::UpdateUIScaling()
     const auto buttonMarginFromWindowBorder = windowSize.x / 8.f;
 
     // Save button
-    SaveSettingsButton.setPosition(sf::Vector2f(buttonMarginFromWindowBorder, buttonPositionY));
-    SaveSettingsButton.setSize(buttonSize);
-    SaveSettingsButton.setCharacterSize(buttonCharacterSize);
-    SaveSettingsButton.setOutlineThickness(buttonOutlineThickness);
+    SaveSettingsButton.SetPosition(sf::Vector2f(buttonMarginFromWindowBorder, buttonPositionY));
+    SaveSettingsButton.SetSize(buttonSize);
+    SaveSettingsButton.SetCharacterSize(buttonCharacterSize);
+    SaveSettingsButton.SetOutlineThickness(buttonOutlineThickness);
 
     // Exit button
-    SaveAndExitButton.setPosition(sf::Vector2f(windowSize.x - buttonSize.x - buttonMarginFromWindowBorder, buttonPositionY));
-    SaveAndExitButton.setSize(buttonSize);
-    SaveAndExitButton.setCharacterSize(buttonCharacterSize);
-    SaveAndExitButton.setOutlineThickness(buttonOutlineThickness);
+    SaveAndExitButton.SetPosition(sf::Vector2f(windowSize.x - buttonSize.x - buttonMarginFromWindowBorder, buttonPositionY));
+    SaveAndExitButton.SetSize(buttonSize);
+    SaveAndExitButton.SetCharacterSize(buttonCharacterSize);
+    SaveAndExitButton.SetOutlineThickness(buttonOutlineThickness);
 }

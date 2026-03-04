@@ -57,16 +57,16 @@ ButtonOverlayBase<E, N>::ButtonOverlayBase(const sf::Vector2f& windowSize, const
     {
         Buttons[i].Id = buttonInits[i].Id;
 
-        Buttons[i].Button.setFont(font);
-        Buttons[i].Button.setText(buttonInits[i].Text);
+        Buttons[i].Button.SetFont(font);
+        Buttons[i].Button.SetText(buttonInits[i].Text);
 
-        Buttons[i].Button.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
-        Buttons[i].Button.setFillColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverBg));
-        Buttons[i].Button.setFillColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveBg));
+        Buttons[i].Button.SetFillColor(mgui::Button::EState::Idle,    sf::Color(Colors::Hex::ButtonIdleBg));
+        Buttons[i].Button.SetFillColor(mgui::Button::EState::Hovered, sf::Color(Colors::Hex::ButtonHoverBg));
+        Buttons[i].Button.SetFillColor(mgui::Button::EState::Pressed, sf::Color(Colors::Hex::ButtonActiveBg));
 
-        Buttons[i].Button.setAccentColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleOutline));
-        Buttons[i].Button.setAccentColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverOutline));
-        Buttons[i].Button.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
+        Buttons[i].Button.SetAccentColor(mgui::Button::EState::Idle,    sf::Color(Colors::Hex::ButtonIdleOutline));
+        Buttons[i].Button.SetAccentColor(mgui::Button::EState::Hovered, sf::Color(Colors::Hex::ButtonHoverOutline));
+        Buttons[i].Button.SetAccentColor(mgui::Button::EState::Pressed, sf::Color(Colors::Hex::ButtonActiveOutline));
     }
     UpdateUIScaling(windowSize);
 }
@@ -77,7 +77,7 @@ bool ButtonOverlayBase<E, N>::IsButtonReleased(E id) const
     for (const auto& button : Buttons)
     {
         if (button.Id == id)
-            return button.Button.isReleased();
+            return button.Button.IsReleased();
     }
 
     return false;
@@ -94,7 +94,7 @@ template<typename E, size_t N>
 void ButtonOverlayBase<E, N>::Update(const sf::RenderWindow& window)
 {
     for (auto& button : Buttons)
-        button.Button.update(window);
+        button.Button.Update(window);
 }
 
 template<typename E, size_t N>
@@ -106,7 +106,7 @@ void ButtonOverlayBase<E, N>::Render(sf::RenderTarget& target)
     Overlay::Render(target);
 
     for (auto& button : Buttons)
-        button.Button.render(target);
+        button.Button.Render(target);
 }
 
 template<typename E, size_t N>
@@ -122,11 +122,11 @@ void ButtonOverlayBase<E, N>::UpdateUIScaling(sf::Vector2f windowSize)
     {
         mgui::Button& button = Buttons[i].Button;
 
-        button.setSize(size);
-        button.setPosition(position + static_cast<float>(i) * positionOffset);
-        button.setOrigin(size / 2.f);
-        button.setOutlineThickness(outlineThickness);
-        button.setCharacterSize(characterSize);
+        button.SetSize(size);
+        button.SetPosition(position + static_cast<float>(i) * positionOffset);
+        button.SetOrigin(size / 2.f);
+        button.SetOutlineThickness(outlineThickness);
+        button.SetCharacterSize(characterSize);
     }
 }
 

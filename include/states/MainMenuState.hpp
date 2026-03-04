@@ -4,7 +4,7 @@
 #include "states/State.hpp"
 #include "mgui/Button.hpp"
 
-class MainMenuState
+class MainMenuState final
     : public IState
 {
 public:
@@ -14,7 +14,13 @@ public:
 
     void Render(sf::RenderTarget& target) override;
 
-    void OnWindowResize() override;
+    void OnWindowResize(const sf::Event::SizeEvent& size) override;
+
+    void OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton) override;
+
+    void OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton) override;
+
+    void OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove) override;
 
 private:
     void UpdateButtons();

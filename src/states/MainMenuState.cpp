@@ -10,23 +10,23 @@
 MainMenuState::MainMenuState(StateContext& context)
     : IState(context)
 {
-    PlayButton.setFont(Context.AppFont);
-    PlayButton.setText("Play");
+    PlayButton.SetFont(Context.AppFont);
+    PlayButton.SetText("Play");
 
-    GoToSettingsButton.setFont(Context.AppFont);
-    GoToSettingsButton.setText("Settings");
+    GoToSettingsButton.SetFont(Context.AppFont);
+    GoToSettingsButton.SetText("Settings");
 
-    ExitButton.setFont(Context.AppFont);
-    ExitButton.setText("Exit");
+    ExitButton.SetFont(Context.AppFont);
+    ExitButton.SetText("Exit");
 
     const auto setButtonColors = [](mgui::Button& button){
-        button.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
-        button.setFillColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverBg));
-        button.setFillColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveBg));
+        button.SetFillColor(mgui::Button::EState::Idle,    sf::Color(Colors::Hex::ButtonIdleBg));
+        button.SetFillColor(mgui::Button::EState::Hovered, sf::Color(Colors::Hex::ButtonHoverBg));
+        button.SetFillColor(mgui::Button::EState::Pressed, sf::Color(Colors::Hex::ButtonActiveBg));
 
-        button.setAccentColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleOutline));
-        button.setAccentColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverOutline));
-        button.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
+        button.SetAccentColor(mgui::Button::EState::Idle,    sf::Color(Colors::Hex::ButtonIdleOutline));
+        button.SetAccentColor(mgui::Button::EState::Hovered, sf::Color(Colors::Hex::ButtonHoverOutline));
+        button.SetAccentColor(mgui::Button::EState::Pressed, sf::Color(Colors::Hex::ButtonActiveOutline));
     };
 
     setButtonColors(PlayButton);
@@ -43,35 +43,50 @@ void MainMenuState::Update(float /*dt*/)
 
 void MainMenuState::Render(sf::RenderTarget& target)
 {
-    PlayButton.render(target);
-    GoToSettingsButton.render(target);
-    ExitButton.render(target);
+    PlayButton.Render(target);
+    GoToSettingsButton.Render(target);
+    ExitButton.Render(target);
 }
 
-void MainMenuState::OnWindowResize()
+void MainMenuState::OnWindowResize(const sf::Event::SizeEvent& size)
 {
     UpdateUIScaling();
 }
 
+void MainMenuState::OnMouseButtonPressed(const sf::Event::MouseButtonEvent &mouseButton)
+{
+    ;
+}
+
+void MainMenuState::OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton)
+{
+    ;
+}
+
+void MainMenuState::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
+{
+    ;
+}
+
 void MainMenuState::UpdateButtons()
 {
-    PlayButton.update(*Context.Window);
-    GoToSettingsButton.update(*Context.Window);
-    ExitButton.update(*Context.Window);
+    PlayButton.Update(*Context.Window);
+    GoToSettingsButton.Update(*Context.Window);
+    ExitButton.Update(*Context.Window);
 
-    if (PlayButton.isReleased())
+    if (PlayButton.IsReleased())
     {
         Context.StateStack.QueueAttach(std::make_shared<GridSelectionState>(Context));
         MarkToBeDetached();
     }
 
-    if (GoToSettingsButton.isReleased())
+    if (GoToSettingsButton.IsReleased())
     {
         Context.StateStack.QueueAttach(std::make_shared<SettingsState>(Context));
         MarkToBeDetached();
     }
 
-    if (ExitButton.isReleased())
+    if (ExitButton.IsReleased())
     {
         MarkToBeDetached();
     }
@@ -96,10 +111,10 @@ void MainMenuState::UpdateUIScaling()
 
     for (size_t i = 0; i < buttons.size(); ++i) {
         mgui::Button* button = buttons[i];
-        button->setPosition(sf::Vector2f(firstButtonPosition.x, firstButtonPosition.y + buttonYPositionOffset * static_cast<float>(i)));
-        button->setSize(buttonSize);
-        button->setCharacterSize(buttonCharacterSize);
-        button->setOrigin(buttonSize / 2.f);
-        button->setOutlineThickness(buttonOutlineThickness);
+        button->SetPosition(sf::Vector2f(firstButtonPosition.x, firstButtonPosition.y + buttonYPositionOffset * static_cast<float>(i)));
+        button->SetSize(buttonSize);
+        button->SetCharacterSize(buttonCharacterSize);
+        button->SetOrigin(buttonSize / 2.f);
+        button->SetOutlineThickness(buttonOutlineThickness);
     }
 }

@@ -4,144 +4,220 @@
 namespace mgui
 {
     Button::Button()
-        : prevState(ButtonState::Idle), state(ButtonState::Idle)
+        : PreviousState(EState::Idle), CurrentState(EState::Idle)
     {
-        this->applyColorScheme(this->idleColor);
+        ApplyColorScheme(IdleColor);
     }
 
-    void Button::setSize(const sf::Vector2f& size)
+    void Button::SetSize(sf::Vector2f size)
     {
-        this->shape.setSize(size);
-        this->updateTextOrigin();
+        Shape.setSize(size);
+        UpdateTextOrigin();
     }
 
-    void Button::setPosition(const sf::Vector2f& position)
+    void Button::SetPosition(sf::Vector2f position)
     {
-        this->shape.setPosition(position);
-        this->label.setPosition(position);
+        Shape.setPosition(position);
+        Label.setPosition(position);
     }
 
-    void Button::setOrigin(const sf::Vector2f& origin)
+    void Button::SetOrigin(sf::Vector2f origin)
     {
-        this->shape.setOrigin(origin);
-        this->updateTextOrigin();
+        Shape.setOrigin(origin);
+        UpdateTextOrigin();
     }
 
-    void Button::setText(const std::string& text)
+    void Button::SetOutlineThickness(float thickness)
     {
-        this->label.setString(text);
-        this->updateTextOrigin();
+        Shape.setOutlineThickness(thickness);
     }
 
-    void Button::setCharacterSize(unsigned size)
+    void Button::SetText(const std::string& text)
     {
-        this->label.setCharacterSize(size);
-        this->updateTextOrigin();
+        Label.setString(text);
+        UpdateTextOrigin();
     }
 
-    void Button::setFillColor(ButtonState state, const sf::Color& color)
+    void Button::SetFont(const sf::Font& font)
+    {
+        Label.setFont(font);
+    }
+
+    void Button::SetCharacterSize(unsigned size)
+    {
+        Label.setCharacterSize(size);
+        UpdateTextOrigin();
+    }
+
+    void Button::SetFillColor(EState state, sf::Color color)
     {
         switch (state)
         {
-        case ButtonState::Idle:
-            this->idleColor.fillColor = color;
-            break;
-        case ButtonState::Hover:
-            this->hoverColor.fillColor = color;
-            break;
-        case ButtonState::Active:
-            this->activeColor.fillColor = color;
-            break;
-        default:
-            break;
+            case EState::Idle:
+                IdleColor.FillColor = color;
+                break;
+
+            case EState::Hovered:
+                HoveredColor.FillColor = color;
+                break;
+
+            case EState::Pressed:
+                PressedColor.FillColor = color;
+                break;
+
+            default:
+                break;
         }
-        if (this->state == state)
-            this->updateColor();
+
+        if (CurrentState == state)
+        {
+            UpdateColor();
+        }
     }
 
-    void Button::setAccentColor(ButtonState state, const sf::Color& color)
+    void Button::SetAccentColor(EState state, sf::Color color)
     {
         switch (state)
         {
-        case ButtonState::Idle:
-            this->idleColor.accentColor = color;
-            break;
-        case ButtonState::Hover:
-            this->hoverColor.accentColor = color;
-            break;
-        case ButtonState::Active:
-            this->activeColor.accentColor = color;
-            break;
-        default:
-            break;
+            case EState::Idle:
+                IdleColor.AccentColor = color;
+                break;
+
+            case EState::Hovered:
+                HoveredColor.AccentColor = color;
+                break;
+
+            case EState::Pressed:
+                PressedColor.AccentColor = color;
+                break;
+
+            default:
+                break;
         }
-        if (this->state == state)
-            this->updateColor();
-    }
 
-    void Button::update(const sf::RenderWindow& window)
-    {
-        this->updateState(window);
-    }
-
-    void Button::render(sf::RenderTarget& target)
-    {
-        target.draw(this->shape);
-        target.draw(this->label);
-    }
-
-    void Button::updateState(const sf::RenderWindow& window)
-    {
-        this->prevState = this->state;
-
-        if (this->shape.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window))))
+        if (CurrentState == state)
         {
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
-                this->state = ButtonState::Active;
-            } else {
-                this->state = ButtonState::Hover;
+            UpdateColor();
+        }
+    }
+
+    sf::Vector2f Button::GetSize() const
+    {
+        return Shape.getSize();
+    }
+
+    sf::FloatRect Button::GetTextLocalBounds() const
+    {
+        return Label.getLocalBounds();
+    }
+
+    bool Button::IsPressed() const
+    {
+        return CurrentState == EState::Pressed;
+    }
+
+    bool Button::IsReleased() const
+    {
+        return PreviousState == EState::Pressed && CurrentState == EState::Hovered;
+    }
+
+    void Button::Update(const sf::RenderWindow& window)
+    {
+        UpdateState(window);
+    }
+
+    void Button::Render(sf::RenderTarget& target)
+    {
+        target.draw(Shape);
+        target.draw(Label);
+    }
+
+    void Button::OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton)
+    {
+        // TODO(siqek):
+    }
+
+    void Button::OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton)
+    {
+        // TODO(siqek):
+    }
+
+    void Button::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
+    {
+        // TODO(siqek):
+
+
+        // const bool isMouseOnButton = Shape.getGlobalBounds().contains(sf::Vector2f(mouseMove.x, mouseMove.y));
+
+        // if (!isMouseOnButton)
+        // {
+        //     // PreviousState = CurrentState;
+        //     // CurrentState = ;
+        // }
+    }
+
+    void Button::UpdateState(const sf::RenderWindow& window)
+    {
+        PreviousState = CurrentState;
+
+        if (Shape.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window))))
+        {
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+            {
+                CurrentState = EState::Pressed;
             }
-        } else {
-            this->state = ButtonState::Idle;
+            else
+            {
+                CurrentState = EState::Hovered;
+            }
+        }
+        else
+        {
+            CurrentState = EState::Idle;
         }
 
-        if (this->prevState != this->state)
-            this->updateColor();
+        if (PreviousState != CurrentState)
+        {
+            UpdateColor();
+        }
     }
 
-    void Button::updateTextOrigin()
+    void Button::UpdateTextOrigin()
     {
-        const auto& shapeSize = this->shape.getSize();
-        const auto& shapeOrigin = this->shape.getOrigin();
-        const auto lb = this->label.getLocalBounds();
-        this->label.setOrigin(sf::Vector2f(
+        const auto shapeSize = Shape.getSize();
+        const auto shapeOrigin = Shape.getOrigin();
+        const auto lb = Label.getLocalBounds();
+        Label.setOrigin(sf::Vector2f(
             lb.left + lb.width / 2.f - shapeSize.x / 2.f + shapeOrigin.x,
             lb.top + lb.height / 2.f - shapeSize.y / 2.f + shapeOrigin.y
         ));
     }
 
-    void Button::updateColor()
+    void Button::UpdateColor()
     {
-        switch (this->state)
+        switch (CurrentState)
         {
-        case ButtonState::Idle:
-            this->applyColorScheme(this->idleColor);
-            break;
-        case ButtonState::Hover:
-            this->applyColorScheme(this->hoverColor);
-            break;
-        case ButtonState::Active:
-            this->applyColorScheme(this->activeColor);
-            break;
-        default:
-            break;
+            case EState::Idle:
+                ApplyColorScheme(IdleColor);
+                break;
+
+            case EState::Hovered:
+                ApplyColorScheme(HoveredColor);
+                break;
+
+            case EState::Pressed:
+                ApplyColorScheme(PressedColor);
+                break;
+
+            default:
+                break;
         }
     }
 
-    void Button::applyColorScheme(const ColorScheme& colorScheme)
+    void Button::ApplyColorScheme(const ColorScheme& colorScheme)
     {
-        this->shape.setFillColor(colorScheme.fillColor);
-        this->shape.setOutlineColor(colorScheme.accentColor);
-        this->label.setFillColor(colorScheme.accentColor);
+        Shape.setFillColor(colorScheme.FillColor);
+        Shape.setOutlineColor(colorScheme.AccentColor);
+        Label.setFillColor(colorScheme.AccentColor);
     }
 }

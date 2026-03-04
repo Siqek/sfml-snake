@@ -145,11 +145,11 @@ void GameState::Render(sf::RenderTarget& target)
     EndGameMenu.Render(target);
 }
 
-void GameState::OnWindowResize()
+void GameState::OnWindowResize(const sf::Event::SizeEvent& size)
 {
     UpdateUIScaling();
 
-    const sf::Vector2f windowSize(Context.Window->getSize());
+    const sf::Vector2f windowSize(size.width, size.height);
 
     InstructionsOverlay.OnWindowResize(windowSize);
     PauseMenu.OnWindowResize(windowSize);

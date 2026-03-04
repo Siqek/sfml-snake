@@ -17,231 +17,252 @@ template<typename T>
 class ArrowSelector
 {
 public:
+    using EState = mgui::ButtonTypes::EState;
+
     struct Option {
-        std::string id;
-        std::string label;
-        T value;
+        std::string Id;
+        std::string Label;
+        T Value;
     };
 
     ArrowSelector(const std::vector<Option>& options, const sf::Font& font, size_t initialOptionIndex = 0);
     ~ArrowSelector() = default;
 
-    void setSize(const sf::Vector2f& size);
-    void setPosition(const sf::Vector2f& position);
-    void setOrigin(const sf::Vector2f& origin);
+    void SetSize(sf::Vector2f size);
+    void SetPosition(sf::Vector2f position);
+    void SetOrigin(sf::Vector2f origin);
+    void SetOutlineThickness(float thickness);
 
-    void setOutlineThickness(float thickness);
+    void SetFillColor(EState state, sf::Color color);
+    void SetAccentColor(EState state, sf::Color color);
 
-    void setFillColor(mgui::ButtonState state, const sf::Color& color);
-    void setAccentColor(mgui::ButtonState state, const sf::Color& color);
+    void SetActiveOption(const std::string& optionId);
 
-    void setActiveOption(const std::string& optionId);
+    sf::Vector2f GetSize() const { return Size; };
 
-    sf::Vector2f getSize() const { return size; };
+    const Option& GetActiveOption() const { return Options.at(ActiveOptionIndex); }
 
-    const Option& getActiveOption() const { return options.at(activeOptionIndex); }
+    T GetActiveValue() const { return GetActiveOption().Value; }
+    const T& GetActiveValueRef() const { return GetActiveOption().Value; }
 
-    T getActiveValue() const { return options.at(activeOptionIndex).value; }
-    const T& getActiveValueRef() const { return options.at(activeOptionIndex).value; }
+    bool HasActiveOptionChanged() const { return bHasActiveOptionChanged; }
 
-    bool hasActiveOptionChanged() const { return activeOptionChanged; }
-
-    void update(const sf::RenderWindow& window);
-    void render(sf::RenderTarget& target);
+    void Update(const sf::RenderWindow& window);
+    void Render(sf::RenderTarget& target);
 
 private:
-    void nextOption();
-    void prevOption();
+    void NextOption();
+    void PrevOption();
 
-    void updateOptionLabelString();
+    void UpdateOptionLabelString();
 
-    void updateOptionLabelOrigin();
-    void updateOrigins();
+    void UpdateOptionLabelOrigin();
+    void UpdateOrigins();
 
-    const std::vector<Option>& options;
+    const std::vector<Option> Options;
 
-    mgui::Button leftArrow;
-    mgui::Button rightArrow;
+    mgui::Button LeftArrow;
+    mgui::Button RightArrow;
 
-    sf::Text optionLabel;
-    sf::RectangleShape optionBox;
+    sf::Text OptionLabel;
+    sf::RectangleShape OptionBox;
 
-    size_t activeOptionIndex;
+    size_t ActiveOptionIndex;
 
-    sf::Vector2f size;
-    sf::Vector2f origin;
+    sf::Vector2f Size;
+    sf::Vector2f Origin;
 
-    bool activeOptionChanged;
+    bool bHasActiveOptionChanged;
 };
 
 template<typename T>
 ArrowSelector<T>::ArrowSelector(const std::vector<Option>& options, const sf::Font& font, size_t initialOptionIndex)
-    : options(options), activeOptionIndex(initialOptionIndex), activeOptionChanged(false)
+    : Options(options), ActiveOptionIndex(initialOptionIndex), bHasActiveOptionChanged(false)
 {
-    assert(!this->options.empty());
-    assert(this->activeOptionIndex < this->options.size());
+    assert(!Options.empty());
+    assert(ActiveOptionIndex < Options.size());
 
-    if (this->activeOptionIndex >= this->options.size())
-        this->activeOptionIndex = 0;
+    if (ActiveOptionIndex >= Options.size())
+    {
+        ActiveOptionIndex = 0;
+    }
 
-    this->leftArrow.setFont(font);
-    this->rightArrow.setFont(font);
-    this->optionLabel.setFont(font);
+    LeftArrow.SetFont(font);
+    RightArrow.SetFont(font);
 
-    this->leftArrow.setText("<");
-    this->rightArrow.setText(">");
-    this->updateOptionLabelString();
+    OptionLabel.setFont(font);
+
+    LeftArrow.SetText("<");
+    RightArrow.SetText(">");
+
+    UpdateOptionLabelString();
 }
 
 template<typename T>
-void ArrowSelector<T>::setSize(const sf::Vector2f& size)
+void ArrowSelector<T>::SetSize(sf::Vector2f size)
 {
-    this->size = size;
+    Size = size;
 
     const float width = size.x;
     const float height = size.y;
 
     unsigned characterSize = static_cast<unsigned>(height / 2.f);
 
-    this->leftArrow.setCharacterSize(characterSize);
-    this->rightArrow.setCharacterSize(characterSize);
-    this->optionLabel.setCharacterSize(characterSize);
+    LeftArrow.SetCharacterSize(characterSize);
+    RightArrow.SetCharacterSize(characterSize);
 
-    this->leftArrow.setSize(sf::Vector2f(height, height));
-    this->rightArrow.setSize(sf::Vector2f(height, height));
-    this->optionBox.setSize(sf::Vector2f(width - 2.f * height, height));
+    OptionLabel.setCharacterSize(characterSize);
 
-    this->updateOrigins();
+    LeftArrow.SetSize(sf::Vector2f(height, height));
+    RightArrow.SetSize(sf::Vector2f(height, height));
+
+    OptionBox.setSize(sf::Vector2f(width - 2.f * height, height));
+
+    UpdateOrigins();
 }
 
 template<typename T>
-void ArrowSelector<T>::setPosition(const sf::Vector2f& position)
+void ArrowSelector<T>::SetPosition(sf::Vector2f position)
 {
-    this->leftArrow.setPosition(position);
-    this->rightArrow.setPosition(position);
-    this->optionBox.setPosition(position);
-    this->optionLabel.setPosition(position);
+    LeftArrow.SetPosition(position);
+    RightArrow.SetPosition(position);
+
+    OptionBox.setPosition(position);
+    OptionLabel.setPosition(position);
 }
 
 template<typename T>
-void ArrowSelector<T>::setOrigin(const sf::Vector2f& origin)
+void ArrowSelector<T>::SetOrigin(sf::Vector2f origin)
 {
-    this->origin = origin;
-    this->updateOrigins();
+    Origin = origin;
+    UpdateOrigins();
 }
 
 template<typename T>
-void ArrowSelector<T>::setOutlineThickness(float thickness)
+void ArrowSelector<T>::SetOutlineThickness(float thickness)
 {
-    this->leftArrow.setOutlineThickness(thickness);
-    this->rightArrow.setOutlineThickness(thickness);
-    this->optionBox.setOutlineThickness(thickness);
+    LeftArrow.SetOutlineThickness(thickness);
+    RightArrow.SetOutlineThickness(thickness);
+
+    OptionBox.setOutlineThickness(thickness);
 }
 
 template<typename T>
-void ArrowSelector<T>::setFillColor(mgui::ButtonState state, const sf::Color& color)
+void ArrowSelector<T>::SetFillColor(EState state, sf::Color color)
 {
-    this->leftArrow.setFillColor(state, color);
-    this->rightArrow.setFillColor(state, color);
+    LeftArrow.SetFillColor(state, color);
+    RightArrow.SetFillColor(state, color);
 
-    if (state == ButtonState::Idle) {
-        this->optionBox.setFillColor(color);
-    }
-}
-
-template<typename T>
-void ArrowSelector<T>::setAccentColor(mgui::ButtonState state, const sf::Color& color)
-{
-    this->leftArrow.setAccentColor(state, color);
-    this->rightArrow.setAccentColor(state, color);
-
-    if (state == ButtonState::Idle) {
-        this->optionLabel.setFillColor(color);
-        this->optionBox.setOutlineColor(color);
-    }
-}
-
-template<typename T>
-void ArrowSelector<T>::setActiveOption(const std::string& optionId)
-{
-    for (size_t i = 0; i < this->options.size(); ++i)
+    if (state == EState::Idle)
     {
-        if (this->options[i].id == optionId)
+        OptionBox.setFillColor(color);
+    }
+}
+
+template<typename T>
+void ArrowSelector<T>::SetAccentColor(EState state, sf::Color color)
+{
+    LeftArrow.SetAccentColor(state, color);
+    RightArrow.SetAccentColor(state, color);
+
+    if (state == EState::Idle)
+    {
+        OptionLabel.setFillColor(color);
+        OptionBox.setOutlineColor(color);
+    }
+}
+
+template<typename T>
+void ArrowSelector<T>::SetActiveOption(const std::string& optionId)
+{
+    for (size_t i = 0; i < Options.size(); ++i)
+    {
+        if (Options[i].Id == optionId)
         {
-            this->activeOptionIndex = i;
-            this->updateOptionLabelString();
+            ActiveOptionIndex = i;
+            UpdateOptionLabelString();
+            break;
         }
     }
 }
 
 template<typename T>
-void ArrowSelector<T>::update(const sf::RenderWindow& window)
+void ArrowSelector<T>::Update(const sf::RenderWindow& window)
 {
-    this->activeOptionChanged = false;
+    bHasActiveOptionChanged = false;
 
-    this->leftArrow.update(window);
-    this->rightArrow.update(window);
+    LeftArrow.Update(window);
+    RightArrow.Update(window);
 
-    if (this->leftArrow.isReleased())
-        this->prevOption();
+    if (LeftArrow.IsReleased())
+    {
+        PrevOption();
+    }
 
-    if (this->rightArrow.isReleased())
-        this->nextOption();
+    if (RightArrow.IsReleased())
+    {
+        NextOption();
+    }
 }
 
 template<typename T>
-void ArrowSelector<T>::render(sf::RenderTarget& target)
+void ArrowSelector<T>::Render(sf::RenderTarget& target)
 {
-    target.draw(this->optionBox);
-    target.draw(this->optionLabel);
+    target.draw(OptionBox);
+    target.draw(OptionLabel);
 
-    this->leftArrow.render(target);
-    this->rightArrow.render(target);
+    LeftArrow.Render(target);
+    RightArrow.Render(target);
 }
 
 template<typename T>
-void ArrowSelector<T>::nextOption()
+void ArrowSelector<T>::NextOption()
 {
-    if (this->activeOptionIndex >= this->options.size() - 1)
+    if (ActiveOptionIndex >= Options.size() - 1)
+    {
         return;
+    }
 
-    this->activeOptionIndex++;
-    this->activeOptionChanged = true;
-    this->updateOptionLabelString();
+    ActiveOptionIndex++;
+    bHasActiveOptionChanged = true;
+    UpdateOptionLabelString();
 }
 
 template<typename T>
-void ArrowSelector<T>::prevOption()
+void ArrowSelector<T>::PrevOption()
 {
-    if (this->activeOptionIndex <= 0)
+    if (ActiveOptionIndex <= 0)
+    {
         return;
+    }
 
-    this->activeOptionIndex--;
-    this->activeOptionChanged = true;
-    this->updateOptionLabelString();
+    ActiveOptionIndex--;
+    bHasActiveOptionChanged = true;
+    UpdateOptionLabelString();
 }
 
 template<typename T>
-void ArrowSelector<T>::updateOptionLabelString()
+void ArrowSelector<T>::UpdateOptionLabelString()
 {
-    this->optionLabel.setString(this->options.at(this->activeOptionIndex).label);
-    this->updateOptionLabelOrigin();
+    OptionLabel.setString(GetActiveOption().Label);
+    UpdateOptionLabelOrigin();
 }
 
 template<typename T>
-void ArrowSelector<T>::updateOptionLabelOrigin()
+void ArrowSelector<T>::UpdateOptionLabelOrigin()
 {
-    const auto tlb = this->optionLabel.getLocalBounds();
-    this->optionLabel.setOrigin(this->origin - this->size / 2.f + sf::Vector2f(tlb.left + tlb.width / 2.f, tlb.top + tlb.height / 2.f));
+    const auto tlb = OptionLabel.getLocalBounds();
+    OptionLabel.setOrigin(Origin - Size / 2.f + sf::Vector2f(tlb.left + tlb.width / 2.f, tlb.top + tlb.height / 2.f));
 }
 
 template<typename T>
-void ArrowSelector<T>::updateOrigins()
+void ArrowSelector<T>::UpdateOrigins()
 {
-    this->leftArrow.setOrigin(this->origin);
-    this->rightArrow.setOrigin(this->origin - sf::Vector2f(this->size.x - this->size.y, 0.f));
-    this->optionBox.setOrigin(this->origin - sf::Vector2f(this->size.y, 0.f));
-    this->updateOptionLabelOrigin();
+    LeftArrow.SetOrigin(Origin);
+    RightArrow.SetOrigin(Origin - sf::Vector2f(Size.x - Size.y, 0.f));
+
+    OptionBox.setOrigin(Origin - sf::Vector2f(Size.y, 0.f));
+    UpdateOptionLabelOrigin();
 }
 
 } // namespace mgui

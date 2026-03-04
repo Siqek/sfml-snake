@@ -18,7 +18,7 @@ class ISnake;
 #include "states/overlays/PauseOverlay.hpp"
 #include "states/overlays/EndGameOverlay.hpp"
 
-class GameState
+class GameState final
     : public IState
 {
 public:
@@ -29,7 +29,7 @@ public:
 
     void Render(sf::RenderTarget& target) override;
 
-    void OnWindowResize() override;
+    void OnWindowResize(const sf::Event::SizeEvent& size) override;
 
     void OnKeyPressed(const sf::Event::KeyEvent& key) override;
 

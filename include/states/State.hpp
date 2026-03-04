@@ -5,23 +5,43 @@ class IState;
 class StateStackManager;
 class GameSettings;
 
-struct StateContext {
-    sf::RenderWindow* Window;
-    const sf::Font& AppFont;
-    StateStackManager& StateStack;
-    GameSettings& CurrentGameSettings;
-
+struct StateContext
+{
+public:
     StateContext(
-        sf::RenderWindow* window,
+        sf::RenderWindow* window, // TEMP // TODO(siqek): remove window from the struct
+        sf::Vector2f windowSize,
         const sf::Font& appFont,
         StateStackManager& stateStack,
         GameSettings& currentGameSettings
     )
-        : Window(window),
-          AppFont(appFont),
+        : AppFont(appFont),
           StateStack(stateStack),
-          CurrentGameSettings(currentGameSettings)
+          CurrentGameSettings(currentGameSettings),
+          Window(window), // TEMP // TODO(siqek): remove window from the struct
+          WindowSize(windowSize)
     {}
+
+    void SetWindowSize(sf::Vector2f windowSize)
+    {
+        std::lock_guard<std::mutex> lock(WindowSizeMutex);
+        WindowSize = windowSize;
+    }
+
+    sf::Vector2f GetWindowSize()
+    {
+        std::lock_guard<std::mutex> lock(WindowSizeMutex);
+        return WindowSize;
+    }
+
+    const sf::Font& AppFont;
+    StateStackManager& StateStack;
+    GameSettings& CurrentGameSettings;
+
+    sf::RenderWindow* Window; // TEMP // TODO(siqek): remove window from the struct
+private:
+    sf::Vector2f WindowSize;
+    std::mutex WindowSizeMutex;
 };
 
 class IState
@@ -35,7 +55,7 @@ public:
 
     virtual void Render(sf::RenderTarget& target) = 0;
 
-    virtual void OnWindowResize() {}
+    virtual void OnWindowResize([[maybe_unused]] const sf::Event::SizeEvent& size) {}
 
     virtual void OnKeyPressed([[maybe_unused]] const sf::Event::KeyEvent& key) {}
 

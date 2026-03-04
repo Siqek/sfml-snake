@@ -24,13 +24,13 @@ void GameSettings::LoadFromFile(const std::string& filename)
     IniParser iniParser(filename);
 
     const auto findValueById = [](const auto& options, const std::string& id)
-        -> const decltype(&options[0].value)
+        -> const decltype(&options[0].Value)
     {
         for (const auto& option : options)
         {
-            if (option.id == id)
+            if (option.Id == id)
             {
-                return &option.value;
+                return &option.Value;
             }
         }
         return nullptr;
@@ -106,29 +106,29 @@ void GameSettings::SaveToFile(const std::string& filename)
 GameSettings::Setting<EGridType> GameSettings::GetDefaultGridTypeSetting()
 {
     const auto& option = GameSettingsOptions::GridTypeOptions[GameSettingsOptions::DefaultGridTypeOptionIndex];
-    return Setting<EGridType>(option.id, option.value);
+    return Setting<EGridType>(option.Id, option.Value);
 }
 
 GameSettings::Setting<sf::Vector2i> GameSettings::GetDefaultGridSizeSetting()
 {
     const auto& option = GameSettingsOptions::GridSizeOptions[GameSettingsOptions::DefaultGridSizeOptionIndex];
-    return Setting<sf::Vector2i>(option.id, option.value);
+    return Setting<sf::Vector2i>(option.Id, option.Value);
 }
 
 GameSettings::Setting<sf::Vector2i> GameSettings::GetDefaultGridHoleSizeSetting()
 {
     const auto& option = GameSettingsOptions::GridHoleSizeOptions[GameSettingsOptions::DefaultGridHoleSizeOptionIndex];
-    return Setting<sf::Vector2i>(option.id, option.value);
+    return Setting<sf::Vector2i>(option.Id, option.Value);
 }
 
 GameSettings::Setting<float> GameSettings::GetDefaultSnakeSpeedSetting()
 {
     const auto& option = GameSettingsOptions::SnakeSpeedOptions[GameSettingsOptions::DefaultSnakeSpeedOptionIndex];
-    return Setting<float>(option.id, option.value);
+    return Setting<float>(option.Id, option.Value);
 }
 
 GameSettings::Setting<unsigned> GameSettings::GetDefaultMaxAppleCountSetting()
 {
     const auto& option = GameSettingsOptions::MaxAppleCountOptions[GameSettingsOptions::DefaultMaxAppleCountOptionIndex];
-    return Setting<unsigned>(option.id, option.value);
+    return Setting<unsigned>(option.Id, option.Value);
 }

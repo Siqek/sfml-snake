@@ -7,7 +7,7 @@
 
 #include "settings/GameSettings.hpp"
 
-class SettingsState
+class SettingsState final
     : public IState
 {
 public:
@@ -17,7 +17,7 @@ public:
 
     void Render(sf::RenderTarget& target) override;
 
-    void OnWindowResize() override;
+    void OnWindowResize(const sf::Event::SizeEvent& size) override;
 
 private:
     void UpdateSelectors();

@@ -35,21 +35,21 @@ GridSelectionState::GridSelectionState(StateContext& context)
     UpdateGridImitation(EGridType::Rectangular);
 
     const auto styleElement = [](auto& elem) -> void {
-        elem.setFillColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleBg));
-        elem.setFillColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverBg));
-        elem.setFillColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveBg));
+        elem.SetFillColor(mgui::ButtonTypes::EState::Idle,    sf::Color(Colors::Hex::ButtonIdleBg));
+        elem.SetFillColor(mgui::ButtonTypes::EState::Hovered, sf::Color(Colors::Hex::ButtonHoverBg));
+        elem.SetFillColor(mgui::ButtonTypes::EState::Pressed, sf::Color(Colors::Hex::ButtonActiveBg));
 
-        elem.setAccentColor(mgui::ButtonState::Idle,   sf::Color(Colors::Hex::ButtonIdleOutline));
-        elem.setAccentColor(mgui::ButtonState::Hover,  sf::Color(Colors::Hex::ButtonHoverOutline));
-        elem.setAccentColor(mgui::ButtonState::Active, sf::Color(Colors::Hex::ButtonActiveOutline));
+        elem.SetAccentColor(mgui::ButtonTypes::EState::Idle,    sf::Color(Colors::Hex::ButtonIdleOutline));
+        elem.SetAccentColor(mgui::ButtonTypes::EState::Hovered, sf::Color(Colors::Hex::ButtonHoverOutline));
+        elem.SetAccentColor(mgui::ButtonTypes::EState::Pressed, sf::Color(Colors::Hex::ButtonActiveOutline));
     };
 
     styleElement(GridTypeSelector);
     styleElement(GridSizeSelector);
     styleElement(GridHoleSizeSelector);
 
-    PlayButton.setFont(Context.AppFont);
-    PlayButton.setText("Play");
+    PlayButton.SetFont(Context.AppFont);
+    PlayButton.SetText("Play");
 
     styleElement(PlayButton);
 
@@ -58,36 +58,36 @@ GridSelectionState::GridSelectionState(StateContext& context)
 
 void GridSelectionState::Update(float /*dt*/)
 {
-    GridTypeSelector.update(*Context.Window);
-    GridSizeSelector.update(*Context.Window);
-    GridHoleSizeSelector.update(*Context.Window);
+    GridTypeSelector.Update(*Context.Window);
+    GridSizeSelector.Update(*Context.Window);
+    GridHoleSizeSelector.Update(*Context.Window);
 
-    PlayButton.update(*Context.Window);
+    PlayButton.Update(*Context.Window);
 
-    if (GridTypeSelector.hasActiveOptionChanged())
+    if (GridTypeSelector.HasActiveOptionChanged())
     {
-        UpdateGridImitation(GridTypeSelector.getActiveValue());
+        UpdateGridImitation(GridTypeSelector.GetActiveValue());
 
-        if (GridTypeSelector.getActiveValue() == EGridType::RectangularDonut)
+        if (GridTypeSelector.GetActiveValue() == EGridType::RectangularDonut)
         {
             AdjustHoleSizeToGridSize();
         }
     }
 
-    if (GridSizeSelector.hasActiveOptionChanged())
+    if (GridSizeSelector.HasActiveOptionChanged())
     {
-        if (GridTypeSelector.getActiveValue() == EGridType::RectangularDonut)
+        if (GridTypeSelector.GetActiveValue() == EGridType::RectangularDonut)
         {
             AdjustHoleSizeToGridSize();
         }
     }
 
-    if (GridHoleSizeSelector.hasActiveOptionChanged())
+    if (GridHoleSizeSelector.HasActiveOptionChanged())
     {
         AdjustHoleSizeToGridSize();
     }
 
-    if (PlayButton.isReleased())
+    if (PlayButton.IsReleased())
     {
         UpdateGameSettings();
         Context.StateStack.QueueAttach(std::make_shared<GameState>(Context));
@@ -101,21 +101,21 @@ void GridSelectionState::Render(sf::RenderTarget &target)
 
     target.draw(GridImitation);
 
-    GridTypeSelector.render(target);
+    GridTypeSelector.Render(target);
 
-    GridSizeSelector.render(target);
+    GridSizeSelector.Render(target);
     target.draw(GridSizeSelectorLabel);
 
-    if (GridTypeSelector.getActiveValue() == EGridType::RectangularDonut)
+    if (GridTypeSelector.GetActiveValue() == EGridType::RectangularDonut)
     {
-        GridHoleSizeSelector.render(target);
+        GridHoleSizeSelector.Render(target);
         target.draw(GridHoleSizeSelectorLabel);
     }
 
-    PlayButton.render(target);
+    PlayButton.Render(target);
 }
 
-void GridSelectionState::OnWindowResize()
+void GridSelectionState::OnWindowResize(const sf::Event::SizeEvent& size)
 {
     UpdateUIScaling();
 }
@@ -124,13 +124,13 @@ void GridSelectionState::UpdateGameSettings()
 {
     auto applyOption = [](auto& setting, const auto& option)
     {
-        setting.Id = option.id;
-        setting.Value = option.value;
+        setting.Id = option.Id;
+        setting.Value = option.Value;
     };
 
-    applyOption(Context.CurrentGameSettings.GridType, GridTypeSelector.getActiveOption());
-    applyOption(Context.CurrentGameSettings.GridSize, GridSizeSelector.getActiveOption());
-    applyOption(Context.CurrentGameSettings.GridHoleSize, GridHoleSizeSelector.getActiveOption());
+    applyOption(Context.CurrentGameSettings.GridType, GridTypeSelector.GetActiveOption());
+    applyOption(Context.CurrentGameSettings.GridSize, GridSizeSelector.GetActiveOption());
+    applyOption(Context.CurrentGameSettings.GridHoleSize, GridHoleSizeSelector.GetActiveOption());
 }
 
 void GridSelectionState::UpdateUIScaling()
@@ -160,10 +160,10 @@ void GridSelectionState::UpdateUIScaling()
     const sf::Vector2f mainSelectorSize = sf::Vector2f(backgroundSize.x * 0.9f, backgroundSize.y * 0.064f);
     const float mainSelectorOutlineThickness = mainSelectorSize.y / 16.f;
 
-    GridTypeSelector.setPosition(sf::Vector2f(backgroundPosition.x, backgroundPosition.y + backgroundSize.y / 2.f - mainSelectorSize.y));
-    GridTypeSelector.setSize(mainSelectorSize);
-    GridTypeSelector.setOrigin(mainSelectorSize / 2.f);
-    GridTypeSelector.setOutlineThickness(mainSelectorOutlineThickness);
+    GridTypeSelector.SetPosition(sf::Vector2f(backgroundPosition.x, backgroundPosition.y + backgroundSize.y / 2.f - mainSelectorSize.y));
+    GridTypeSelector.SetSize(mainSelectorSize);
+    GridTypeSelector.SetOrigin(mainSelectorSize / 2.f);
+    GridTypeSelector.SetOutlineThickness(mainSelectorOutlineThickness);
 
     const sf::Vector2f subselectorSize = mainSelectorSize * 0.8f;
     const float subselectorOutlineThickness = mainSelectorOutlineThickness * 0.8f;
@@ -190,35 +190,35 @@ void GridSelectionState::UpdateUIScaling()
     GridSizeSelectorLabel.setOutlineThickness(subselectorLabelOutlineThickness);
     centerOrigin(GridSizeSelectorLabel);
 
-    GridSizeSelector.setPosition(gridSizeSelectorPosition);
-    GridSizeSelector.setSize(subselectorSize);
-    GridSizeSelector.setOrigin(subselectorSize / 2.f);
-    GridSizeSelector.setOutlineThickness(subselectorOutlineThickness);
+    GridSizeSelector.SetPosition(gridSizeSelectorPosition);
+    GridSizeSelector.SetSize(subselectorSize);
+    GridSizeSelector.SetOrigin(subselectorSize / 2.f);
+    GridSizeSelector.SetOutlineThickness(subselectorOutlineThickness);
 
     GridHoleSizeSelectorLabel.setPosition(gridHoleSizeSelectorLabelPosition);
     GridHoleSizeSelectorLabel.setCharacterSize(subselectorLabelCharacterSize);
     GridHoleSizeSelectorLabel.setOutlineThickness(subselectorLabelOutlineThickness);
     centerOrigin(GridHoleSizeSelectorLabel);
 
-    GridHoleSizeSelector.setPosition(gridHoleSizeSelectorPosition);
-    GridHoleSizeSelector.setSize(subselectorSize);
-    GridHoleSizeSelector.setOrigin(subselectorSize / 2.f);
-    GridHoleSizeSelector.setOutlineThickness(subselectorOutlineThickness);
+    GridHoleSizeSelector.SetPosition(gridHoleSizeSelectorPosition);
+    GridHoleSizeSelector.SetSize(subselectorSize);
+    GridHoleSizeSelector.SetOrigin(subselectorSize / 2.f);
+    GridHoleSizeSelector.SetOutlineThickness(subselectorOutlineThickness);
 
     const float freeSpaceUnderBackground = windowSize.y - backgroundYTopMargin - backgroundSize.y;
     const sf::Vector2f playButtonPosition = sf::Vector2f(windowSize.x / 2.f, backgroundYTopMargin + backgroundSize.y + freeSpaceUnderBackground / 2.f);
     const unsigned playButtonCharacterSize = static_cast<unsigned>(freeSpaceUnderBackground / 6.f);
 
-    PlayButton.setPosition(playButtonPosition);
-    PlayButton.setCharacterSize(playButtonCharacterSize);
+    PlayButton.SetPosition(playButtonPosition);
+    PlayButton.SetCharacterSize(playButtonCharacterSize);
 
-    const sf::Vector2f playButtonTextSize = PlayButton.geTextLocalBounds().getSize();
+    const sf::Vector2f playButtonTextSize = PlayButton.GetTextLocalBounds().getSize();
     const sf::Vector2f playButtonSize = sf::Vector2f(playButtonTextSize.x * 6.f, playButtonTextSize.y * 2.f);
     const float playButtonOutlineThickness = playButtonSize.y / 16.f;
 
-    PlayButton.setSize(playButtonSize);
-    PlayButton.setOrigin(playButtonSize / 2.f);
-    PlayButton.setOutlineThickness(playButtonOutlineThickness);
+    PlayButton.SetSize(playButtonSize);
+    PlayButton.SetOrigin(playButtonSize / 2.f);
+    PlayButton.SetOutlineThickness(playButtonOutlineThickness);
 }
 
 void GridSelectionState::UpdateGridImitation(EGridType gridType)
@@ -242,8 +242,8 @@ void GridSelectionState::UpdateGridImitation(EGridType gridType)
 
 void GridSelectionState::AdjustHoleSizeToGridSize()
 {
-    const sf::Vector2i activeHoleSize = GridHoleSizeSelector.getActiveValue();
-    const sf::Vector2i activeGridSize = GridSizeSelector.getActiveValue();
+    const sf::Vector2i activeHoleSize = GridHoleSizeSelector.GetActiveValue();
+    const sf::Vector2i activeGridSize = GridSizeSelector.GetActiveValue();
     const sf::Vector2i activeRingSize = (activeGridSize - activeHoleSize) / 2;
 
     const bool isRingBigEnough =
@@ -256,10 +256,10 @@ void GridSelectionState::AdjustHoleSizeToGridSize()
     }
 
     // Finds and sets option with biggest possible value for active grid size.
-    std::string holeSizeId = GameSettingsOptions::GridHoleSizeOptions.front().id;
+    std::string holeSizeId = GameSettingsOptions::GridHoleSizeOptions.front().Id;
     for (const auto& holeSizeOption : GameSettingsOptions::GridHoleSizeOptions)
     {
-        const sf::Vector2i ringSize = (activeGridSize - holeSizeOption.value) / 2;
+        const sf::Vector2i ringSize = (activeGridSize - holeSizeOption.Value) / 2;
 
         const bool isRingTooSmall =
             ringSize.x < RectangularDonutGrid::MinRingSize ||
@@ -269,7 +269,7 @@ void GridSelectionState::AdjustHoleSizeToGridSize()
         {
             break;
         }
-        holeSizeId = holeSizeOption.id;
+        holeSizeId = holeSizeOption.Id;
     }
-    GridHoleSizeSelector.setActiveOption(holeSizeId);
+    GridHoleSizeSelector.SetActiveOption(holeSizeId);
 }

@@ -9,7 +9,7 @@
 
 #include "mgui/Button.hpp"
 
-class GridSelectionState
+class GridSelectionState final
     : public IState
 {
 public:
@@ -19,7 +19,7 @@ public:
 
     void Render(sf::RenderTarget& target) override;
 
-    void OnWindowResize() override;
+    void OnWindowResize(const sf::Event::SizeEvent& size) override;
 
 private:
     void UpdateGameSettings();

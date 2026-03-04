@@ -24,7 +24,7 @@ public:
 
     void BuildSnapshot(RenderSnapshot& snapshot);
 
-    void OnWindowResize();
+    void OnWindowResize(const sf::Event::SizeEvent& size);
 
     void OnKeyPressed(const sf::Event::KeyEvent& key);
 

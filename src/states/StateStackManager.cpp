@@ -78,11 +78,11 @@ void StateStackManager::RenderStates(sf::RenderTarget &target)
     }
 }
 
-void StateStackManager::OnWindowResize()
+void StateStackManager::OnWindowResize(const sf::Event::SizeEvent& size)
 {
     for (auto& state : StateStack)
     {
-        state->OnWindowResize();
+        state->OnWindowResize(size);
     }
 }
 

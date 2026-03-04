@@ -21,11 +21,12 @@
 Game::Game()
     : bIsRunning(false),
       Snapshots(), ReadSnapshot(&Snapshots[0]), WriteSnapshot(&Snapshots[1]), BuiltSnapshot(&Snapshots[2]), bIsNewSnapshotAvailable(false),
-      DeltaTime(0.f), Settings("config/game_settings.ini"), Context(nullptr, AppFont, StateStack, Settings)
+      DeltaTime(0.f), Settings("config/game_settings.ini"), Context(nullptr, sf::Vector2f(0, 0), AppFont, StateStack, Settings)
 {
     InitWindow();
 
     Context.Window = Window;
+    Context.SetWindowSize(sf::Vector2f(Window->getSize()));
 
     InitFont();
     InitStates();
@@ -242,7 +243,7 @@ void Game::UpdateSFMLEvent()
                 sf::FloatRect visibleArea({ 0.f, 0.f }, sf::Vector2f(event.size.width, event.size.height));
                 Window->setView(sf::View(visibleArea));
 
-                StateStack.OnWindowResize();
+                StateStack.OnWindowResize(event.size);
                 break;
             }
 
