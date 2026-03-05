@@ -59,6 +59,10 @@ namespace mgui
         void OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove);
 
     private:
+        void SetState(EState newState);
+
+        inline bool IsMouseOnButton(sf::Vector2f mousePosition) const;
+
         void UpdateState(const sf::RenderWindow& window);
 
         void UpdateTextOrigin();

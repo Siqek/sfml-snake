@@ -36,9 +36,9 @@ MainMenuState::MainMenuState(StateContext& context)
     UpdateUIScaling();
 }
 
-void MainMenuState::Update(float /*dt*/)
+void MainMenuState::Update([[maybe_unused]] float dt)
 {
-    UpdateButtons();
+    HandleButtonActions();
 }
 
 void MainMenuState::Render(sf::RenderTarget& target)
@@ -53,27 +53,29 @@ void MainMenuState::OnWindowResize(const sf::Event::SizeEvent& size)
     UpdateUIScaling();
 }
 
-void MainMenuState::OnMouseButtonPressed(const sf::Event::MouseButtonEvent &mouseButton)
+void MainMenuState::OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton)
 {
-    ;
+    PlayButton.OnMouseButtonPressed(mouseButton);
+    GoToSettingsButton.OnMouseButtonPressed(mouseButton);
+    ExitButton.OnMouseButtonPressed(mouseButton);
 }
 
 void MainMenuState::OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton)
 {
-    ;
+    PlayButton.OnMouseButtonReleased(mouseButton);
+    GoToSettingsButton.OnMouseButtonReleased(mouseButton);
+    ExitButton.OnMouseButtonReleased(mouseButton);
 }
 
 void MainMenuState::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
 {
-    ;
+    PlayButton.OnMouseMoved(mouseMove);
+    GoToSettingsButton.OnMouseMoved(mouseMove);
+    ExitButton.OnMouseMoved(mouseMove);
 }
 
-void MainMenuState::UpdateButtons()
+void MainMenuState::HandleButtonActions()
 {
-    PlayButton.Update(*Context.Window);
-    GoToSettingsButton.Update(*Context.Window);
-    ExitButton.Update(*Context.Window);
-
     if (PlayButton.IsReleased())
     {
         Context.StateStack.QueueAttach(std::make_shared<GridSelectionState>(Context));

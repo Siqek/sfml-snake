@@ -53,10 +53,10 @@ SettingsState::SettingsState(StateContext& context)
     UpdateUIScaling();
 }
 
-void SettingsState::Update(float /*dt*/)
+void SettingsState::Update([[maybe_unused]] float dt)
 {
     UpdateSelectors();
-    UpdateButtons();
+    HandleButtonActions();
 }
 
 void SettingsState::Render(sf::RenderTarget& target)
@@ -76,6 +76,24 @@ void SettingsState::Render(sf::RenderTarget& target)
 void SettingsState::OnWindowResize(const sf::Event::SizeEvent& size)
 {
     UpdateUIScaling();
+}
+
+void SettingsState::OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton)
+{
+    SaveSettingsButton.OnMouseButtonPressed(mouseButton);
+    SaveAndExitButton.OnMouseButtonPressed(mouseButton);
+}
+
+void SettingsState::OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton)
+{
+    SaveSettingsButton.OnMouseButtonReleased(mouseButton);
+    SaveAndExitButton.OnMouseButtonReleased(mouseButton);
+}
+
+void SettingsState::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
+{
+    SaveSettingsButton.OnMouseMoved(mouseMove);
+    SaveAndExitButton.OnMouseMoved(mouseMove);
 }
 
 void SettingsState::UpdateSelectors()
@@ -99,11 +117,8 @@ void SettingsState::UpdateSelectors()
     updateSettingIfChanged(MaxAppleCountSelector, Settings.MaxAppleCount);
 }
 
-void SettingsState::UpdateButtons()
+void SettingsState::HandleButtonActions()
 {
-    SaveSettingsButton.Update(*Context.Window);
-    SaveAndExitButton.Update(*Context.Window);
-
     if (SaveSettingsButton.IsReleased())
     {
         Context.CurrentGameSettings = Settings;

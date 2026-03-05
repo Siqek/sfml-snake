@@ -134,33 +134,61 @@ namespace mgui
 
     void Button::OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton)
     {
-        // TODO(siqek):
+        if (IsMouseOnButton(sf::Vector2f(mouseButton.x, mouseButton.y)) &&
+            mouseButton.button == sf::Mouse::Button::Left)
+        {
+            SetState(EState::Pressed);
+        }
     }
 
     void Button::OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton)
     {
-        // TODO(siqek):
+        if (IsMouseOnButton(sf::Vector2f(mouseButton.x, mouseButton.y)) &&
+            mouseButton.button == sf::Mouse::Button::Left)
+        {
+            SetState(EState::Hovered);
+        }
     }
 
     void Button::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
     {
-        // TODO(siqek):
+        if (!IsMouseOnButton(sf::Vector2f(mouseMove.x, mouseMove.y)))
+        {
+            SetState(EState::Idle);
+            return;
+        }
 
+        if (CurrentState == EState::Pressed)
+        {
+            return;
+        }
 
-        // const bool isMouseOnButton = Shape.getGlobalBounds().contains(sf::Vector2f(mouseMove.x, mouseMove.y));
+        SetState(EState::Hovered);
+    }
 
-        // if (!isMouseOnButton)
-        // {
-        //     // PreviousState = CurrentState;
-        //     // CurrentState = ;
-        // }
+    void Button::SetState(EState newState)
+    {
+        if (CurrentState == newState)
+        {
+            return;
+        }
+
+        PreviousState = CurrentState;
+        CurrentState = newState;
+
+        UpdateColor();
+    }
+
+    inline bool Button::IsMouseOnButton(sf::Vector2f mousePosition) const
+    {
+        return Shape.getGlobalBounds().contains(mousePosition);
     }
 
     void Button::UpdateState(const sf::RenderWindow& window)
     {
         PreviousState = CurrentState;
 
-        if (Shape.getGlobalBounds().contains(sf::Vector2f(sf::Mouse::getPosition(window))))
+        if (IsMouseOnButton(sf::Vector2f(sf::Mouse::getPosition(window))))
         {
             if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
             {

@@ -62,8 +62,6 @@ void GridSelectionState::Update(float /*dt*/)
     GridSizeSelector.Update(*Context.Window);
     GridHoleSizeSelector.Update(*Context.Window);
 
-    PlayButton.Update(*Context.Window);
-
     if (GridTypeSelector.HasActiveOptionChanged())
     {
         UpdateGridImitation(GridTypeSelector.GetActiveValue());
@@ -118,6 +116,21 @@ void GridSelectionState::Render(sf::RenderTarget &target)
 void GridSelectionState::OnWindowResize(const sf::Event::SizeEvent& size)
 {
     UpdateUIScaling();
+}
+
+void GridSelectionState::OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton)
+{
+    PlayButton.OnMouseButtonPressed(mouseButton);
+}
+
+void GridSelectionState::OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton)
+{
+    PlayButton.OnMouseButtonReleased(mouseButton);
+}
+
+void GridSelectionState::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
+{
+    PlayButton.OnMouseMoved(mouseMove);
 }
 
 void GridSelectionState::UpdateGameSettings()

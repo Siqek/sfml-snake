@@ -23,7 +23,8 @@ public:
     void OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove) override;
 
 private:
-    void UpdateButtons();
+    void HandleButtonActions();
+
     void UpdateUIScaling();
 
     mgui::Button PlayButton;
