@@ -4,7 +4,8 @@
 namespace mgui
 {
     Button::Button()
-        : PreviousState(EState::Idle), CurrentState(EState::Idle)
+        : CurrentState(EState::Idle),
+          OnReleaseCallback(nullptr)
     {
         ApplyColorScheme(IdleColor);
     }
@@ -101,6 +102,11 @@ namespace mgui
         }
     }
 
+    void Button::SetOnReleaseCallback(Callback callback)
+    {
+        OnReleaseCallback = std::move(callback);
+    }
+
     sf::Vector2f Button::GetSize() const
     {
         return Shape.getSize();
@@ -116,16 +122,6 @@ namespace mgui
         return CurrentState == EState::Pressed;
     }
 
-    bool Button::IsReleased() const
-    {
-        return PreviousState == EState::Pressed && CurrentState == EState::Hovered;
-    }
-
-    void Button::Update(const sf::RenderWindow& window)
-    {
-        UpdateState(window);
-    }
-
     void Button::Render(sf::RenderTarget& target)
     {
         target.draw(Shape);
@@ -135,7 +131,8 @@ namespace mgui
     void Button::OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton)
     {
         if (IsMouseOnButton(sf::Vector2f(mouseButton.x, mouseButton.y)) &&
-            mouseButton.button == sf::Mouse::Button::Left)
+            mouseButton.button == sf::Mouse::Button::Left &&
+            CurrentState == EState::Hovered)
         {
             SetState(EState::Pressed);
         }
@@ -144,9 +141,15 @@ namespace mgui
     void Button::OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton)
     {
         if (IsMouseOnButton(sf::Vector2f(mouseButton.x, mouseButton.y)) &&
-            mouseButton.button == sf::Mouse::Button::Left)
+            mouseButton.button == sf::Mouse::Button::Left &&
+            CurrentState == EState::Pressed)
         {
             SetState(EState::Hovered);
+
+            if (OnReleaseCallback)
+            {
+                OnReleaseCallback();
+            }
         }
     }
 
@@ -173,7 +176,6 @@ namespace mgui
             return;
         }
 
-        PreviousState = CurrentState;
         CurrentState = newState;
 
         UpdateColor();
@@ -182,32 +184,6 @@ namespace mgui
     inline bool Button::IsMouseOnButton(sf::Vector2f mousePosition) const
     {
         return Shape.getGlobalBounds().contains(mousePosition);
-    }
-
-    void Button::UpdateState(const sf::RenderWindow& window)
-    {
-        PreviousState = CurrentState;
-
-        if (IsMouseOnButton(sf::Vector2f(sf::Mouse::getPosition(window))))
-        {
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
-            {
-                CurrentState = EState::Pressed;
-            }
-            else
-            {
-                CurrentState = EState::Hovered;
-            }
-        }
-        else
-        {
-            CurrentState = EState::Idle;
-        }
-
-        if (PreviousState != CurrentState)
-        {
-            UpdateColor();
-        }
     }
 
     void Button::UpdateTextOrigin()

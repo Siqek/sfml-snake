@@ -17,6 +17,8 @@ namespace mgui
     public:
         using EState = ButtonTypes::EState;
 
+        using Callback = std::function<void()>;
+
         Button();
         ~Button() = default;
 
@@ -43,13 +45,13 @@ namespace mgui
         ////////////////////////////////////////////////////////////
         void SetAccentColor(EState state, sf::Color color);
 
+        void SetOnReleaseCallback(Callback callback);
+
         sf::Vector2f GetSize() const;
         sf::FloatRect GetTextLocalBounds() const;
 
         bool IsPressed() const;
-        bool IsReleased() const;
 
-        void Update(const sf::RenderWindow& window);
         void Render(sf::RenderTarget& target);
 
         void OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton);
@@ -62,8 +64,6 @@ namespace mgui
         void SetState(EState newState);
 
         inline bool IsMouseOnButton(sf::Vector2f mousePosition) const;
-
-        void UpdateState(const sf::RenderWindow& window);
 
         void UpdateTextOrigin();
 
@@ -87,8 +87,9 @@ namespace mgui
         ColorScheme HoveredColor;
         ColorScheme PressedColor;
 
-        EState PreviousState;
         EState CurrentState;
+
+        Callback OnReleaseCallback;
     };
 }
 

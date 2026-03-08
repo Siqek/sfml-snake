@@ -51,16 +51,22 @@ GridSelectionState::GridSelectionState(StateContext& context)
     PlayButton.SetFont(Context.AppFont);
     PlayButton.SetText("Play");
 
+    PlayButton.SetOnReleaseCallback([this]{
+        UpdateGameSettings();
+        Context.StateStack.QueueAttach(std::make_shared<GameState>(Context));
+        MarkToBeDetached();
+    });
+
     styleElement(PlayButton);
 
     UpdateUIScaling();
 }
 
-void GridSelectionState::Update(float /*dt*/)
+void GridSelectionState::Update([[maybe_unused]] float dt)
 {
-    GridTypeSelector.Update(*Context.Window);
-    GridSizeSelector.Update(*Context.Window);
-    GridHoleSizeSelector.Update(*Context.Window);
+    // GridTypeSelector.Update();
+    // GridSizeSelector.Update();
+    // GridHoleSizeSelector.Update();
 
     if (GridTypeSelector.HasActiveOptionChanged())
     {
@@ -83,13 +89,6 @@ void GridSelectionState::Update(float /*dt*/)
     if (GridHoleSizeSelector.HasActiveOptionChanged())
     {
         AdjustHoleSizeToGridSize();
-    }
-
-    if (PlayButton.IsReleased())
-    {
-        UpdateGameSettings();
-        Context.StateStack.QueueAttach(std::make_shared<GameState>(Context));
-        MarkToBeDetached();
     }
 }
 
@@ -120,16 +119,28 @@ void GridSelectionState::OnWindowResize(const sf::Event::SizeEvent& size)
 
 void GridSelectionState::OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton)
 {
+    GridTypeSelector.OnMouseButtonPressed(mouseButton);
+    GridSizeSelector.OnMouseButtonPressed(mouseButton);
+    GridHoleSizeSelector.OnMouseButtonPressed(mouseButton);
+
     PlayButton.OnMouseButtonPressed(mouseButton);
 }
 
 void GridSelectionState::OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton)
 {
+    GridTypeSelector.OnMouseButtonReleased(mouseButton);
+    GridSizeSelector.OnMouseButtonReleased(mouseButton);
+    GridHoleSizeSelector.OnMouseButtonReleased(mouseButton);
+
     PlayButton.OnMouseButtonReleased(mouseButton);
 }
 
 void GridSelectionState::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
 {
+    GridTypeSelector.OnMouseMoved(mouseMove);
+    GridSizeSelector.OnMouseMoved(mouseMove);
+    GridHoleSizeSelector.OnMouseMoved(mouseMove);
+
     PlayButton.OnMouseMoved(mouseMove);
 }
 

@@ -28,15 +28,20 @@ public:
             : Id(id), Text(text) {}
     };
 
-    ButtonOverlayBase(const sf::Vector2f& windowSize, const sf::Font& font, const std::array<ButtonInit, N>& buttonInits);
+    ButtonOverlayBase(sf::Vector2f windowSize, const sf::Font& font, const std::array<ButtonInit, N>& buttonInits);
     virtual ~ButtonOverlayBase() = default;
 
-    bool IsButtonReleased(E id) const;
+    void SetOnReleaseButtonCallback(E id, mgui::Button::Callback callback);
 
-    virtual void OnWindowResize(const sf::Vector2f& windowSize) override;
-
-    virtual void Update(const sf::RenderWindow& window) override;
     virtual void Render(sf::RenderTarget& target) override;
+
+    virtual void OnWindowResize(const sf::Event::SizeEvent& windowSize) override;
+
+    virtual void OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton);
+
+    virtual void OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton);
+
+    virtual void OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove);
 
 private:
     void UpdateUIScaling(sf::Vector2f windowSize);
@@ -50,7 +55,7 @@ private:
 };
 
 template<typename E, size_t N>
-ButtonOverlayBase<E, N>::ButtonOverlayBase(const sf::Vector2f& windowSize, const sf::Font& font, const std::array<ButtonInit, N>& buttonInits)
+ButtonOverlayBase<E, N>::ButtonOverlayBase(sf::Vector2f windowSize, const sf::Font& font, const std::array<ButtonInit, N>& buttonInits)
     : Overlay(windowSize, sf::Color(Colors::Hex::OverlayBackground))
 {
     for (size_t i = 0; i < N; ++i)
@@ -72,41 +77,68 @@ ButtonOverlayBase<E, N>::ButtonOverlayBase(const sf::Vector2f& windowSize, const
 }
 
 template<typename E, size_t N>
-bool ButtonOverlayBase<E, N>::IsButtonReleased(E id) const
+void ButtonOverlayBase<E, N>::SetOnReleaseButtonCallback(E id, mgui::Button::Callback callback)
 {
-    for (const auto& button : Buttons)
+    for (OverlayButton& button : Buttons)
     {
         if (button.Id == id)
-            return button.Button.IsReleased();
+        {
+            button.Button.SetOnReleaseCallback(callback);
+            break;
+        }
     }
-
-    return false;
 }
 
 template<typename E, size_t N>
-void ButtonOverlayBase<E, N>::OnWindowResize(const sf::Vector2f& windowSize)
-{
-    Overlay::OnWindowResize(windowSize);
-    UpdateUIScaling(windowSize);
-}
-
-template<typename E, size_t N>
-void ButtonOverlayBase<E, N>::Update(const sf::RenderWindow& window)
-{
-    for (auto& button : Buttons)
-        button.Button.Update(window);
-}
-
-template<typename E, size_t N>
-void ButtonOverlayBase<E, N>::Render(sf::RenderTarget& target)
+void ButtonOverlayBase<E, N>::Render(sf::RenderTarget &target)
 {
     if (!IsActive())
+    {
         return;
+    }
 
     Overlay::Render(target);
 
     for (auto& button : Buttons)
+    {
         button.Button.Render(target);
+    }
+}
+
+template<typename E, size_t N>
+void ButtonOverlayBase<E, N>::OnWindowResize(const sf::Event::SizeEvent& size)
+{
+    const sf::Vector2f windowSize(size.width, size.height);
+
+    Overlay::OnWindowResize(size);
+    UpdateUIScaling(windowSize);
+}
+
+template<typename E, size_t N>
+void ButtonOverlayBase<E, N>::OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton)
+{
+    for (OverlayButton& button : Buttons)
+    {
+        button.Button.OnMouseButtonPressed(mouseButton);
+    }
+}
+
+template<typename E, size_t N>
+void ButtonOverlayBase<E, N>::OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton)
+{
+    for (OverlayButton& button : Buttons)
+    {
+        button.Button.OnMouseButtonReleased(mouseButton);
+    }
+}
+
+template<typename E, size_t N>
+void ButtonOverlayBase<E, N>::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
+{
+    for (OverlayButton& button : Buttons)
+    {
+        button.Button.OnMouseMoved(mouseMove);
+    }
 }
 
 template<typename E, size_t N>

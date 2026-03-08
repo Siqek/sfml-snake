@@ -3,7 +3,7 @@
 
 #include "config/Colors.hpp"
 
-PauseOverlay::PauseOverlay(const sf::Vector2f& windowSize, const sf::Font& font)
+PauseOverlay::PauseOverlay(sf::Vector2f windowSize, const sf::Font& font)
     : ButtonOverlayBase(windowSize, font,
         {{ { EButton::Continue, "Continue" }, { EButton::Restart, "Restart" }, { EButton::BackToMenu, "Back to Menu" } }})
 {
@@ -16,20 +16,24 @@ PauseOverlay::PauseOverlay(const sf::Vector2f& windowSize, const sf::Font& font)
     UpdateUIScaling(windowSize);
 }
 
-void PauseOverlay::OnWindowResize(const sf::Vector2f& windowSize)
-{
-    ButtonOverlayBase::OnWindowResize(windowSize);
-    UpdateUIScaling(windowSize);
-}
-
 void PauseOverlay::Render(sf::RenderTarget& target)
 {
     if (!IsActive())
+    {
         return;
+    }
 
     ButtonOverlayBase::Render(target);
 
     target.draw(PauseText);
+}
+
+void PauseOverlay::OnWindowResize(const sf::Event::SizeEvent& size)
+{
+    const sf::Vector2f windowSize(size.width, size.height);
+
+    ButtonOverlayBase::OnWindowResize(size);
+    UpdateUIScaling(windowSize);
 }
 
 void PauseOverlay::UpdateUIScaling(sf::Vector2f newWindowSize)

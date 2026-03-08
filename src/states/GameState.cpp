@@ -40,6 +40,8 @@ GameState::GameState(StateContext& context)
 
     InitKeybinds();
 
+    SetOverlayCallbacks();
+
     UpdateUIScaling();
 
     InstructionsOverlay.Show();
@@ -49,49 +51,10 @@ GameState::~GameState() = default;
 
 void GameState::Update(float dt)
 {
-    if (EndGameMenu.IsActive())
+    if (EndGameMenu.IsActive() ||
+        InstructionsOverlay.IsActive() ||
+        PauseMenu.IsActive())
     {
-        EndGameMenu.Update(*Context.Window);
-
-        if (EndGameMenu.IsButtonReleased(EndGameOverlay::EButton::BackToMenu))
-        {
-            Context.StateStack.QueueAttach(std::make_shared<MainMenuState>(Context));
-            MarkToBeDetached();
-        }
-
-        if (EndGameMenu.IsButtonReleased(EndGameOverlay::EButton::Restart))
-        {
-            Restart();
-        }
-
-        return;
-    }
-
-    if (InstructionsOverlay.IsActive())
-    {
-        return;
-    }
-
-    if (PauseMenu.IsActive())
-    {
-        PauseMenu.Update(*Context.Window);
-
-        if (PauseMenu.IsButtonReleased(PauseOverlay::EButton::Continue))
-        {
-            PauseMenu.Close();
-        }
-
-        if (PauseMenu.IsButtonReleased(PauseOverlay::EButton::Restart))
-        {
-            Restart();
-        }
-
-        if (PauseMenu.IsButtonReleased(PauseOverlay::EButton::BackToMenu))
-        {
-            Context.StateStack.QueueAttach(std::make_shared<MainMenuState>(Context));
-            MarkToBeDetached();
-        }
-
         return;
     }
 
@@ -149,11 +112,9 @@ void GameState::OnWindowResize(const sf::Event::SizeEvent& size)
 {
     UpdateUIScaling();
 
-    const sf::Vector2f windowSize(size.width, size.height);
-
-    InstructionsOverlay.OnWindowResize(windowSize);
-    PauseMenu.OnWindowResize(windowSize);
-    EndGameMenu.OnWindowResize(windowSize);
+    InstructionsOverlay.OnWindowResize(size);
+    PauseMenu.OnWindowResize(size);
+    EndGameMenu.OnWindowResize(size);
 }
 
 void GameState::OnKeyPressed(const sf::Event::KeyEvent& key)
@@ -231,6 +192,44 @@ void GameState::OnKeyReleased(const sf::Event::KeyEvent& key)
     }
 }
 
+void GameState::OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton)
+{
+    if (PauseMenu.IsActive())
+    {
+        PauseMenu.OnMouseButtonPressed(mouseButton);
+    }
+
+    if (EndGameMenu.IsActive())
+    {
+        EndGameMenu.OnMouseButtonPressed(mouseButton);
+    }
+}
+
+void GameState::OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton)
+{
+    if (PauseMenu.IsActive())
+    {
+        PauseMenu.OnMouseButtonReleased(mouseButton);
+    }
+
+    if (EndGameMenu.IsActive())
+    {
+        EndGameMenu.OnMouseButtonReleased(mouseButton);
+    }
+}
+
+void GameState::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
+{
+    if (PauseMenu.IsActive())
+    {
+        PauseMenu.OnMouseMoved(mouseMove);
+    }
+
+    if (EndGameMenu.IsActive())
+    {
+        EndGameMenu.OnMouseMoved(mouseMove);
+    }
+}
 
 void GameState::InitKeybinds()
 {
@@ -249,6 +248,32 @@ void GameState::InitKeybinds()
     Keybinds[EAction::AltMoveLeft]  = KeyMapping::ToKey(iniParser.getString("Snake", "AltMoveLeft",  "Left"));
 
     Keybinds[EAction::TogglePause] = KeyMapping::ToKey(iniParser.getString("General", "TogglePause", "Escape"));
+}
+
+void GameState::SetOverlayCallbacks()
+{
+    PauseMenu.SetOnReleaseButtonCallback(PauseOverlay::EButton::Continue, [this]{
+        PauseMenu.Close();
+    });
+
+    PauseMenu.SetOnReleaseButtonCallback(PauseOverlay::EButton::Restart, [this]{
+        Restart();
+    });
+
+    PauseMenu.SetOnReleaseButtonCallback(PauseOverlay::EButton::BackToMenu, [this]{
+        Context.StateStack.QueueAttach(std::make_shared<MainMenuState>(Context));
+        MarkToBeDetached();
+    });
+
+
+    EndGameMenu.SetOnReleaseButtonCallback(EndGameOverlay::EButton::BackToMenu, [this]{
+        Context.StateStack.QueueAttach(std::make_shared<MainMenuState>(Context));
+        MarkToBeDetached();
+    });
+
+    EndGameMenu.SetOnReleaseButtonCallback(EndGameOverlay::EButton::Restart, [this]{
+        Restart();
+    });
 }
 
 void GameState::UpdateScoreText()

@@ -21,20 +21,24 @@ void EndGameOverlay::SetTitle(const std::string& text)
     Title.setOrigin(sf::Vector2f(lb.left + lb.width / 2.f, lb.top + lb.height / 2.f));
 }
 
-void EndGameOverlay::OnWindowResize(const sf::Vector2f& windowSize)
-{
-    ButtonOverlayBase::OnWindowResize(windowSize);
-    UpdateUIScaling(windowSize);
-}
-
 void EndGameOverlay::Render(sf::RenderTarget& target)
 {
     if (!IsActive())
+    {
         return;
+    }
 
     ButtonOverlayBase::Render(target);
 
     target.draw(Title);
+}
+
+void EndGameOverlay::OnWindowResize(const sf::Event::SizeEvent& size)
+{
+    const sf::Vector2f windowSize(size.width, size.height);
+
+    ButtonOverlayBase::OnWindowResize(size);
+    UpdateUIScaling(windowSize);
 }
 
 void EndGameOverlay::UpdateUIScaling(sf::Vector2f windowSize)

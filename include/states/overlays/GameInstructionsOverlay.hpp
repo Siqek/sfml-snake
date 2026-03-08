@@ -3,16 +3,16 @@
 
 #include "states/overlays/Overlay.hpp"
 
-class GameInstructionsOverlay
+class GameInstructionsOverlay final
     : public Overlay
 {
 public:
     GameInstructionsOverlay(sf::Vector2f windowSize, const sf::Font& font);
     ~GameInstructionsOverlay() = default;
 
-    void OnWindowResize(const sf::Vector2f& windowSize) override;
-
     void Render(sf::RenderTarget& target) override;
+
+    void OnWindowResize(const sf::Event::SizeEvent& size) override;
 
 private:
     void UpdateUIScaling(sf::Vector2f windowSize);

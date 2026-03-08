@@ -32,12 +32,6 @@ GameInstructionsOverlay::GameInstructionsOverlay(sf::Vector2f windowSize, const 
     UpdateUIScaling(windowSize);
 }
 
-void GameInstructionsOverlay::OnWindowResize(const sf::Vector2f& windowSize)
-{
-    Overlay::OnWindowResize(windowSize);
-    UpdateUIScaling(windowSize);
-}
-
 void GameInstructionsOverlay::Render(sf::RenderTarget& target)
 {
     if (!IsActive())
@@ -53,6 +47,14 @@ void GameInstructionsOverlay::Render(sf::RenderTarget& target)
 
     target.draw(OrText);
     target.draw(PressAnyKeyText);
+}
+
+void GameInstructionsOverlay::OnWindowResize(const sf::Event::SizeEvent& size)
+{
+    const sf::Vector2f windowSize(size.width, size.height);
+
+    Overlay::OnWindowResize(size);
+    UpdateUIScaling(windowSize);
 }
 
 void GameInstructionsOverlay::UpdateUIScaling(sf::Vector2f windowSize)

@@ -26,9 +26,9 @@ public:
     void OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove) override;
 
 private:
-    void UpdateSelectors();
+    void UpdateSettings();
 
-    void HandleButtonActions();
+    void SetButtonCallbacks();
 
     void UpdateUIScaling();
 

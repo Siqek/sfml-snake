@@ -50,13 +50,18 @@ SettingsState::SettingsState(StateContext& context)
     SaveAndExitButton.SetText("Save & Exit");
     setElementColors(SaveAndExitButton);
 
+    SetButtonCallbacks();
+
     UpdateUIScaling();
 }
 
 void SettingsState::Update([[maybe_unused]] float dt)
 {
-    UpdateSelectors();
-    HandleButtonActions();
+    // GridSizeSelector.Update();
+    // SnakeSpeedSelector.Update();
+    // MaxAppleCountSelector.Update();
+
+    UpdateSettings();
 }
 
 void SettingsState::Render(sf::RenderTarget& target)
@@ -80,28 +85,36 @@ void SettingsState::OnWindowResize(const sf::Event::SizeEvent& size)
 
 void SettingsState::OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton)
 {
+    GridSizeSelector.OnMouseButtonPressed(mouseButton);
+    SnakeSpeedSelector.OnMouseButtonPressed(mouseButton);
+    MaxAppleCountSelector.OnMouseButtonPressed(mouseButton);
+
     SaveSettingsButton.OnMouseButtonPressed(mouseButton);
     SaveAndExitButton.OnMouseButtonPressed(mouseButton);
 }
 
 void SettingsState::OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton)
 {
+    GridSizeSelector.OnMouseButtonReleased(mouseButton);
+    SnakeSpeedSelector.OnMouseButtonReleased(mouseButton);
+    MaxAppleCountSelector.OnMouseButtonReleased(mouseButton);
+
     SaveSettingsButton.OnMouseButtonReleased(mouseButton);
     SaveAndExitButton.OnMouseButtonReleased(mouseButton);
 }
 
 void SettingsState::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
 {
+    GridSizeSelector.OnMouseMoved(mouseMove);
+    SnakeSpeedSelector.OnMouseMoved(mouseMove);
+    MaxAppleCountSelector.OnMouseMoved(mouseMove);
+
     SaveSettingsButton.OnMouseMoved(mouseMove);
     SaveAndExitButton.OnMouseMoved(mouseMove);
 }
 
-void SettingsState::UpdateSelectors()
+void SettingsState::UpdateSettings()
 {
-    GridSizeSelector.Update(*Context.Window);
-    SnakeSpeedSelector.Update(*Context.Window);
-    MaxAppleCountSelector.Update(*Context.Window);
-
     const auto updateSettingIfChanged = [](const auto& selector, auto& setting)
     {
         if (selector.HasActiveOptionChanged())
@@ -117,21 +130,19 @@ void SettingsState::UpdateSelectors()
     updateSettingIfChanged(MaxAppleCountSelector, Settings.MaxAppleCount);
 }
 
-void SettingsState::HandleButtonActions()
+void SettingsState::SetButtonCallbacks()
 {
-    if (SaveSettingsButton.IsReleased())
-    {
+    SaveSettingsButton.SetOnReleaseCallback([this]{
         Context.CurrentGameSettings = Settings;
         Context.CurrentGameSettings.SaveToFile("config/game_settings.ini");
-    }
+    });
 
-    if (SaveAndExitButton.IsReleased())
-    {
+    SaveAndExitButton.SetOnReleaseCallback([this]{
         Context.CurrentGameSettings = Settings;
         Context.CurrentGameSettings.SaveToFile("config/game_settings.ini");
         Context.StateStack.QueueAttach(std::make_shared<MainMenuState>(Context));
         MarkToBeDetached();
-    }
+    });
 }
 
 void SettingsState::UpdateUIScaling()

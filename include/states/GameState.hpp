@@ -35,8 +35,16 @@ public:
 
     void OnKeyReleased(const sf::Event::KeyEvent& key) override;
 
+    void OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton) override;
+
+    void OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton) override;
+
+    void OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove) override;
+
 private:
     void InitKeybinds();
+
+    void SetOverlayCallbacks();
 
     void UpdateScoreText();
 

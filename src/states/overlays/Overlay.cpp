@@ -1,7 +1,7 @@
 #include "stdafx.hpp"
 #include "states/overlays/Overlay.hpp"
 
-Overlay::Overlay(const sf::Vector2f& windowSize, sf::Color backgroundColor)
+Overlay::Overlay(sf::Vector2f windowSize, sf::Color backgroundColor)
     : bIsActive(false)
 {
     WindowOverlay.setSize(windowSize);
@@ -23,14 +23,12 @@ void Overlay::Show()
     bIsActive = true;
 }
 
-void Overlay::OnWindowResize(const sf::Vector2f& windowSize)
-{
-    WindowOverlay.setSize(windowSize);
-}
-
-void Overlay::Update(const sf::RenderWindow& /*window*/) {}
-
 void Overlay::Render(sf::RenderTarget &target)
 {
     target.draw(WindowOverlay);
+}
+
+void Overlay::OnWindowResize(const sf::Event::SizeEvent& size)
+{
+    WindowOverlay.setSize(sf::Vector2f(size.width, size.height));
 }

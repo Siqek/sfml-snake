@@ -4,7 +4,7 @@
 class Overlay
 {
 public:
-    Overlay(const sf::Vector2f& windowSize, sf::Color backgroundColor = sf::Color(0u, 0u, 0u, 128u));
+    Overlay(sf::Vector2f windowSize, sf::Color backgroundColor = sf::Color(0u, 0u, 0u, 128u));
     virtual ~Overlay() = default;
 
     void SetBackgroundColor(sf::Color color);
@@ -14,10 +14,9 @@ public:
 
     bool IsActive() const { return bIsActive; }
 
-    virtual void OnWindowResize(const sf::Vector2f& windowSize);
-
-    virtual void Update(const sf::RenderWindow& window);
     virtual void Render(sf::RenderTarget& target);
+
+    virtual void OnWindowResize(const sf::Event::SizeEvent& size);
 
 private:
     sf::RectangleShape WindowOverlay;

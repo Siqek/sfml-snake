@@ -14,7 +14,7 @@ struct EndGameOverlayTypes
     };
 };
 
-class EndGameOverlay
+class EndGameOverlay final
     : public ButtonOverlayBase<EndGameOverlayTypes::EButton, 2>
 {
 public:
@@ -25,9 +25,9 @@ public:
 
     void SetTitle(const std::string& text);
 
-    void OnWindowResize(const sf::Vector2f& windowSize) override;
-
     void Render(sf::RenderTarget& target) override;
+
+    void OnWindowResize(const sf::Event::SizeEvent& size) override;
 
 private:
     void UpdateUIScaling(sf::Vector2f windowSize);

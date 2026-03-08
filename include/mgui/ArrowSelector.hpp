@@ -47,8 +47,13 @@ public:
 
     bool HasActiveOptionChanged() const { return bHasActiveOptionChanged; }
 
-    void Update(const sf::RenderWindow& window);
     void Render(sf::RenderTarget& target);
+
+    void OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton);
+
+    void OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton);
+
+    void OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove);
 
 private:
     void NextOption();
@@ -72,6 +77,9 @@ private:
     sf::Vector2f Size;
     sf::Vector2f Origin;
 
+    // TODO(siqek):
+    // bHasActiveOptionChanged never is set back to false
+    // use callback logic as in button - use OnOptionChange callback
     bool bHasActiveOptionChanged;
 };
 
@@ -94,6 +102,14 @@ ArrowSelector<T>::ArrowSelector(const std::vector<Option>& options, const sf::Fo
 
     LeftArrow.SetText("<");
     RightArrow.SetText(">");
+
+    LeftArrow.SetOnReleaseCallback([this]{
+        PrevOption();
+    });
+
+    RightArrow.SetOnReleaseCallback([this]{
+        NextOption();
+    });
 
     UpdateOptionLabelString();
 }
@@ -187,25 +203,6 @@ void ArrowSelector<T>::SetActiveOption(const std::string& optionId)
 }
 
 template<typename T>
-void ArrowSelector<T>::Update(const sf::RenderWindow& window)
-{
-    bHasActiveOptionChanged = false;
-
-    LeftArrow.Update(window);
-    RightArrow.Update(window);
-
-    if (LeftArrow.IsReleased())
-    {
-        PrevOption();
-    }
-
-    if (RightArrow.IsReleased())
-    {
-        NextOption();
-    }
-}
-
-template<typename T>
 void ArrowSelector<T>::Render(sf::RenderTarget& target)
 {
     target.draw(OptionBox);
@@ -213,6 +210,27 @@ void ArrowSelector<T>::Render(sf::RenderTarget& target)
 
     LeftArrow.Render(target);
     RightArrow.Render(target);
+}
+
+template<typename T>
+void ArrowSelector<T>::OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton)
+{
+    LeftArrow.OnMouseButtonPressed(mouseButton);
+    RightArrow.OnMouseButtonPressed(mouseButton);
+}
+
+template<typename T>
+void ArrowSelector<T>::OnMouseButtonReleased(const sf::Event::MouseButtonEvent& mouseButton)
+{
+    LeftArrow.OnMouseButtonReleased(mouseButton);
+    RightArrow.OnMouseButtonReleased(mouseButton);
+}
+
+template<typename T>
+void ArrowSelector<T>::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
+{
+    LeftArrow.OnMouseMoved(mouseMove);
+    RightArrow.OnMouseMoved(mouseMove);
 }
 
 template<typename T>

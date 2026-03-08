@@ -13,18 +13,18 @@ struct PauseOverlayTypes
     };
 };
 
-class PauseOverlay
+class PauseOverlay final
     : public ButtonOverlayBase<PauseOverlayTypes::EButton, 3>
 {
 public:
     using EButton = PauseOverlayTypes::EButton;
 
-    PauseOverlay(const sf::Vector2f& windowSize, const sf::Font& font);
+    PauseOverlay(sf::Vector2f windowSize, const sf::Font& font);
     ~PauseOverlay() = default;
 
-    void OnWindowResize(const sf::Vector2f& windowSize) override;
-
     void Render(sf::RenderTarget& target) override;
+
+    void OnWindowResize(const sf::Event::SizeEvent& size) override;
 
 private:
     void UpdateUIScaling(sf::Vector2f windowSize);

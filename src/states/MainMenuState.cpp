@@ -19,6 +19,8 @@ MainMenuState::MainMenuState(StateContext& context)
     ExitButton.SetFont(Context.AppFont);
     ExitButton.SetText("Exit");
 
+    SetButtonCallbacks();
+
     const auto setButtonColors = [](mgui::Button& button){
         button.SetFillColor(mgui::Button::EState::Idle,    sf::Color(Colors::Hex::ButtonIdleBg));
         button.SetFillColor(mgui::Button::EState::Hovered, sf::Color(Colors::Hex::ButtonHoverBg));
@@ -34,11 +36,6 @@ MainMenuState::MainMenuState(StateContext& context)
     setButtonColors(ExitButton);
 
     UpdateUIScaling();
-}
-
-void MainMenuState::Update([[maybe_unused]] float dt)
-{
-    HandleButtonActions();
 }
 
 void MainMenuState::Render(sf::RenderTarget& target)
@@ -74,24 +71,21 @@ void MainMenuState::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
     ExitButton.OnMouseMoved(mouseMove);
 }
 
-void MainMenuState::HandleButtonActions()
+void MainMenuState::SetButtonCallbacks()
 {
-    if (PlayButton.IsReleased())
-    {
+    PlayButton.SetOnReleaseCallback([this]{
         Context.StateStack.QueueAttach(std::make_shared<GridSelectionState>(Context));
         MarkToBeDetached();
-    }
+    });
 
-    if (GoToSettingsButton.IsReleased())
-    {
+    GoToSettingsButton.SetOnReleaseCallback([this]{
         Context.StateStack.QueueAttach(std::make_shared<SettingsState>(Context));
         MarkToBeDetached();
-    }
+    });
 
-    if (ExitButton.IsReleased())
-    {
+    ExitButton.SetOnReleaseCallback([this]{
         MarkToBeDetached();
-    }
+    });
 }
 
 void MainMenuState::UpdateUIScaling()
