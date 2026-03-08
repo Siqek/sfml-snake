@@ -11,6 +11,10 @@ project "Game"
     targetname "Game"
     objdir "build/obj/%{cfg.buildcfg}"
 
+    -- Override WindowedApp with ConsoleApp in Debug on Windows to attach a console
+    filter { "system:windows", "configurations:Debug" }
+        kind "ConsoleApp"
+
     -- Precompiled headers
     pchheader "stdafx.hpp"
     pchsource "src/stdafx.cpp"
