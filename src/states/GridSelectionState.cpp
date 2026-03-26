@@ -57,39 +57,11 @@ GridSelectionState::GridSelectionState(StateContext& context)
         MarkToBeDetached();
     });
 
+    SetSelectorCallbacks();
+
     styleElement(PlayButton);
 
     UpdateUIScaling();
-}
-
-void GridSelectionState::Update([[maybe_unused]] float dt)
-{
-    // GridTypeSelector.Update();
-    // GridSizeSelector.Update();
-    // GridHoleSizeSelector.Update();
-
-    if (GridTypeSelector.HasActiveOptionChanged())
-    {
-        UpdateGridImitation(GridTypeSelector.GetActiveValue());
-
-        if (GridTypeSelector.GetActiveValue() == EGridType::RectangularDonut)
-        {
-            AdjustHoleSizeToGridSize();
-        }
-    }
-
-    if (GridSizeSelector.HasActiveOptionChanged())
-    {
-        if (GridTypeSelector.GetActiveValue() == EGridType::RectangularDonut)
-        {
-            AdjustHoleSizeToGridSize();
-        }
-    }
-
-    if (GridHoleSizeSelector.HasActiveOptionChanged())
-    {
-        AdjustHoleSizeToGridSize();
-    }
 }
 
 void GridSelectionState::Render(sf::RenderTarget &target)
@@ -142,6 +114,29 @@ void GridSelectionState::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove
     GridHoleSizeSelector.OnMouseMoved(mouseMove);
 
     PlayButton.OnMouseMoved(mouseMove);
+}
+
+void GridSelectionState::SetSelectorCallbacks()
+{
+    GridTypeSelector.SetOnOptionChangedCallback([this]{
+        UpdateGridImitation(GridTypeSelector.GetActiveValue());
+
+        if (GridTypeSelector.GetActiveValue() == EGridType::RectangularDonut)
+        {
+            AdjustHoleSizeToGridSize();
+        }
+    });
+
+    GridSizeSelector.SetOnOptionChangedCallback([this]{
+        if (GridTypeSelector.GetActiveValue() == EGridType::RectangularDonut)
+        {
+            AdjustHoleSizeToGridSize();
+        }
+    });
+
+    GridHoleSizeSelector.SetOnOptionChangedCallback([this]{
+        AdjustHoleSizeToGridSize();
+    });
 }
 
 void GridSelectionState::UpdateGameSettings()

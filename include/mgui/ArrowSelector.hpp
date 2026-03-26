@@ -19,6 +19,8 @@ class ArrowSelector
 public:
     using EState = mgui::ButtonTypes::EState;
 
+    using Callback = std::function<void()>;
+
     struct Option {
         std::string Id;
         std::string Label;
@@ -38,14 +40,14 @@ public:
 
     void SetActiveOption(const std::string& optionId);
 
+    void SetOnOptionChangedCallback(Callback callback);
+
     sf::Vector2f GetSize() const { return Size; };
 
     const Option& GetActiveOption() const { return Options.at(ActiveOptionIndex); }
 
     T GetActiveValue() const { return GetActiveOption().Value; }
     const T& GetActiveValueRef() const { return GetActiveOption().Value; }
-
-    bool HasActiveOptionChanged() const { return bHasActiveOptionChanged; }
 
     void Render(sf::RenderTarget& target);
 
@@ -66,6 +68,8 @@ private:
 
     const std::vector<Option> Options;
 
+    Callback OnOptionChangedCallback;
+
     mgui::Button LeftArrow;
     mgui::Button RightArrow;
 
@@ -76,16 +80,11 @@ private:
 
     sf::Vector2f Size;
     sf::Vector2f Origin;
-
-    // TODO(siqek):
-    // bHasActiveOptionChanged never is set back to false
-    // use callback logic as in button - use OnOptionChange callback
-    bool bHasActiveOptionChanged;
 };
 
 template<typename T>
 ArrowSelector<T>::ArrowSelector(const std::vector<Option>& options, const sf::Font& font, size_t initialOptionIndex)
-    : Options(options), ActiveOptionIndex(initialOptionIndex), bHasActiveOptionChanged(false)
+    : Options(options), ActiveOptionIndex(initialOptionIndex)
 {
     assert(!Options.empty());
     assert(ActiveOptionIndex < Options.size());
@@ -203,6 +202,12 @@ void ArrowSelector<T>::SetActiveOption(const std::string& optionId)
 }
 
 template<typename T>
+void ArrowSelector<T>::SetOnOptionChangedCallback(Callback callback)
+{
+    OnOptionChangedCallback = std::move(callback);
+}
+
+template<typename T>
 void ArrowSelector<T>::Render(sf::RenderTarget& target)
 {
     target.draw(OptionBox);
@@ -242,7 +247,12 @@ void ArrowSelector<T>::NextOption()
     }
 
     ActiveOptionIndex++;
-    bHasActiveOptionChanged = true;
+
+    if (OnOptionChangedCallback)
+    {
+        OnOptionChangedCallback();
+    }
+
     UpdateOptionLabelString();
 }
 
@@ -255,7 +265,12 @@ void ArrowSelector<T>::PrevOption()
     }
 
     ActiveOptionIndex--;
-    bHasActiveOptionChanged = true;
+
+    if (OnOptionChangedCallback)
+    {
+        OnOptionChangedCallback();
+    }
+
     UpdateOptionLabelString();
 }
 

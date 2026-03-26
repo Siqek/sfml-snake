@@ -13,7 +13,7 @@ class SettingsState final
 public:
     SettingsState(StateContext& context);
 
-    void Update(float dt) override;
+    void Update([[maybe_unused]] float dt) override {};
 
     void Render(sf::RenderTarget& target) override;
 
@@ -26,7 +26,7 @@ public:
     void OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove) override;
 
 private:
-    void UpdateSettings();
+    void SetSelectorCallbacks();
 
     void SetButtonCallbacks();
 

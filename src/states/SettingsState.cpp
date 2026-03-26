@@ -50,18 +50,11 @@ SettingsState::SettingsState(StateContext& context)
     SaveAndExitButton.SetText("Save & Exit");
     setElementColors(SaveAndExitButton);
 
+    SetSelectorCallbacks();
+
     SetButtonCallbacks();
 
     UpdateUIScaling();
-}
-
-void SettingsState::Update([[maybe_unused]] float dt)
-{
-    // GridSizeSelector.Update();
-    // SnakeSpeedSelector.Update();
-    // MaxAppleCountSelector.Update();
-
-    UpdateSettings();
 }
 
 void SettingsState::Render(sf::RenderTarget& target)
@@ -113,21 +106,28 @@ void SettingsState::OnMouseMoved(const sf::Event::MouseMoveEvent& mouseMove)
     SaveAndExitButton.OnMouseMoved(mouseMove);
 }
 
-void SettingsState::UpdateSettings()
+void SettingsState::SetSelectorCallbacks()
 {
-    const auto updateSettingIfChanged = [](const auto& selector, auto& setting)
-    {
-        if (selector.HasActiveOptionChanged())
-        {
-            const auto& option = selector.GetActiveOption();
-            setting.Value = option.Value;
-            setting.Id = option.Id;
-        }
-    };
+    GridSizeSelector.SetOnOptionChangedCallback([this]{
+        const auto& option = GridSizeSelector.GetActiveOption();
 
-    updateSettingIfChanged(GridSizeSelector, Settings.GridSize);
-    updateSettingIfChanged(SnakeSpeedSelector, Settings.SnakeSpeed);
-    updateSettingIfChanged(MaxAppleCountSelector, Settings.MaxAppleCount);
+        Settings.GridSize.Value = option.Value;
+        Settings.GridSize.Id    = option.Id;
+    });
+
+    SnakeSpeedSelector.SetOnOptionChangedCallback([this]{
+        const auto& option = SnakeSpeedSelector.GetActiveOption();
+
+        Settings.SnakeSpeed.Value = option.Value;
+        Settings.SnakeSpeed.Id    = option.Id;
+    });
+
+    MaxAppleCountSelector.SetOnOptionChangedCallback([this]{
+        const auto& option = MaxAppleCountSelector.GetActiveOption();
+
+        Settings.MaxAppleCount.Value = option.Value;
+        Settings.MaxAppleCount.Id    = option.Id;
+    });
 }
 
 void SettingsState::SetButtonCallbacks()
