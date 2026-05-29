@@ -90,7 +90,7 @@ void MainMenuState::SetButtonCallbacks()
 
 void MainMenuState::UpdateUIScaling()
 {
-    const auto windowSize = sf::Vector2f(Context.Window->getSize());
+    const auto windowSize = sf::Vector2f(Context.GetWindowSize());
 
     const std::array<mgui::Button*, 3> buttons{
         &PlayButton,

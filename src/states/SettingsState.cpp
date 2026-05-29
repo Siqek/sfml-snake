@@ -147,7 +147,7 @@ void SettingsState::SetButtonCallbacks()
 
 void SettingsState::UpdateUIScaling()
 {
-    const auto windowSize = sf::Vector2f(Context.Window->getSize());
+    const auto windowSize = sf::Vector2f(Context.GetWindowSize());
 
     const auto selectorSize = sf::Vector2f(windowSize.x / 3.5f, windowSize.y / 18.f);
     const auto firstSelectorPosition = sf::Vector2f(windowSize.x / 3.f * 2.f, windowSize.y / 2.f - 1.5f * selectorSize.y);

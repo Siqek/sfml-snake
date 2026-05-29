@@ -9,7 +9,6 @@ struct StateContext
 {
 public:
     StateContext(
-        sf::RenderWindow* window, // TEMP // TODO(siqek): remove window from the struct
         sf::Vector2f windowSize,
         const sf::Font& appFont,
         StateStackManager& stateStack,
@@ -18,7 +17,6 @@ public:
         : AppFont(appFont),
           StateStack(stateStack),
           CurrentGameSettings(currentGameSettings),
-          Window(window), // TEMP // TODO(siqek): remove window from the struct
           WindowSize(windowSize)
     {}
 
@@ -37,8 +35,8 @@ public:
     const sf::Font& AppFont;
     StateStackManager& StateStack;
     GameSettings& CurrentGameSettings;
+    std::atomic<bool> HasWindowFocus{false};
 
-    sf::RenderWindow* Window; // TEMP // TODO(siqek): remove window from the struct
 private:
     sf::Vector2f WindowSize;
     std::mutex WindowSizeMutex;

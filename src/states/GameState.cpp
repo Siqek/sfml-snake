@@ -24,9 +24,9 @@ GameState::GameState(StateContext& context)
     Grid(CreateGrid()),
     PlayerSnake(CreateSnake()),
     Score(0u),
-    InstructionsOverlay(sf::Vector2f(Context.Window->getSize()), Context.AppFont),
-    PauseMenu(sf::Vector2f(Context.Window->getSize()), Context.AppFont),
-    EndGameMenu(sf::Vector2f(Context.Window->getSize()), Context.AppFont)
+    InstructionsOverlay(sf::Vector2f(Context.GetWindowSize()), Context.AppFont),
+    PauseMenu(sf::Vector2f(Context.GetWindowSize()), Context.AppFont),
+    EndGameMenu(sf::Vector2f(Context.GetWindowSize()), Context.AppFont)
 {
     Apples.setAppleLimit(Context.CurrentGameSettings.MaxAppleCount.Value);
     Apples.spawnAll(Grid->GetFreeTiles());
@@ -119,7 +119,7 @@ void GameState::OnWindowResize(const sf::Event::SizeEvent& size)
 
 void GameState::OnKeyPressed(const sf::Event::KeyEvent& key)
 {
-    if (!Context.Window->hasFocus())
+    if (!Context.HasWindowFocus.load())
     {
         return;
     }
@@ -285,7 +285,7 @@ void GameState::UpdateScoreText()
 
 void GameState::UpdateUIScaling()
 {
-    const sf::Vector2f windowSize(Context.Window->getSize());
+    const sf::Vector2f windowSize(Context.GetWindowSize());
 
     const sf::Vector2i gridSize = Context.CurrentGameSettings.GridSize.Value;
 

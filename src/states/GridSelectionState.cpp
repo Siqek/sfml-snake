@@ -154,7 +154,7 @@ void GridSelectionState::UpdateGameSettings()
 
 void GridSelectionState::UpdateUIScaling()
 {
-    const sf::Vector2f windowSize(Context.Window->getSize());
+    const sf::Vector2f windowSize(Context.GetWindowSize());
 
     const sf::Vector2f backgroundSize = sf::Vector2f(windowSize.x * 0.3f, windowSize.y * 0.75f);
     const float backgroundYTopMargin = windowSize.y * 0.05f;

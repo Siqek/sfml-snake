@@ -21,12 +21,12 @@
 Game::Game()
     : bIsRunning(false),
       Snapshots(), ReadSnapshot(&Snapshots[0]), WriteSnapshot(&Snapshots[1]), BuiltSnapshot(&Snapshots[2]), bIsNewSnapshotAvailable(false),
-      DeltaTime(0.f), Settings("config/game_settings.ini"), Context(nullptr, sf::Vector2f(0, 0), AppFont, StateStack, Settings)
+      DeltaTime(0.f), Settings("config/game_settings.ini"), Context(sf::Vector2f(0, 0), AppFont, StateStack, Settings)
 {
     InitWindow();
 
-    Context.Window = Window;
     Context.SetWindowSize(sf::Vector2f(Window->getSize()));
+    Context.HasWindowFocus.store(Window->hasFocus());
 
     InitFont();
     InitStates();
@@ -243,9 +243,18 @@ void Game::UpdateSFMLEvent()
                 sf::FloatRect visibleArea({ 0.f, 0.f }, sf::Vector2f(event.size.width, event.size.height));
                 Window->setView(sf::View(visibleArea));
 
+                Context.SetWindowSize(sf::Vector2f(event.size.width, event.size.height));
                 StateStack.OnWindowResize(event.size);
                 break;
             }
+
+            case sf::Event::LostFocus:
+                Context.HasWindowFocus.store(Window->hasFocus());
+                break;
+
+            case sf::Event::GainedFocus:
+                Context.HasWindowFocus.store(Window->hasFocus());
+                break;
 
             case sf::Event::KeyPressed:
                 StateStack.OnKeyPressed(event.key);
