@@ -1,78 +1,107 @@
 #include "stdafx.hpp"
 #include "game/AppleCluster.hpp"
 
+#include "render/RenderContext.hpp"
+
 AppleCluster::AppleCluster()
-    : appleLimit(0u), tileSize(0.f), apples{}
+    : AppleLimit(0u), TileSize(0.f), Apples{}
 {}
 
-void AppleCluster::setTileSize(float size)
+void AppleCluster::SetTileSize(float size)
 {
-    this->tileSize = size;
-    for (auto& apple : this->apples)
-        apple.setTileSize(size);
+    TileSize = size;
+    for (auto& apple : Apples)
+    {
+        apple.SetTileSize(size);
+    }
 }
 
-bool AppleCluster::spawn(const std::vector<sf::Vector2i>& freeTiles)
+bool AppleCluster::Spawn(const std::vector<sf::Vector2i>& freeTiles)
 {
-    if (freeTiles.size() <= this->apples.size())
+    if (freeTiles.size() <= Apples.size())
+    {
         return false;
+    }
 
     std::vector<sf::Vector2i> trueFreeTiles;
     trueFreeTiles.reserve(freeTiles.size());
 
     std::vector<sf::Vector2i> applePositions;
-    applePositions.reserve(this->apples.size());
+    applePositions.reserve(Apples.size());
 
-    for (const auto& apple : this->apples) {
-        applePositions.push_back(apple.getPosition());
+    for (const auto& apple : Apples)
+    {
+        applePositions.push_back(apple.GetPosition());
     }
 
-    for (const auto& freeTile : freeTiles) {
+    for (const auto& freeTile : freeTiles)
+    {
         bool isFree = true;
-        for (auto& applePosition : applePositions) {
-            if (freeTile == applePosition) {
+        for (auto& applePosition : applePositions)
+        {
+            if (freeTile == applePosition)
+            {
                 isFree = false;
                 applePosition = applePositions.back();
                 applePositions.pop_back();
                 break;
             }
         }
+
         if (isFree)
+        {
             trueFreeTiles.push_back(freeTile);
+        }
     }
 
     if (trueFreeTiles.empty())
+    {
         return false;
+    }
 
-    this->apples.emplace_back();
-    this->apples.back().setTileSize(this->tileSize);
-    return this->apples.back().spawn(trueFreeTiles);
+    Apples.emplace_back();
+    Apples.back().SetTileSize(TileSize);
+    return Apples.back().Spawn(trueFreeTiles);
 }
 
-void AppleCluster::spawnAll(const std::vector<sf::Vector2i>& freeTiles)
+void AppleCluster::SpawnAll(const std::vector<sf::Vector2i>& freeTiles)
 {
-    int applesToSpawn = static_cast<int>(this->appleLimit) - static_cast<int>(this->apples.size());
-    for (int i = 0; i < applesToSpawn; i++) {
-        if (!this->spawn(freeTiles))
+    int applesToSpawn = static_cast<int>(AppleLimit) - static_cast<int>(Apples.size());
+    for (int i = 0; i < applesToSpawn; ++i)
+    {
+        if (!Spawn(freeTiles))
+        {
             return;
+        }
     }
 }
 
-bool AppleCluster::eatAppleAt(sf::Vector2i snakeHead)
+bool AppleCluster::EatAppleAt(sf::Vector2i snakeHead)
 {
-    for (size_t i = 0; i < this->apples.size(); i++) {
-        if (this->apples[i].getPosition() == snakeHead) {
-            this->apples[i] = this->apples.back();
-            this->apples.pop_back();
+    for (size_t i = 0; i < Apples.size(); ++i)
+    {
+        if (Apples[i].GetPosition() == snakeHead)
+        {
+            Apples[i] = Apples.back();
+            Apples.pop_back();
             return true;
         }
     }
     return false;
 }
 
-void AppleCluster::render(sf::RenderTarget& target, float offsetX, float offsetY)
+void AppleCluster::Render(sf::RenderTarget& target, float offsetX, float offsetY)
 {
-    for (size_t i = 0; i < this->apples.size(); i++) {
-        this->apples[i].render(target, offsetX, offsetY);
+    for (auto& apple : Apples)
+    {
+        apple.Render(target, offsetX, offsetY);
+    }
+}
+
+void AppleCluster::FillContext(RenderContext& context, const sf::Vector2f& offset)
+{
+    for (auto& apple : Apples)
+    {
+        apple.FillContext(context, offset);
     }
 }

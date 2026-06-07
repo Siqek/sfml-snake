@@ -1,6 +1,8 @@
 #ifndef MGUI_BUTTON_HPP
 #define MGUI_BUTTON_HPP
 
+class RenderContext;
+
 namespace mgui
 {
     struct ButtonTypes
@@ -53,6 +55,8 @@ namespace mgui
         bool IsPressed() const;
 
         void Render(sf::RenderTarget& target);
+
+        void FillContext(RenderContext& context) const;
 
         void OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton);
 

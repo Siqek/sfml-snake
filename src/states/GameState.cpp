@@ -18,6 +18,9 @@
 
 #include "config/Colors.hpp"
 
+#include "render/RenderSnapshot.hpp"
+#include "render/RenderContext.hpp"
+
 GameState::GameState(StateContext& context)
     : IState(context),
     KeyState(0u),
@@ -28,8 +31,8 @@ GameState::GameState(StateContext& context)
     PauseMenu(sf::Vector2f(Context.GetWindowSize()), Context.AppFont),
     EndGameMenu(sf::Vector2f(Context.GetWindowSize()), Context.AppFont)
 {
-    Apples.setAppleLimit(Context.CurrentGameSettings.MaxAppleCount.Value);
-    Apples.spawnAll(Grid->GetFreeTiles());
+    Apples.SetAppleLimit(Context.CurrentGameSettings.MaxAppleCount.Value);
+    Apples.SpawnAll(Grid->GetFreeTiles());
 
     ScoreText.setFont(Context.AppFont);
     ScoreText.setString("0");
@@ -74,9 +77,9 @@ void GameState::Update(float dt)
         return;
     }
 
-    if (Apples.eatAppleAt(PlayerSnake->GetHeadPosition()))
+    if (Apples.EatAppleAt(PlayerSnake->GetHeadPosition()))
     {
-        Apples.spawn(Grid->GetFreeTiles());
+        Apples.Spawn(Grid->GetFreeTiles());
         PlayerSnake->Grow(1u);
         Score++;
         UpdateScoreText();
@@ -87,18 +90,18 @@ void GameState::Render(sf::RenderTarget& target)
 {
     for (const auto& freeTile : Grid->GetFreeTiles())
     {
-
-        Tile.setFillColor(sf::Color(freeTile.x % 2 == freeTile.y % 2 ? Colors::Hex::BoardCellPrimary : Colors::Hex::BoardCellSecondary));
+        const bool isDarkTile = freeTile.x % 2 == freeTile.y % 2;
+        Tile.setFillColor(sf::Color(isDarkTile ? Colors::Hex::BoardCellPrimary : Colors::Hex::BoardCellSecondary));
 
         Tile.setPosition(GridOffset + sf::Vector2f(freeTile) * TileSize);
         target.draw(Tile);
     }
 
-    PlayerSnakeRenderer.render(target, *PlayerSnake, GridOffset);
+    PlayerSnakeRenderer.Render(target, *PlayerSnake, GridOffset);
 
     if (!PlayerSnake->HasFilledGrid())
     {
-        Apples.render(target, GridOffset.x, GridOffset.y);
+        Apples.Render(target, GridOffset.x, GridOffset.y);
     }
 
     target.draw(ScoreText);
@@ -106,6 +109,33 @@ void GameState::Render(sf::RenderTarget& target)
     InstructionsOverlay.Render(target);
     PauseMenu.Render(target);
     EndGameMenu.Render(target);
+}
+
+void GameState::BuildSnapshot(RenderSnapshot& snapshot)
+{
+    RenderContext& context = snapshot.CreateContext();
+
+    for (const auto& freeTile : Grid->GetFreeTiles())
+    {
+        const bool isDarkTile = freeTile.x % 2 == freeTile.y % 2;
+        Tile.setFillColor(sf::Color(isDarkTile ? Colors::Hex::BoardCellPrimary : Colors::Hex::BoardCellSecondary));
+
+        Tile.setPosition(GridOffset + sf::Vector2f(freeTile) * TileSize);
+        context.Drawables.emplace_back(Tile);
+    }
+
+    PlayerSnakeRenderer.FillContext(context, *PlayerSnake, GridOffset);
+
+    if (!PlayerSnake->HasFilledGrid())
+    {
+        Apples.FillContext(context, GridOffset);
+    }
+
+    context.Drawables.emplace_back(ScoreText);
+
+    InstructionsOverlay.FillContext(context);
+    PauseMenu.FillContext(context);
+    EndGameMenu.FillContext(context);
 }
 
 void GameState::OnWindowResize(const sf::Event::SizeEvent& size)
@@ -293,8 +323,8 @@ void GameState::UpdateUIScaling()
         windowSize.x * 0.95f / gridSize.x,
         windowSize.y * UIConfig::GridHeightRatio / gridSize.y
     );
-    PlayerSnakeRenderer.setTileSize(TileSize);
-    Apples.setTileSize(TileSize);
+    PlayerSnakeRenderer.SetTileSize(TileSize);
+    Apples.SetTileSize(TileSize);
     Tile.setSize(sf::Vector2f(TileSize, TileSize));
 
     ScoreText.setCharacterSize(static_cast<unsigned>(windowSize.y * UIConfig::ScoreHeightRatio * 0.25f));
@@ -343,8 +373,8 @@ void GameState::Restart()
 
     PlayerSnake = CreateSnake();
 
-    Apples.reset();
-    Apples.spawnAll(Grid->GetFreeTiles());
+    Apples.Reset();
+    Apples.SpawnAll(Grid->GetFreeTiles());
 
     InstructionsOverlay.Show();
     PauseMenu.Close();

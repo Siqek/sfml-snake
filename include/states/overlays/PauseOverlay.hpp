@@ -1,6 +1,8 @@
 #ifndef PAUSEOVERLAY_HPP
 #define PAUSEOVERLAY_HPP
 
+class RenderContext;
+
 #include "states/overlays/ButtonOverlayBase.hpp"
 
 struct PauseOverlayTypes
@@ -23,6 +25,8 @@ public:
     ~PauseOverlay() = default;
 
     void Render(sf::RenderTarget& target) override;
+
+    void FillContext(RenderContext& context) override;
 
     void OnWindowResize(const sf::Event::SizeEvent& size) override;
 

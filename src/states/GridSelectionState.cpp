@@ -12,6 +12,9 @@
 
 #include "config/Colors.hpp"
 
+#include "render/RenderSnapshot.hpp"
+#include "render/RenderContext.hpp"
+
 GridSelectionState::GridSelectionState(StateContext& context)
     : IState(context),
     GridTypeSelector(GameSettingsOptions::GridTypeOptions, Context.AppFont, GameSettingsOptions::DefaultGridTypeOptionIndex),
@@ -82,6 +85,27 @@ void GridSelectionState::Render(sf::RenderTarget &target)
     }
 
     PlayButton.Render(target);
+}
+
+void GridSelectionState::BuildSnapshot(RenderSnapshot& snapshot)
+{
+    RenderContext& context = snapshot.CreateContext();
+
+    context.Drawables.emplace_back(GridSelectionBackground);
+    context.Drawables.emplace_back(GridImitation);
+
+    GridTypeSelector.FillContext(context);
+
+    GridSizeSelector.FillContext(context);
+    context.Drawables.emplace_back(GridSizeSelectorLabel);
+
+    if (GridTypeSelector.GetActiveValue() == EGridType::RectangularDonut)
+    {
+        GridHoleSizeSelector.FillContext(context);
+        context.Drawables.emplace_back(GridHoleSizeSelectorLabel);
+    }
+
+    PlayButton.FillContext(context);
 }
 
 void GridSelectionState::OnWindowResize(const sf::Event::SizeEvent& size)

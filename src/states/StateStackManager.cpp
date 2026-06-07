@@ -64,7 +64,7 @@ void StateStackManager::UpdateStates(float dt)
         }
     }
 
-    for (auto& state : statesToDetach)
+    for (const auto& state : statesToDetach)
     {
         Detach(state);
     }
@@ -75,6 +75,14 @@ void StateStackManager::RenderStates(sf::RenderTarget &target)
     for (auto& state : StateStack)
     {
         state->Render(target);
+    }
+}
+
+void StateStackManager::BuildSnapshot(RenderSnapshot& snapshot)
+{
+    for (const auto& state : StateStack)
+    {
+        state->BuildSnapshot(snapshot);
     }
 }
 

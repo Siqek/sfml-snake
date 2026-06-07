@@ -1,6 +1,8 @@
 #include "stdafx.hpp"
 #include "mgui/Button.hpp"
 
+#include "render/RenderContext.hpp"
+
 namespace mgui
 {
     Button::Button()
@@ -126,6 +128,12 @@ namespace mgui
     {
         target.draw(Shape);
         target.draw(Label);
+    }
+
+    void Button::FillContext(RenderContext& context) const
+    {
+        context.Drawables.emplace_back(Shape);
+        context.Drawables.emplace_back(Label);
     }
 
     void Button::OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton)

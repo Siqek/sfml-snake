@@ -8,6 +8,9 @@
 
 #include "config/Colors.hpp"
 
+#include "render/RenderSnapshot.hpp"
+#include "render/RenderContext.hpp"
+
 SettingsState::SettingsState(StateContext& context)
     : IState(context),
     GridSizeSelector(GameSettingsOptions::GridSizeOptions, Context.AppFont, GameSettingsOptions::DefaultGridSizeOptionIndex),
@@ -69,6 +72,22 @@ void SettingsState::Render(sf::RenderTarget& target)
 
     SaveSettingsButton.Render(target);
     SaveAndExitButton.Render(target);
+}
+
+void SettingsState::BuildSnapshot(RenderSnapshot& snapshot)
+{
+    RenderContext& context = snapshot.CreateContext();
+
+    context.Drawables.emplace_back(GridSizeLabel);
+    context.Drawables.emplace_back(SnakeSpeedLabel);
+    context.Drawables.emplace_back(MaxAppleCountLabel);
+
+    GridSizeSelector.FillContext(context);
+    SnakeSpeedSelector.FillContext(context);
+    MaxAppleCountSelector.FillContext(context);
+
+    SaveSettingsButton.FillContext(context);
+    SaveAndExitButton.FillContext(context);
 }
 
 void SettingsState::OnWindowResize(const sf::Event::SizeEvent& size)

@@ -28,6 +28,18 @@ void PauseOverlay::Render(sf::RenderTarget& target)
     target.draw(PauseText);
 }
 
+void PauseOverlay::FillContext(RenderContext& context)
+{
+    if (!IsActive())
+    {
+        return;
+    }
+
+    ButtonOverlayBase::FillContext(context);
+
+    context.Drawables.emplace_back(PauseText);
+}
+
 void PauseOverlay::OnWindowResize(const sf::Event::SizeEvent& size)
 {
     const sf::Vector2f windowSize(size.width, size.height);

@@ -3,6 +3,8 @@
 
 #include "config/Colors.hpp"
 
+#include "render/RenderContext.hpp"
+
 EndGameOverlay::EndGameOverlay(sf::Vector2f windowSize, const sf::Font& font)
     : ButtonOverlayBase(windowSize, font,
         {{ { EButton::Restart, "Restart" }, { EButton::BackToMenu, "Back to Menu" } }})
@@ -31,6 +33,18 @@ void EndGameOverlay::Render(sf::RenderTarget& target)
     ButtonOverlayBase::Render(target);
 
     target.draw(Title);
+}
+
+void EndGameOverlay::FillContext(RenderContext& context)
+{
+    if (!IsActive())
+    {
+        return;
+    }
+
+    ButtonOverlayBase::FillContext(context);
+
+    context.Drawables.emplace_back(Title);
 }
 
 void EndGameOverlay::OnWindowResize(const sf::Event::SizeEvent& size)

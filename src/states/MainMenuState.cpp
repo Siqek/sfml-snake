@@ -7,6 +7,9 @@
 
 #include "config/Colors.hpp"
 
+#include "render/RenderSnapshot.hpp"
+#include "render/RenderContext.hpp"
+
 MainMenuState::MainMenuState(StateContext& context)
     : IState(context)
 {
@@ -43,6 +46,15 @@ void MainMenuState::Render(sf::RenderTarget& target)
     PlayButton.Render(target);
     GoToSettingsButton.Render(target);
     ExitButton.Render(target);
+}
+
+void MainMenuState::BuildSnapshot(RenderSnapshot& snapshot)
+{
+    RenderContext& context = snapshot.CreateContext();
+
+    PlayButton.FillContext(context);
+    GoToSettingsButton.FillContext(context);
+    ExitButton.FillContext(context);
 }
 
 void MainMenuState::OnWindowResize(const sf::Event::SizeEvent& size)

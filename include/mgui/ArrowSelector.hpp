@@ -11,6 +11,8 @@
 
 #include "mgui/Button.hpp"
 
+#include "render/RenderContext.hpp"
+
 namespace mgui {
 
 template<typename T>
@@ -50,6 +52,8 @@ public:
     const T& GetActiveValueRef() const { return GetActiveOption().Value; }
 
     void Render(sf::RenderTarget& target);
+
+    void FillContext(RenderContext& context);
 
     void OnMouseButtonPressed(const sf::Event::MouseButtonEvent& mouseButton);
 
@@ -215,6 +219,16 @@ void ArrowSelector<T>::Render(sf::RenderTarget& target)
 
     LeftArrow.Render(target);
     RightArrow.Render(target);
+}
+
+template<typename T>
+void ArrowSelector<T>::FillContext(RenderContext& context)
+{
+    context.Drawables.emplace_back(OptionBox);
+    context.Drawables.emplace_back(OptionLabel);
+
+    LeftArrow.FillContext(context);
+    RightArrow.FillContext(context);
 }
 
 template<typename T>

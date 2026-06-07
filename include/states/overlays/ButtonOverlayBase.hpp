@@ -14,6 +14,8 @@
 
 #include "config/Colors.hpp"
 
+#include "render/RenderContext.hpp"
+
 template<typename E, size_t N>
 class ButtonOverlayBase
     : public Overlay
@@ -34,6 +36,8 @@ public:
     void SetOnReleaseButtonCallback(E id, mgui::Button::Callback callback);
 
     virtual void Render(sf::RenderTarget& target) override;
+
+    virtual void FillContext(RenderContext& context) override;
 
     virtual void OnWindowResize(const sf::Event::SizeEvent& windowSize) override;
 
@@ -90,7 +94,7 @@ void ButtonOverlayBase<E, N>::SetOnReleaseButtonCallback(E id, mgui::Button::Cal
 }
 
 template<typename E, size_t N>
-void ButtonOverlayBase<E, N>::Render(sf::RenderTarget &target)
+void ButtonOverlayBase<E, N>::Render(sf::RenderTarget& target)
 {
     if (!IsActive())
     {
@@ -102,6 +106,22 @@ void ButtonOverlayBase<E, N>::Render(sf::RenderTarget &target)
     for (auto& button : Buttons)
     {
         button.Button.Render(target);
+    }
+}
+
+template<typename E, size_t N>
+void ButtonOverlayBase<E, N>::FillContext(RenderContext& context)
+{
+    if (!IsActive())
+    {
+        return;
+    }
+
+    Overlay::FillContext(context);
+
+    for (const OverlayButton& button : Buttons)
+    {
+        button.Button.FillContext(context);
     }
 }
 

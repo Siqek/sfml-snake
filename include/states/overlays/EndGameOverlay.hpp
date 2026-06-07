@@ -1,6 +1,8 @@
 #ifndef ENDGAMEOVERLAY_HPP
 #define ENDGAMEOVERLAY_HPP
 
+class RenderContext;
+
 #include "states/overlays/ButtonOverlayBase.hpp"
 
 #include "mgui/Button.hpp"
@@ -26,6 +28,8 @@ public:
     void SetTitle(const std::string& text);
 
     void Render(sf::RenderTarget& target) override;
+
+    void FillContext(RenderContext& context) override;
 
     void OnWindowResize(const sf::Event::SizeEvent& size) override;
 

@@ -20,8 +20,9 @@
 
 Game::Game()
     : bIsRunning(false),
-      Snapshots(), ReadSnapshot(&Snapshots[0]), WriteSnapshot(&Snapshots[1]), BuiltSnapshot(&Snapshots[2]), bIsNewSnapshotAvailable(false),
-      DeltaTime(0.f), Settings("config/game_settings.ini"), Context(sf::Vector2f(0, 0), AppFont, StateStack, Settings)
+      DeltaTime(0.f), Settings("config/game_settings.ini"), Context(sf::Vector2f(0, 0), AppFont, StateStack, Settings),
+      Snapshots{ RenderSnapshot(AppFont), RenderSnapshot(AppFont), RenderSnapshot(AppFont) },
+      ReadSnapshot(&Snapshots[0]), WriteSnapshot(&Snapshots[1]), BuiltSnapshot(&Snapshots[2]), bIsNewSnapshotAvailable(false)
 {
     InitWindow();
 
@@ -149,7 +150,18 @@ void Game::Render()
 {
     Window->clear(sf::Color(Colors::Hex::Background));
 
-    StateStack.RenderStates(*Window);
+
+    {
+        // TEMP(siqek): TODO(siqek): building and rendering snapshot test
+
+        // New way of rendering
+        // static RenderSnapshot snapshot(AppFont);
+        // snapshot.Clear();
+        // StateStack.BuildSnapshot(snapshot);
+        // snapshot.Render(*Window);
+
+        StateStack.RenderStates(*Window); // Current way of rendering
+    }
 
     Window->draw(FpsLabel);
 

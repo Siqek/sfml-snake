@@ -4,6 +4,7 @@
 class IState;
 class StateStackManager;
 class GameSettings;
+class RenderSnapshot;
 
 struct StateContext
 {
@@ -52,6 +53,8 @@ public:
     virtual void Update(float dt) = 0;
 
     virtual void Render(sf::RenderTarget& target) = 0;
+
+    virtual void BuildSnapshot(RenderSnapshot& snapshot) = 0;
 
     virtual void OnWindowResize([[maybe_unused]] const sf::Event::SizeEvent& size) {}
 

@@ -1,6 +1,8 @@
 #ifndef OVERLAY_HPP
 #define OVERLAY_HPP
 
+class RenderContext;
+
 class Overlay
 {
 public:
@@ -15,6 +17,8 @@ public:
     bool IsActive() const { return bIsActive; }
 
     virtual void Render(sf::RenderTarget& target);
+
+    virtual void FillContext(RenderContext& context);
 
     virtual void OnWindowResize(const sf::Event::SizeEvent& size);
 

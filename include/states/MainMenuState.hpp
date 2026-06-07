@@ -1,6 +1,8 @@
 #ifndef MAINMENUSTATE_HPP
 #define MAINMENUSTATE_HPP
 
+class RenderSnapshot;
+
 #include "states/State.hpp"
 #include "mgui/Button.hpp"
 
@@ -13,6 +15,8 @@ public:
     void Update([[maybe_unused]] float dt) override {}
 
     void Render(sf::RenderTarget& target) override;
+
+    void BuildSnapshot(RenderSnapshot& snapshot) override;
 
     void OnWindowResize(const sf::Event::SizeEvent& size) override;
 

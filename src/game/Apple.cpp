@@ -1,50 +1,57 @@
 #include "stdafx.hpp"
 #include "game/Apple.hpp"
 
+#include "render/RenderContext.hpp"
+
 Apple::Apple()
-    : position{}, tileSize(0.f), isSpawned(false)
+    : Position{}, TileSize(0.f), bIsSpawned(false)
 {
-    this->appleShape.setFillColor(sf::Color::Red);
-    this->appleShape.setOutlineColor(sf::Color(170, 0, 0));
+    AppleShape.setFillColor(sf::Color::Red);
+    AppleShape.setOutlineColor(sf::Color(170, 0, 0));
 }
 
-sf::Vector2i Apple::getPosition() const
+void Apple::SetTileSize(float tileSize)
 {
-    return this->position;
+    TileSize = tileSize;
+    AppleShape.setSize(sf::Vector2f(TileSize, TileSize));
+    AppleShape.setOutlineThickness(-std::max(2.f, TileSize / 10.f));
 }
 
-void Apple::setTileSize(float tileSize)
-{
-    this->tileSize = tileSize;
-    this->appleShape.setSize(sf::Vector2f(this->tileSize, this->tileSize));
-    this->appleShape.setOutlineThickness(-std::max(2.f, this->tileSize / 10.f));
-}
-
-bool Apple::spawn(const std::vector<sf::Vector2i>& freeTiles)
+bool Apple::Spawn(const std::vector<sf::Vector2i>& freeTiles)
 {
     static std::random_device rd;
     static std::mt19937 gen(rd());
     std::uniform_int_distribution<> distr(0, freeTiles.size() - 1);
 
-    if (freeTiles.empty()) {
-        this->position = sf::Vector2i(-1, -1);
-        this->isSpawned = false;
+    if (freeTiles.empty())
+    {
+        Position = sf::Vector2i(-1, -1);
+        bIsSpawned = false;
         return false;
     }
 
-    this->position = freeTiles[distr(gen)];
-    this->isSpawned = true;
+    Position = freeTiles[distr(gen)];
+    bIsSpawned = true;
     return true;
 }
 
-void Apple::render(sf::RenderTarget &target, float offsetX, float offsetY)
+void Apple::Render(sf::RenderTarget &target, float offsetX, float offsetY)
 {
-    if (!isSpawned)
+    if (!bIsSpawned)
+    {
         return;
+    }
 
-    this->appleShape.setPosition(
-        offsetX + static_cast<float>(this->position.x) * this->tileSize,
-        offsetY + static_cast<float>(this->position.y) * this->tileSize
+    AppleShape.setPosition(
+        offsetX + static_cast<float>(Position.x) * TileSize,
+        offsetY + static_cast<float>(Position.y) * TileSize
     );
-    target.draw(this->appleShape);
+    target.draw(AppleShape);
+}
+
+void Apple::FillContext(RenderContext &context, const sf::Vector2f& offset)
+{
+
+    AppleShape.setPosition(offset + sf::Vector2f(Position) * TileSize);
+    context.Drawables.emplace_back(AppleShape);
 }

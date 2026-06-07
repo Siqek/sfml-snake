@@ -1,6 +1,8 @@
 #ifndef SETTINGSSTATE_HPP
 #define SETTINGSSTATE_HPP
 
+class RenderSnapshot;
+
 #include "states/State.hpp"
 
 #include "mgui/ArrowSelector.hpp"
@@ -16,6 +18,8 @@ public:
     void Update([[maybe_unused]] float dt) override {};
 
     void Render(sf::RenderTarget& target) override;
+
+    void BuildSnapshot(RenderSnapshot& snapshot) override;
 
     void OnWindowResize(const sf::Event::SizeEvent& size) override;
 

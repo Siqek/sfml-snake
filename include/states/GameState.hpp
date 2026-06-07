@@ -9,6 +9,8 @@ namespace UIConfig {
 class IGrid;
 class ISnake;
 
+class RenderSnapshot;
+
 #include "states/State.hpp"
 
 #include "game/snake/SnakeRenderer.hpp"
@@ -28,6 +30,8 @@ public:
     void Update(float dt) override;
 
     void Render(sf::RenderTarget& target) override;
+
+    void BuildSnapshot(RenderSnapshot& snapshot) override;
 
     void OnWindowResize(const sf::Event::SizeEvent& size) override;
 

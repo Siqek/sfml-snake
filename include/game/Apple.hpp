@@ -1,26 +1,30 @@
 #ifndef APPLE_HPP
 #define APPLE_HPP
 
+class RenderContext;
+
 class Apple
 {
 public:
     Apple();
     ~Apple() = default;
 
-    sf::Vector2i getPosition() const;
+    sf::Vector2i GetPosition() const { return Position; };
 
-    void setTileSize(float tileSize);
+    void SetTileSize(float tileSize);
 
-    bool spawn(const std::vector<sf::Vector2i>& freeTiles);
-    void render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
+    bool Spawn(const std::vector<sf::Vector2i>& freeTiles);
+    void Render(sf::RenderTarget& target, float offsetX = 0, float offsetY = 0);
+
+    void FillContext(RenderContext& context, const sf::Vector2f& offset);
 
 private:
-    sf::Vector2i position;
-    sf::RectangleShape appleShape;
+    sf::Vector2i Position;
+    sf::RectangleShape AppleShape;
 
-    float tileSize;
+    float TileSize;
 
-    bool isSpawned;
+    bool bIsSpawned;
 };
 
 #endif // APPLE_HPP

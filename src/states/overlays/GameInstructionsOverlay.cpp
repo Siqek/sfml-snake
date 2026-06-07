@@ -49,6 +49,29 @@ void GameInstructionsOverlay::Render(sf::RenderTarget& target)
     target.draw(PressAnyKeyText);
 }
 
+void GameInstructionsOverlay::FillContext(RenderContext& context)
+{
+    if (!IsActive())
+    {
+        return;
+    }
+
+    Overlay::FillContext(context);
+
+    for (const auto& keyPrompt : KeyPrompts)
+    {
+        KeyPromptRendererInstance.FillContext(context, keyPrompt);
+    }
+
+    for (const auto& arrowPrompt : ArrowPrompts)
+    {
+        ArrowPromptRendererInstance.FillContext(context, arrowPrompt);
+    }
+
+    context.Drawables.emplace_back(OrText);
+    context.Drawables.emplace_back(PressAnyKeyText);
+}
+
 void GameInstructionsOverlay::OnWindowResize(const sf::Event::SizeEvent& size)
 {
     const sf::Vector2f windowSize(size.width, size.height);

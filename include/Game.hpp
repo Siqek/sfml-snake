@@ -46,17 +46,6 @@ private:
 
     std::thread RenderThread;
 
-    RenderSnapshot Snapshots[3];
-
-    RenderSnapshot* ReadSnapshot;
-    RenderSnapshot* WriteSnapshot;
-    RenderSnapshot* BuiltSnapshot;
-
-    bool bIsNewSnapshotAvailable;
-
-    std::mutex SnapshotMutex;
-    std::condition_variable CV;
-
     sf::RenderWindow* Window;
     std::deque<sf::Event> EventQueue;
 
@@ -73,6 +62,18 @@ private:
     StateStackManager StateStack;
 
     StateContext Context;
+
+    // snapshot-related variables
+    RenderSnapshot Snapshots[3]; // shared resource - lock SnapshotMutex to use it safely
+
+    RenderSnapshot* ReadSnapshot; // shared resource - lock SnapshotMutex to use it safely
+    RenderSnapshot* WriteSnapshot; // shared resource - lock SnapshotMutex to use it safely
+    RenderSnapshot* BuiltSnapshot; // shared resource - lock SnapshotMutex to use it safely
+
+    std::mutex SnapshotMutex;
+    std::condition_variable CV;
+
+    bool bIsNewSnapshotAvailable; // shared resource - lock SnapshotMutex to use it safely
 };
 
 #endif

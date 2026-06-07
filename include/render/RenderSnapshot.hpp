@@ -2,16 +2,17 @@
 #define RENDERSNAPSHOT_HPP
 
 #include <vector>
-#include <memory>
 
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Font.hpp>
 
 #include "render/RenderContext.hpp"
 
-struct RenderSnapshot
+class RenderSnapshot
 {
-    RenderSnapshot()
-        : RenderContexts{} {}
+public:
+    RenderSnapshot(const sf::Font& renderFont)
+        : RenderContexts{}, RenderFont(renderFont) {}
 
     void Clear()
     {
@@ -20,11 +21,21 @@ struct RenderSnapshot
 
     void Render(sf::RenderTarget& target)
     {
-        // TODO(siqek): finish
-        (void)target;
+        for (auto& context : RenderContexts)
+        {
+            context.Render(target, RenderFont);
+        }
     }
 
-    std::vector<std::unique_ptr<RenderContext>> RenderContexts;
+    [[nodiscard]] RenderContext& CreateContext()
+    {
+        return RenderContexts.emplace_back();
+    }
+
+private:
+    std::vector<RenderContext> RenderContexts;
+
+    const sf::Font& RenderFont;
 };
 
 #endif // RENDERSNAPSHOT_HPP
