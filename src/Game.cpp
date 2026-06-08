@@ -19,10 +19,9 @@
 #endif // _WIN32
 
 Game::Game()
-    : bIsRunning(false),
-      DeltaTime(0.f), Settings("config/game_settings.ini"), Context(sf::Vector2f(0, 0), AppFont, StateStack, Settings),
+    : Settings("config/game_settings.ini"), Context(sf::Vector2f(0, 0), AppFont, StateStack, Settings),
       Snapshots{ RenderSnapshot(AppFont), RenderSnapshot(AppFont), RenderSnapshot(AppFont) },
-      ReadSnapshot(&Snapshots[0]), WriteSnapshot(&Snapshots[1]), BuiltSnapshot(&Snapshots[2]), bIsNewSnapshotAvailable(false)
+      ReadSnapshot(&Snapshots[0]), WriteSnapshot(&Snapshots[1]), BuiltSnapshot(&Snapshots[2])
 {
     InitWindow();
 
@@ -32,10 +31,10 @@ Game::Game()
     InitFont();
     InitStates();
 
-    FpsLabel.setFont(AppFont);
-    FpsLabel.setPosition(sf::Vector2f(5.f, 5.f));
-    FpsLabel.setCharacterSize(16u);
-    FpsLabel.setFillColor(sf::Color::Green);
+    FPSLabel.setFont(AppFont);
+    FPSLabel.setPosition(sf::Vector2f(5.f, 5.f));
+    FPSLabel.setCharacterSize(16u);
+    FPSLabel.setFillColor(sf::Color::Green);
 }
 
 Game::~Game()
@@ -60,16 +59,9 @@ void Game::Run()
     // UpdateLoop();
 }
 
-void Game::End()
+void Game::RequestEnd()
 {
     bIsRunning = false;
-
-    if (RenderThread.joinable())
-    {
-        RenderThread.join();
-    }
-
-    Window->close();
 }
 
 void Game::InitWindow()
@@ -127,13 +119,21 @@ void Game::InitStates()
 
 void Game::Update()
 {
+    const float deltaTime = DeltaTimeClock.restart().asSeconds();
+
+    UPSCounter.Update(deltaTime);
+    UpdatesPerSecond = static_cast<int>(UPSCounter.GetFPS());
+
+    // TEMP(siqek): TODO(siqek): construct string in render loop after updating FPS counter
+    FPSLabel.setString(std::to_string(UpdatesPerSecond) + " UPS");
+
+
     // TODO(siqek):
-    UpdateDeltaTime(); // do i need delta time as a member?
+
     // Window->pollEvent should be called only on main thread so:
     // create temp queue (add events to it from main thread)
     // read the queue from simulation thread
     UpdateSFMLEvent();
-    UpdateFPS(); // dont update fps based on simulation
 
     if (StateStack.IsEmpty())
     {
@@ -141,7 +141,7 @@ void Game::Update()
         return;
     }
 
-    StateStack.UpdateStates(DeltaTime);
+    StateStack.UpdateStates(deltaTime);
 
     StateStack.FlushPendingAttachments();
 }
@@ -163,7 +163,7 @@ void Game::Render()
         StateStack.RenderStates(*Window); // Current way of rendering
     }
 
-    Window->draw(FpsLabel);
+    Window->draw(FPSLabel);
 
     Window->display();
 }
@@ -192,7 +192,7 @@ void Game::UpdateLoop()
 
             bIsNewSnapshotAvailable = true;
         }
-        CV.notify_one();
+        NewSnapshotCV.notify_one();
     }
 }
 
@@ -205,7 +205,7 @@ void Game::RenderLoop()
 
             if (!bIsNewSnapshotAvailable)
             {
-                CV.wait(lock, [this]{ return bIsNewSnapshotAvailable; });
+                NewSnapshotCV.wait(lock, [this]{ return bIsNewSnapshotAvailable; });
             }
 
             std::swap(ReadSnapshot, BuiltSnapshot);
@@ -228,15 +228,16 @@ void Game::BuildSnapshot(RenderSnapshot &snapshot)
     (void)snapshot; // ignore *unused args*
 }
 
-void Game::UpdateFPS()
+void Game::End()
 {
-    FpsCounter.update(DeltaTime);
-    FpsLabel.setString(std::to_string(FpsCounter.getFPS()) + " fps");
-}
+    bIsRunning = false;
 
-void Game::UpdateDeltaTime()
-{
-    DeltaTime = DeltaTimeClock.restart().asSeconds();
+    if (RenderThread.joinable())
+    {
+        RenderThread.join();
+    }
+
+    Window->close();
 }
 
 void Game::UpdateSFMLEvent()

@@ -9,7 +9,7 @@
 
 #include "render/RenderSnapshot.hpp"
 
-#include "utils/FPSCounter.hpp"
+#include "utils/FrameCounter.hpp"
 
 class Game
 {
@@ -18,7 +18,8 @@ public:
     ~Game();
 
     void Run();
-    void End();
+
+    void RequestEnd();
 
 private:
     void InitWindow();
@@ -33,16 +34,16 @@ private:
 
     void BuildSnapshot(RenderSnapshot& snapshot);
 
-    void UpdateDeltaTime();
+    void End();
+
     void UpdateSFMLEvent();
-    void UpdateFPS();
 
     void SetMinimumWindowSize(sf::Vector2i minimumSize);
 
     void SetMinimumWindowSize_Linux(sf::Vector2i minimumSize);
     void SetMinimumWindowSize_Windows(sf::Vector2i minimumSize);
 
-    std::atomic<bool> bIsRunning;
+    std::atomic<bool> bIsRunning{false};
 
     std::thread RenderThread;
 
@@ -50,10 +51,14 @@ private:
     std::deque<sf::Event> EventQueue;
 
     sf::Clock DeltaTimeClock;
-    float DeltaTime;
+    sf::Clock RenderTimeClock;
 
-    FPSCounter FpsCounter;
-    sf::Text FpsLabel;
+    FrameCounter FPSCounter; // Frames Per Second (Render)
+    FrameCounter UPSCounter; // Updates Per Second (Simulation)
+
+    std::atomic<int> UpdatesPerSecond{0};
+
+    sf::Text FPSLabel;
 
     sf::Font AppFont; // is it thread-safe?
 
@@ -71,9 +76,9 @@ private:
     RenderSnapshot* BuiltSnapshot; // shared resource - lock SnapshotMutex to use it safely
 
     std::mutex SnapshotMutex;
-    std::condition_variable CV;
+    std::condition_variable NewSnapshotCV;
 
-    bool bIsNewSnapshotAvailable; // shared resource - lock SnapshotMutex to use it safely
+    bool bIsNewSnapshotAvailable{false}; // shared resource - lock SnapshotMutex to use it safely
 };
 
 #endif
