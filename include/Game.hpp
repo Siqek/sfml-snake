@@ -32,7 +32,7 @@ private:
     void UpdateLoop();
     void RenderLoop();
 
-    void BuildSnapshot(RenderSnapshot& snapshot);
+    void BuildSnapshot();
 
     void End();
 

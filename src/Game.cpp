@@ -46,17 +46,12 @@ void Game::Run()
 {
     bIsRunning = true;
 
-    while (bIsRunning)
-    {
-        Update();
-        Render();
-    }
+    Window->setActive(false);
+    RenderThread = std::thread(&Game::RenderLoop, this);
 
-    // TODO(siqek): finish multithreading
+    UpdateLoop();
 
-    // RenderThread = std::thread(&Game::RenderLoop, this);
-
-    // UpdateLoop();
+    End();
 }
 
 void Game::RequestEnd()
@@ -124,20 +119,11 @@ void Game::Update()
     UPSCounter.Update(deltaTime);
     UpdatesPerSecond = static_cast<int>(UPSCounter.GetFPS());
 
-    // TEMP(siqek): TODO(siqek): construct string in render loop after updating FPS counter
-    FPSLabel.setString(std::to_string(UpdatesPerSecond) + " UPS");
-
-
-    // TODO(siqek):
-
-    // Window->pollEvent should be called only on main thread so:
-    // create temp queue (add events to it from main thread)
-    // read the queue from simulation thread
     UpdateSFMLEvent();
 
     if (StateStack.IsEmpty())
     {
-        End();
+        RequestEnd();
         return;
     }
 
@@ -148,20 +134,15 @@ void Game::Update()
 
 void Game::Render()
 {
+    const float renderTime = RenderTimeClock.restart().asSeconds();
+    FPSCounter.Update(renderTime);
+
     Window->clear(sf::Color(Colors::Hex::Background));
 
+    ReadSnapshot->Render(*Window);
 
-    {
-        // TEMP(siqek): TODO(siqek): building and rendering snapshot test
-
-        // New way of rendering
-        // static RenderSnapshot snapshot(AppFont);
-        // snapshot.Clear();
-        // StateStack.BuildSnapshot(snapshot);
-        // snapshot.Render(*Window);
-
-        StateStack.RenderStates(*Window); // Current way of rendering
-    }
+    const int framesPerSecond =  static_cast<int>(FPSCounter.GetFPS());
+    FPSLabel.setString(std::to_string(framesPerSecond) + " FPS | " + std::to_string(UpdatesPerSecond) + " UPS");
 
     Window->draw(FPSLabel);
 
@@ -170,20 +151,12 @@ void Game::Render()
 
 void Game::UpdateLoop()
 {
-    // before multithreading, there are few conditions to achieve:
-
-    // TODO(siqek):
-    // disallow touching the window in simulation
-
-    // TODO(siqek):
-    // update GUI elements (buttons, etc.) based on events
-    // don't pass *Window in update methods
     while (bIsRunning)
     {
         Update();
 
         WriteSnapshot->Clear();
-        BuildSnapshot(*WriteSnapshot);
+        BuildSnapshot();
 
         {
             std::lock_guard<std::mutex> lock(SnapshotMutex);
@@ -198,6 +171,8 @@ void Game::UpdateLoop()
 
 void Game::RenderLoop()
 {
+    Window->setActive(true);
+
     while (bIsRunning)
     {
         {
@@ -213,19 +188,13 @@ void Game::RenderLoop()
             bIsNewSnapshotAvailable = false;
         }
 
-        // TODO(siqek):
-        // draw everything on sf::RenderTexture and then draw on window?
-        // ReadSnapshot->Render(render_target);
-
-        // Window->draw(render_target);
+        Render();
     }
 }
 
-void Game::BuildSnapshot(RenderSnapshot &snapshot)
+void Game::BuildSnapshot()
 {
-    // TODO(siqek): finish it
-
-    (void)snapshot; // ignore *unused args*
+    StateStack.BuildSnapshot(*WriteSnapshot);
 }
 
 void Game::End()
@@ -248,7 +217,7 @@ void Game::UpdateSFMLEvent()
         switch (event.type)
         {
             case sf::Event::Closed:
-                End();
+                RequestEnd();
                 break;
 
             case sf::Event::Resized:
