@@ -124,12 +124,12 @@ void GameState::BuildSnapshot(RenderSnapshot& snapshot)
         context.Drawables.emplace_back(Tile);
     }
 
-    PlayerSnakeRenderer.FillContext(context, *PlayerSnake, GridOffset);
-
     if (!PlayerSnake->HasFilledGrid())
     {
         Apples.FillContext(context, GridOffset);
     }
+
+    PlayerSnakeRenderer.FillContext(context, *PlayerSnake, GridOffset);
 
     context.Drawables.emplace_back(ScoreText);
 

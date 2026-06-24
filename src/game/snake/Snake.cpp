@@ -18,6 +18,20 @@ SnakeBase::SnakeBase(float speedTilesPerSec, unsigned length, std::shared_ptr<IG
 
 void SnakeBase::ChangeDirection(EMoveDirection direction)
 {
+    // TODO(siqek): snake animation require new system of changing direction
+    //              maybe add another direction variable:
+    //                  - prev: previous direction - obvious
+    //                  - current: immutable* - this function wouldn't be allowed to change that
+    //                  - next: request would be applied to this variable instead of 'current'
+    //                  - next after next: would work as 'next' now
+
+    // if (direction == OppositeDirectionTo(CurrentDirection))
+    // {
+    //     return;
+    // }
+
+    // NextDirection = direction;
+
     const bool isDirectionUnchanged = PrevDirection == CurrentDirection;
 
     const EMoveDirection referenceDirection = isDirectionUnchanged ? PrevDirection : CurrentDirection;
@@ -50,7 +64,7 @@ void SnakeBase::Update(float dt)
 
     TilesTraveled += SpeedTilesPerSec * dt;
 
-    while (TilesTraveled > 1.f)
+    while (TilesTraveled >= 1.f)
     {
         Move();
         TilesTraveled -= 1.f;

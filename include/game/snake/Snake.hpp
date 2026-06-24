@@ -3,13 +3,7 @@
 
 class IGrid;
 
-enum class EMoveDirection
-{
-    Right,
-    Left,
-    Up,
-    Down
-};
+#include "game/snake/MoveDirection.hpp"
 
 class ISnake
 {
@@ -26,6 +20,10 @@ public:
 
     virtual const std::deque<sf::Vector2i>& GetBody() const = 0;
 
+    virtual float GetTilesTraveled() const = 0;
+
+    virtual EMoveDirection GetDirection() const = 0;
+
     virtual void ChangeDirection(EMoveDirection direction) = 0;
 
     virtual void Grow(unsigned lengthToGrow) = 0;
@@ -40,6 +38,10 @@ public:
     virtual ~SnakeBase() override = default;
 
     bool IsAlive() const override { return bIsAlive; }
+
+    float GetTilesTraveled() const override { return TilesTraveled; }
+
+    EMoveDirection GetDirection() const override { return CurrentDirection; }
 
     void ChangeDirection(EMoveDirection direction) override;
 

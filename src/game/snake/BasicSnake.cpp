@@ -29,15 +29,7 @@ sf::Vector2i BasicSnake::GetTailPosition() const
 
 void BasicSnake::Move()
 {
-    sf::Vector2i newHeadPos = GetHeadPosition();
-
-    switch (CurrentDirection)
-    {
-        case EMoveDirection::Right: newHeadPos.x++; break;
-        case EMoveDirection::Left:  newHeadPos.x--; break;
-        case EMoveDirection::Up:    newHeadPos.y--; break;
-        case EMoveDirection::Down:  newHeadPos.y++; break;
-    }
+    const sf::Vector2i newHeadPos = GetHeadPosition() + DirectionToVector(CurrentDirection);
 
     PrevDirection = CurrentDirection;
     CurrentDirection = NextDirection;

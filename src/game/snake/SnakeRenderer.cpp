@@ -2,6 +2,7 @@
 #include "game/snake/SnakeRenderer.hpp"
 
 #include "game/snake/Snake.hpp"
+#include "game/snake/MoveDirection.hpp"
 
 #include "config/Colors.hpp"
 
@@ -57,18 +58,12 @@ void SnakeRenderer::Render(sf::RenderTarget& target, const ISnake& snake, const 
 void SnakeRenderer::FillContext(RenderContext& context, const ISnake& snake, const sf::Vector2f& offset)
 {
     const auto& snakeBody = snake.GetBody();
-    for (size_t i = 0; i < snakeBody.size(); ++i)
+    for (size_t i = 1; i < snakeBody.size(); ++i)
     {
         const sf::Vector2f position = offset + sf::Vector2f(snakeBody[i]) * TileSize;
 
         BodySegment.setPosition(position);
         context.Drawables.emplace_back(BodySegment);
-
-        if (i == 0)
-        {
-            AddHeadBorderToContext(context, position);
-            continue;
-        }
 
         if (i == snakeBody.size() - 1)
         {
@@ -77,6 +72,22 @@ void SnakeRenderer::FillContext(RenderContext& context, const ISnake& snake, con
         }
 
         AddSegmentBorderToContext(context, position, snakeBody[i - 1], snakeBody[i], snakeBody[i + 1]);
+    }
+
+    if (snakeBody.size() > 0)
+    {
+        const sf::Vector2f position = offset + sf::Vector2f(snakeBody[0]) * TileSize;
+
+        BodySegment.setPosition(position);
+        context.Drawables.emplace_back(BodySegment);
+
+        // TODO(siqek): head animation - movement between tiles
+
+        // const sf::Vector2f moveProgress = sf::Vector2f(DirectionToVector(snake.GetDirection())) * std::min(snake.GetTilesTraveled(), 1.f) * TileSize;
+        // BodySegment.setPosition(position + moveProgress);
+        // context.Drawables.emplace_back(BodySegment);
+
+        AddHeadBorderToContext(context, position);
     }
 }
 
