@@ -30,22 +30,15 @@ sf::Vector2i BasicSnake::GetTailPosition() const
 void BasicSnake::Move()
 {
     const sf::Vector2i newHeadPos = GetHeadPosition() + DirectionToVector(CurrentDirection);
+    const sf::Vector2i nextNewHeadPos = newHeadPos + DirectionToVector(NextDirection);
 
     PrevDirection = CurrentDirection;
     CurrentDirection = NextDirection;
+    NextDirection = NextNextDirection;
 
-    if (!Grid->IsWithinBoundaries(newHeadPos))
-    {
-        Die();
-        return;
-    }
-
-    const bool canMoveIntoVacatedTailTile = GetPendingGrowth() == 0 && IsTailCollidingAt(newHeadPos);
-    if (IsCollidingAt(newHeadPos) && !canMoveIntoVacatedTailTile)
-    {
-        Die();
-        return;
-    }
+    // TODO(siqek): TEMP(siqek):
+    // temporarily dissallow following tail
+    const bool canMoveIntoVacatedTailTile = false;// = GetPendingGrowth() == 0 && IsTailCollidingAt(newHeadPos);
 
     if (canMoveIntoVacatedTailTile)
     {
@@ -59,6 +52,17 @@ void BasicSnake::Move()
     if (!ConsumePendingGrowth())
     {
         RemoveTail();
+    }
+
+    if (!Grid->IsWithinBoundaries(nextNewHeadPos))
+    {
+        Die();
+        return;
+    }
+
+    if (IsCollidingAt(nextNewHeadPos) && !canMoveIntoVacatedTailTile)
+    {
+        Die();
     }
 }
 

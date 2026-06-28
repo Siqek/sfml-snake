@@ -58,7 +58,9 @@ void SnakeRenderer::Render(sf::RenderTarget& target, const ISnake& snake, const 
 void SnakeRenderer::FillContext(RenderContext& context, const ISnake& snake, const sf::Vector2f& offset)
 {
     const auto& snakeBody = snake.GetBody();
-    for (size_t i = 1; i < snakeBody.size(); ++i)
+    const size_t snakeSize = snakeBody.size();
+
+    for (size_t i = 1; i < snakeSize; ++i)
     {
         const sf::Vector2f position = offset + sf::Vector2f(snakeBody[i]) * TileSize;
 
@@ -74,20 +76,25 @@ void SnakeRenderer::FillContext(RenderContext& context, const ISnake& snake, con
         AddSegmentBorderToContext(context, position, snakeBody[i - 1], snakeBody[i], snakeBody[i + 1]);
     }
 
-    if (snakeBody.size() > 0)
+    if (snakeSize > 0)
     {
         const sf::Vector2f position = offset + sf::Vector2f(snakeBody[0]) * TileSize;
+        const sf::Vector2i directionOffset = DirectionToVector(snake.GetDirection());
 
-        BodySegment.setPosition(position);
+        // Render additional segment body between head and second body segment to fill the gap between them.
+        if (snakeSize > 1)
+        {
+            BodySegment.setPosition(position);
+            context.Drawables.emplace_back(BodySegment);
+
+            AddSegmentBorderToContext(context, position, snakeBody[1], snakeBody[0], snakeBody[0] + directionOffset);
+        }
+
+        const sf::Vector2f moveProgress = sf::Vector2f(directionOffset) * std::min(snake.GetTilesTraveled(), 1.f) * TileSize;
+        BodySegment.setPosition(position + moveProgress);
         context.Drawables.emplace_back(BodySegment);
 
-        // TODO(siqek): head animation - movement between tiles
-
-        // const sf::Vector2f moveProgress = sf::Vector2f(DirectionToVector(snake.GetDirection())) * std::min(snake.GetTilesTraveled(), 1.f) * TileSize;
-        // BodySegment.setPosition(position + moveProgress);
-        // context.Drawables.emplace_back(BodySegment);
-
-        AddHeadBorderToContext(context, position);
+        AddHeadBorderToContext(context, position + moveProgress);
     }
 }
 

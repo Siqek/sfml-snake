@@ -3,9 +3,6 @@
 
 SnakeBase::SnakeBase(float speedTilesPerSec, unsigned length, std::shared_ptr<IGrid> grid)
     : Grid(grid),
-      CurrentDirection(EMoveDirection::Right),
-      PrevDirection(EMoveDirection::Right),
-      NextDirection(EMoveDirection::Right),
       SpeedTilesPerSec(speedTilesPerSec),
       PendingGrowth(std::max(1u, length) - 1u),
       TilesTraveled(0.f),
@@ -18,23 +15,9 @@ SnakeBase::SnakeBase(float speedTilesPerSec, unsigned length, std::shared_ptr<IG
 
 void SnakeBase::ChangeDirection(EMoveDirection direction)
 {
-    // TODO(siqek): snake animation require new system of changing direction
-    //              maybe add another direction variable:
-    //                  - prev: previous direction - obvious
-    //                  - current: immutable* - this function wouldn't be allowed to change that
-    //                  - next: request would be applied to this variable instead of 'current'
-    //                  - next after next: would work as 'next' now
+    const bool isDirectionUnchanged = CurrentDirection == NextDirection;
 
-    // if (direction == OppositeDirectionTo(CurrentDirection))
-    // {
-    //     return;
-    // }
-
-    // NextDirection = direction;
-
-    const bool isDirectionUnchanged = PrevDirection == CurrentDirection;
-
-    const EMoveDirection referenceDirection = isDirectionUnchanged ? PrevDirection : CurrentDirection;
+    const EMoveDirection referenceDirection = isDirectionUnchanged ? CurrentDirection : NextDirection;
     const bool isTryingToSetOppositeDirection = direction == OppositeDirectionTo(referenceDirection);
 
     if (isTryingToSetOppositeDirection)
@@ -44,10 +27,10 @@ void SnakeBase::ChangeDirection(EMoveDirection direction)
 
     if (isDirectionUnchanged)
     {
-        CurrentDirection = direction;
+        NextDirection = direction;
     }
 
-    NextDirection = direction;
+    NextNextDirection = direction;
 }
 
 void SnakeBase::Grow(unsigned lengthToGrow)

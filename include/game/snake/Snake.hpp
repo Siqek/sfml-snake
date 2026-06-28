@@ -64,17 +64,18 @@ protected:
 
     std::shared_ptr<IGrid> Grid;
 
-    EMoveDirection CurrentDirection;
-    EMoveDirection PrevDirection;
-    EMoveDirection NextDirection;
+    EMoveDirection CurrentDirection  = EMoveDirection::Right;
+    EMoveDirection PrevDirection     = EMoveDirection::Right;
+    EMoveDirection NextDirection     = EMoveDirection::Right;
+    EMoveDirection NextNextDirection = EMoveDirection::Right;
 
 private:
-    float SpeedTilesPerSec;
-    unsigned PendingGrowth;
+    float SpeedTilesPerSec = 0.f;
+    unsigned PendingGrowth = 0u;
 
-    float TilesTraveled;
+    float TilesTraveled = 0.f;
 
-    bool bIsAlive;
+    bool bIsAlive = true;
 };
 
 #endif // SNAKE_HPP
