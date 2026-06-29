@@ -115,14 +115,20 @@ void GameState::BuildSnapshot(RenderSnapshot& snapshot)
 {
     RenderContext& context = snapshot.CreateContext();
 
-    for (const auto& freeTile : Grid->GetFreeTiles())
+    const auto addTileToContext = [&](const sf::Vector2i& tilePos)
     {
-        const bool isDarkTile = freeTile.x % 2 == freeTile.y % 2;
+        const bool isDarkTile = tilePos.x % 2 == tilePos.y % 2;
         Tile.setFillColor(sf::Color(isDarkTile ? Colors::Hex::BoardCellPrimary : Colors::Hex::BoardCellSecondary));
 
-        Tile.setPosition(GridOffset + sf::Vector2f(freeTile) * TileSize);
+        Tile.setPosition(GridOffset + sf::Vector2f(tilePos) * TileSize);
         context.Drawables.emplace_back(Tile);
+    };
+
+    for (const auto& freeTile : Grid->GetFreeTiles())
+    {
+        addTileToContext(freeTile);
     }
+    addTileToContext(PlayerSnake->GetTailPosition());
 
     if (!PlayerSnake->HasFilledGrid())
     {

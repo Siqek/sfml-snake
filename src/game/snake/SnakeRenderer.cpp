@@ -60,22 +60,18 @@ void SnakeRenderer::FillContext(RenderContext& context, const ISnake& snake, con
     const auto& snakeBody = snake.GetBody();
     const size_t snakeSize = snakeBody.size();
 
-    for (size_t i = 1; i < snakeSize; ++i)
+    // Body segments
+    for (size_t i = 1; i + 1 < snakeSize; ++i)
     {
         const sf::Vector2f position = offset + sf::Vector2f(snakeBody[i]) * TileSize;
 
         BodySegment.setPosition(position);
         context.Drawables.emplace_back(BodySegment);
 
-        if (i == snakeBody.size() - 1)
-        {
-            AddTailBorderToContext(context, position, snakeBody[i - 1], snakeBody[i]);
-            continue;
-        }
-
         AddSegmentBorderToContext(context, position, snakeBody[i - 1], snakeBody[i], snakeBody[i + 1]);
     }
 
+    // Head
     if (snakeSize > 0)
     {
         const sf::Vector2f position = offset + sf::Vector2f(snakeBody[0]) * TileSize;
@@ -95,6 +91,23 @@ void SnakeRenderer::FillContext(RenderContext& context, const ISnake& snake, con
         context.Drawables.emplace_back(BodySegment);
 
         AddHeadBorderToContext(context, position + moveProgress);
+    }
+
+    // Tail
+    if (snakeSize > 1)
+    {
+        // TODO(siqek):
+        // finish tail animations
+
+        const sf::Vector2f directionOffset = sf::Vector2f(snakeBody[snakeSize - 2] - snakeBody[snakeSize - 1]);
+        const sf::Vector2f moveProgress = { 0.f, 0.f }; //= directionOffset * std::min(snake.GetTilesTraveled(), 1.f) * TileSize;
+
+        const sf::Vector2f position = offset + sf::Vector2f(snakeBody[snakeSize - 1]) * TileSize + moveProgress;
+
+        BodySegment.setPosition(position);
+        context.Drawables.emplace_back(BodySegment);
+
+        AddTailBorderToContext(context, position, snakeBody[snakeSize - 2], snakeBody[snakeSize - 1]);
     }
 }
 

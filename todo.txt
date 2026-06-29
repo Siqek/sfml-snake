@@ -1,7 +1,5 @@
  - TODO(siqek): NOTE(siqek): tail animation isn't done yet
 
- - FIX(siqek): in game start (when snake's length is 1 - just a head) tiles disappear
-
  - NOTE(siqek): temporarily tail following is disallowed
 
  - NOTE(siqek): checks in BasicSnake::Move are reordered in order to validate following move instead of current
